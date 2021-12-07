@@ -87,3 +87,22 @@ export class BorshReader {
     return acc
   }
 }
+
+export class BorshStruct<T> {
+  constructor(
+    private readonly fields: BorshField<T>[],
+    private readonly construct: (args: Partial<T>) => T
+  ) {}
+
+  deserialize(buffer: Buffer, offset: number = 0): [T, number] {
+    const reader = new BorshReader(buffer, offset)
+    const args = reader.readStruct(this.fields)
+    return [this.construct(args), reader.offset]
+  }
+
+  serialize(instance: T): Buffer {
+    const writer = new BorshWriter()
+    writer.writeStruct(instance, this.fields)
+    return writer.buffer
+  }
+}
