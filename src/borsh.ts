@@ -1,5 +1,3 @@
-import BN from 'bn.js'
-
 const DEFAULT_BYTES = 1024
 
 export type Borsh<T> = {
@@ -89,10 +87,13 @@ export class BorshReader {
 }
 
 export class BorshStruct<T> {
+  readonly byteSize: number
   constructor(
     private readonly fields: BorshField<T>[],
     private readonly construct: (args: Partial<T>) => T
-  ) {}
+  ) {
+    this.byteSize = this.getByteSize()
+  }
 
   deserialize(buffer: Buffer, offset: number = 0): [T, number] {
     const reader = new BorshReader(buffer, offset)
@@ -104,5 +105,9 @@ export class BorshStruct<T> {
     const writer = new BorshWriter()
     writer.writeStruct(instance, this.fields)
     return writer.buffer
+  }
+
+  private getByteSize() {
+    return this.fields.reduce((acc, [_, borsh]) => acc + borsh.byteSize, 0)
   }
 }
