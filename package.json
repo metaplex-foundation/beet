@@ -1,0 +1,47 @@
+{
+  "name": "@metaplex-foundation/borsh",
+  "version": "0.0.0",
+  "description": "Borsh compatible De/Serializer",
+  "main": "dist/src/bors.js",
+  "types": "dist/src/borsh.d.ts",
+  "scripts": {
+    "check:publish-ready": "yarn build && yarn test",
+    "preversion": "yarn check:publish-ready",
+    "postversion": "git add package.json && git commit -m \"chore: update to v$npm_package_version\" && git tag $npm_package_version",
+    "prepublish": "yarn check:publish-ready",
+    "postpublish": "git push origin && git push origin --tags",
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "test": "tape dist/test/*.test.js",
+    "lint": "prettier -c ./src/",
+    "lint:fix": "prettier --format ./src",
+    "doc": "typedoc src/*.ts --readme README.md"
+  },
+  "repository": "git@github.com:metaplex-foundation/borsh.git",
+  "author": "Thorsten Lorenz <thlorenz@gmx.de>",
+  "license": "MIT",
+  "private": false,
+  "directories": {
+    "dist": "./dist/src"
+  },
+  "files": [
+    "dist/src/*"
+  ],
+  "dependencies": {
+    "bn.js": "^5.2.0",
+    "bs58": "^4.0.1",
+    "debug": "^4.3.3",
+    "text-encoding-utf-8": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/debug": "^4.1.7",
+    "@types/node": "^14.18.0",
+    "@types/tape": "^4.13.2",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "supports-color": "^8.1.1",
+    "tape": "^5.3.2",
+    "typedoc": "^0.22.10",
+    "typescript": "^4.5.2"
+  }
+}
