@@ -3,6 +3,9 @@ import test from 'tape'
 import {
   bignum,
   Borsh,
+  i16,
+  i32,
+  i8,
   u128,
   u16,
   u256,
@@ -151,6 +154,36 @@ test('numbers: round trip u512', (t) => {
   ]
   const offsets = [0, u512.byteSize, 2 * u512.byteSize]
   const borsh = u512
+
+  checkCases(offsets, cases, borsh, t)
+  t.end()
+})
+
+// -----------------
+// Signed Ints
+// -----------------
+test('numbers: round trip i8', (t) => {
+  const borsh = i8
+  const cases = [0, 1, -1, 100, -100, 0x7f, -0x80]
+  const offsets = [0, borsh.byteSize, 2 * borsh.byteSize]
+
+  checkCases(offsets, cases, borsh, t)
+  t.end()
+})
+
+test('numbers: round trip i16', (t) => {
+  const borsh = i16
+  const cases = [0, 1, -1, 0x7f, -0x80, 0x7fff, -0x8000]
+  const offsets = [0, borsh.byteSize, 2 * borsh.byteSize]
+
+  checkCases(offsets, cases, borsh, t)
+  t.end()
+})
+
+test('numbers: round trip i32', (t) => {
+  const borsh = i32
+  const cases = [0, 1, -1, 0x7f, -0x80, 0x7fff, -0x8000, 0x7fffff, -0x800000]
+  const offsets = [0, borsh.byteSize, 2 * borsh.byteSize]
 
   checkCases(offsets, cases, borsh, t)
   t.end()
