@@ -97,7 +97,7 @@ export class BorshStruct<T> implements Borsh<T> {
   serialize(instance: T): Buffer {
     const writer = new BorshWriter()
     writer.writeStruct(instance, this.fields)
-    return writer.buffer
+    return writer.buffer.slice(0, this.byteSize)
   }
 
   private getByteSize() {
