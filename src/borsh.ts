@@ -1,5 +1,6 @@
 import { Borsh, BorshField } from './types'
 
+export * from './collections'
 export * from './numbers'
 export * from './types'
 

@@ -19,15 +19,20 @@ class GameScore {
       ['losses', i32],
     ],
     (args) =>
-      new GameScore(args.win, args.totalWin, args.whaleAccount, args.losses),
+      new GameScore(
+        args.win!,
+        args.totalWin!,
+        args.whaleAccount!,
+        args.losses!
+      ),
     'GameStruct'
   )
 }
 
 function eqBN(x: BN): Specifications<BN> {
   const check = (y: BN) => y.eq(x)
-  check.$spec = 'sameBN(' + x + ')'
-  check.$description = 'BN is same as ' + x
+  check.$spec = 'eqBN(' + x + ')'
+  check.$description = 'BN is equal to ' + x
   return check
 }
 
