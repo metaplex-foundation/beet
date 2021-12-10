@@ -38,8 +38,8 @@ function checkCases(
       {
         // Larger buffer
         const buf = Buffer.alloc(offset + borsh.byteSize + offset)
-        borsh.write(buf, 0, x)
-        const n = borsh.read(buf, 0)
+        borsh.write(buf, offset, x)
+        const n = borsh.read(buf, offset)
         const [a, b] = oneType(x, n)
         t.equal(
           a.toString(),
@@ -50,8 +50,8 @@ function checkCases(
       {
         // Exact buffer
         const buf = Buffer.alloc(offset + borsh.byteSize)
-        borsh.write(buf, 0, x)
-        const n = borsh.read(buf, 0)
+        borsh.write(buf, offset, x)
+        const n = borsh.read(buf, offset)
         const [a, b] = oneType(x, n)
         t.equal(
           a.toString(),
