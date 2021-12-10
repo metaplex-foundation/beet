@@ -1,0 +1,11 @@
+providers:
+  - airtap-system
+
+browsers:
+  - name: chrome
+    options:
+      headless: true
+    provider: airtap-system
+
+browserify:
+  - plugin: tsify
