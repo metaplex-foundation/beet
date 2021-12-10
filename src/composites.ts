@@ -1,12 +1,12 @@
 import { strict as assert } from 'assert'
-import { Borsh } from './types'
+import { Beet } from './types'
 
 export type COption<T> = T | null
 
 const SOME = Buffer.from(Uint8Array.from([1, 0, 0, 0])).slice(0, 4)
 const NONE = Buffer.from(Uint8Array.from([0, 0, 0, 0])).slice(0, 4)
 
-export function coption<T>(inner: Borsh<T>): Borsh<COption<T>> {
+export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
       if (value == null) {

@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import test from 'tape'
 import spok, { Specifications } from 'spok'
-import { BorshStruct, i32, u128, u16, u8 } from '../src/borsh'
+import { BeetStruct, i32, u128, u16, u8 } from '../src/beet'
 
 class GameScore {
   constructor(
@@ -11,7 +11,7 @@ class GameScore {
     readonly losses: number
   ) {}
 
-  static readonly struct = new BorshStruct<GameScore>(
+  static readonly struct = new BeetStruct<GameScore>(
     [
       ['win', u8],
       ['totalWin', u16],
