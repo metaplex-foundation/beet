@@ -6,7 +6,7 @@ export const fixedSizeUtf8String: (
 ) => Borsh<string> = (stringByteLength: number) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
-      const stringBuf = Buffer.from(value)
+      const stringBuf = Buffer.from(value, 'utf8')
       assert.equal(
         stringBuf.byteLength,
         stringByteLength,
@@ -18,7 +18,7 @@ export const fixedSizeUtf8String: (
 
     read: function (buf: Buffer, offset: number): string {
       const sizeSlice = buf.slice(offset, offset + 4)
-      const containedSize = sizeSlice.readUInt32LE(offset)
+      const containedSize = sizeSlice.readUInt32LE(0)
       assert.equal(
         containedSize,
         stringByteLength,
@@ -28,6 +28,6 @@ export const fixedSizeUtf8String: (
       return stringSlice.toString('utf8')
     },
     byteSize: 4 + stringByteLength,
-    description: 'primitive: sized utf8 string',
+    description: 'primitive: fixed size utf8 string',
   }
 }
