@@ -1,4 +1,4 @@
-import { Borsh, BorshField } from './types'
+import { Beet, BeetField } from './types'
 
 export * from './collections'
 export * from './composites'
@@ -10,7 +10,7 @@ const DEFAULT_BYTES = 1024
 // -----------------
 // Writer
 // -----------------
-export class BorshWriter {
+export class BeetWriter {
   private buf: Buffer
   private _offset: number
   constructor(private readonly allocateBytes = DEFAULT_BYTES) {
@@ -32,16 +32,16 @@ export class BorshWriter {
     }
   }
 
-  write<T>(borsh: Borsh<T>, value: T) {
-    this.maybeResize(borsh.byteSize)
-    borsh.write(this.buf, this._offset, value)
-    this._offset += borsh.byteSize
+  write<T>(beet: Beet<T>, value: T) {
+    this.maybeResize(beet.byteSize)
+    beet.write(this.buf, this._offset, value)
+    this._offset += beet.byteSize
   }
 
-  writeStruct<T>(instance: T, fields: BorshField<T>[]) {
-    for (const [key, borsh] of fields) {
+  writeStruct<T>(instance: T, fields: BeetField<T>[]) {
+    for (const [key, beet] of fields) {
       const value = instance[key]
-      this.write(borsh, value)
+      this.write(beet, value)
     }
   }
 }
@@ -49,34 +49,34 @@ export class BorshWriter {
 // -----------------
 // Reader
 // -----------------
-export class BorshReader {
+export class BeetReader {
   constructor(private readonly buffer: Buffer, private _offset: number = 0) {}
 
   get offset() {
     return this._offset
   }
 
-  read<T>(borsh: Borsh<T>): T {
-    const value = borsh.read(this.buffer, this._offset)
-    this._offset += borsh.byteSize
+  read<T>(beet: Beet<T>): T {
+    const value = beet.read(this.buffer, this._offset)
+    this._offset += beet.byteSize
     return value
   }
 
-  readStruct<T>(fields: BorshField<T>[]) {
+  readStruct<T>(fields: BeetField<T>[]) {
     const acc: Partial<T> = {}
-    for (const [key, borsh] of fields) {
-      acc[key] = this.read(borsh)
+    for (const [key, beet] of fields) {
+      acc[key] = this.read(beet)
     }
     return acc
   }
 }
 
-export class BorshStruct<T> implements Borsh<T> {
+export class BeetStruct<T> implements Beet<T> {
   readonly byteSize: number
   constructor(
-    private readonly fields: BorshField<T>[],
+    private readonly fields: BeetField<T>[],
     private readonly construct: (args: Partial<T>) => T,
-    readonly description = BorshStruct.description
+    readonly description = BeetStruct.description
   ) {
     this.byteSize = this.getByteSize()
   }
@@ -91,20 +91,20 @@ export class BorshStruct<T> implements Borsh<T> {
   }
 
   deserialize(buffer: Buffer, offset: number = 0): [T, number] {
-    const reader = new BorshReader(buffer, offset)
+    const reader = new BeetReader(buffer, offset)
     const args = reader.readStruct(this.fields)
     return [this.construct(args), reader.offset]
   }
 
   serialize(instance: T): Buffer {
-    const writer = new BorshWriter()
+    const writer = new BeetWriter()
     writer.writeStruct(instance, this.fields)
     return writer.buffer.slice(0, this.byteSize)
   }
 
   private getByteSize() {
-    return this.fields.reduce((acc, [_, borsh]) => acc + borsh.byteSize, 0)
+    return this.fields.reduce((acc, [_, beet]) => acc + beet.byteSize, 0)
   }
 
-  static description = 'BorshStruct'
+  static description = 'BeetStruct'
 }

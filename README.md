@@ -1,3 +1,3 @@
-# @metaplex-foundation/borsh
+# @metaplex-foundation/beet
 
-Borsh compatible De/Serializer
+Strict borsh compatible de/serializer.

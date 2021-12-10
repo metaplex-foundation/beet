@@ -1,9 +1,9 @@
-import { Borsh } from './types'
+import { Beet } from './types'
 import { strict as assert } from 'assert'
 
-export const fixedSizeUtf8String: (
+export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
   stringByteLength: number
-) => Borsh<string> = (stringByteLength: number) => {
+) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
       const stringBuf = Buffer.from(value, 'utf8')
