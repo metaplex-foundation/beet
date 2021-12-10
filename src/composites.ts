@@ -21,17 +21,11 @@ export function coption<T>(inner: Borsh<T>): Borsh<COption<T>> {
     },
 
     read: function (buf: Buffer, offset: number): COption<T> {
-      if (
-        buf
-          .slice(0, 4)
-          .compare(NONE, offset, offset + 4, offset, offset + 4) === 0
-      ) {
+      if (buf.compare(NONE, 0, 4, offset, offset + 4) === 0) {
         return null
       }
       assert(
-        buf
-          .slice(0, 4)
-          .compare(SOME, offset, offset + 4, offset, offset + 4) === 0,
+        buf.compare(SOME, 0, 4, offset, offset + 4) === 0,
         'should be valid COption buffer'
       )
       return inner.read(buf, offset + 4)
