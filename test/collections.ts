@@ -12,15 +12,15 @@ function checkCases(
       {
         // Larger buffer
         const buf = Buffer.alloc(offset + borsh.byteSize + offset)
-        borsh.write(buf, 0, x)
-        const y = borsh.read(buf, 0)
+        borsh.write(buf, offset, x)
+        const y = borsh.read(buf, offset)
         t.equal(x, y, `round trip ${x}, offset ${offset} larger buffer`)
       }
       {
         // Exact buffer
         const buf = Buffer.alloc(offset + borsh.byteSize)
-        borsh.write(buf, 0, x)
-        const y = borsh.read(buf, 0)
+        borsh.write(buf, offset, x)
+        const y = borsh.read(buf, offset)
         t.equal(x, y, `round trip ${x}, offset ${offset} exact buffer`)
       }
     }
