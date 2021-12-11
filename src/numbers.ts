@@ -94,3 +94,18 @@ export const i32: Beet<number> = {
   byteSize: 4,
   description: 'primitive: i32',
 }
+
+// -----------------
+// Boolean
+// -----------------
+export const bool: Beet<boolean> = {
+  write: function (buf: Buffer, offset: number, value: boolean): void {
+    const n = value ? 1 : 0
+    u8.write(buf, offset, n)
+  },
+  read: function (buf: Buffer, offset: number): boolean {
+    return u8.read(buf, offset) === 1
+  },
+  byteSize: 1,
+  description: 'primitive: bool',
+}

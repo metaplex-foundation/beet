@@ -13,6 +13,7 @@ import {
   u512,
   u64,
   u8,
+  bool,
 } from '../src/beet'
 
 function oneType(
@@ -186,5 +187,35 @@ test('numbers: round trip i32', (t) => {
   const offsets = [0, beet.byteSize, 2 * beet.byteSize]
 
   checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+// -----------------
+// Boolean
+// -----------------
+test('numbers: round trip bool', (t) => {
+  const beet = bool
+  const cases = [true, false]
+  const offsets = [0, beet.byteSize]
+
+  for (const offset of offsets) {
+    for (const x of cases) {
+      {
+        // Larger buffer
+        const buf = Buffer.alloc(offset + beet.byteSize + offset)
+        beet.write(buf, offset, x)
+        const y = beet.read(buf, offset)
+        t.equal(y, x, `round trip ${x}, offset ${offset} larger buffer`)
+      }
+      {
+        // Exact buffer
+        const buf = Buffer.alloc(offset + beet.byteSize)
+        beet.write(buf, offset, x)
+        const y = beet.read(buf, offset)
+        t.equal(y, x, `round trip ${x}, offset ${offset} larger buffer`)
+      }
+    }
+  }
+
   t.end()
 })
