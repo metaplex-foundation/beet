@@ -71,32 +71,32 @@ export class BeetReader {
   }
 }
 
-export class BeetStruct<T> implements Beet<T> {
+export class BeetStruct<Class, Args = Class> implements Beet<Class> {
   readonly byteSize: number
   constructor(
-    private readonly fields: BeetField<T>[],
-    private readonly construct: (args: Partial<T>) => T,
+    private readonly fields: BeetField<Args>[],
+    private readonly construct: (args: Partial<Args>) => Class,
     readonly description = BeetStruct.description
   ) {
     this.byteSize = this.getByteSize()
   }
 
   // TODO: support nested structs by implementing these methods
-  read(_buf: Buffer, _offset: number): T {
+  read(_buf: Buffer, _offset: number): Class {
     throw new Error('Method not implemented.')
   }
 
-  write(_buf: Buffer, _offset: number, _value: T): void {
+  write(_buf: Buffer, _offset: number, _value: Class): void {
     throw new Error('Method not implemented.')
   }
 
-  deserialize(buffer: Buffer, offset: number = 0): [T, number] {
+  deserialize(buffer: Buffer, offset: number = 0): [Class, number] {
     const reader = new BeetReader(buffer, offset)
     const args = reader.readStruct(this.fields)
     return [this.construct(args), reader.offset]
   }
 
-  serialize(instance: T): Buffer {
+  serialize(instance: Args): Buffer {
     const writer = new BeetWriter()
     writer.writeStruct(instance, this.fields)
     return writer.buffer.slice(0, this.byteSize)
