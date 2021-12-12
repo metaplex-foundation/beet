@@ -1,6 +1,10 @@
 import { Beet, BeetField } from './types'
 import { logDebug, logTrace } from './utils'
 import { strict as assert } from 'assert'
+import colors from 'ansicolors'
+import prettyBytes from 'pretty-bytes'
+
+const { brightBlack } = colors
 
 export * from './collections'
 export * from './composites'
@@ -76,6 +80,9 @@ export class BeetReader {
   }
 }
 
+function bytes(val: { byteSize: number }) {
+  return brightBlack(prettyBytes(val.byteSize))
+}
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
@@ -83,13 +90,16 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     private readonly construct: (args: Args) => Class,
     readonly description = BeetStruct.description
   ) {
+    this.byteSize = this.getByteSize()
     if (logDebug.enabled) {
       const flds = fields
-        .map(([key, val]: BeetField<Args>) => `${key}: ${val.description}`)
-        .join(',\n  ')
-      logDebug(`struct ${description} {\n  ${flds}\n}`)
+        .map(
+          ([key, val]: BeetField<Args>) =>
+            `${key}: ${val.description} ${bytes(val)}`
+        )
+        .join('\n  ')
+      logDebug(`struct ${description} {\n  ${flds}\n} ${bytes(this)}`)
     }
-    this.byteSize = this.getByteSize()
   }
 
   // TODO: support nested structs by implementing these methods
