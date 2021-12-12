@@ -1,11 +1,11 @@
 import { Beet, BeetField } from './types'
+import { logDebug, logTrace } from './utils'
+import { strict as assert } from 'assert'
 
 export * from './collections'
 export * from './composites'
 export * from './numbers'
 export * from './types'
-
-const DEFAULT_BYTES = 1024
 
 // -----------------
 // Writer
@@ -13,8 +13,8 @@ const DEFAULT_BYTES = 1024
 export class BeetWriter {
   private buf: Buffer
   private _offset: number
-  constructor(private readonly allocateBytes = DEFAULT_BYTES) {
-    this.buf = Buffer.alloc(allocateBytes)
+  constructor(byteSize: number) {
+    this.buf = Buffer.alloc(byteSize)
     this._offset = 0
   }
 
@@ -28,7 +28,12 @@ export class BeetWriter {
 
   private maybeResize(bytesNeeded: number) {
     if (this._offset + bytesNeeded > this.buf.length) {
-      this.buf = Buffer.concat([this.buf, Buffer.alloc(this.allocateBytes)])
+      assert.fail(
+        `We shouldn't ever need to resize, but ${
+          this._offset + bytesNeeded
+        } > ${this.buf.length}`
+      )
+      // this.buf = Buffer.concat([this.buf, Buffer.alloc(this.allocateBytes)])
     }
   }
 
@@ -63,7 +68,7 @@ export class BeetReader {
   }
 
   readStruct<T>(fields: BeetField<T>[]) {
-    const acc: Partial<T> = {}
+    const acc: T = <T>{}
     for (const [key, beet] of fields) {
       acc[key] = this.read(beet)
     }
@@ -71,13 +76,19 @@ export class BeetReader {
   }
 }
 
-export class BeetStruct<Class, Args = Class> implements Beet<Class> {
+export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
     private readonly fields: BeetField<Args>[],
-    private readonly construct: (args: Partial<Args>) => Class,
+    private readonly construct: (args: Args) => Class,
     readonly description = BeetStruct.description
   ) {
+    if (logDebug.enabled) {
+      const flds = fields
+        .map(([key, val]: BeetField<Args>) => `${key}: ${val.description}`)
+        .join(',\n  ')
+      logDebug(`struct ${description} {\n  ${flds}\n}`)
+    }
     this.byteSize = this.getByteSize()
   }
 
@@ -91,13 +102,28 @@ export class BeetStruct<Class, Args = Class> implements Beet<Class> {
   }
 
   deserialize(buffer: Buffer, offset: number = 0): [Class, number] {
+    if (logTrace.enabled) {
+      logTrace(
+        'deserializing [%s] from %d bytes buffer',
+        this.description,
+        buffer.byteLength
+      )
+      logTrace(buffer)
+      logTrace(buffer.toJSON().data)
+    }
     const reader = new BeetReader(buffer, offset)
     const args = reader.readStruct(this.fields)
     return [this.construct(args), reader.offset]
   }
 
   serialize(instance: Args): Buffer {
-    const writer = new BeetWriter()
+    logTrace(
+      'serializing [%s] %o to %d bytes buffer',
+      this.description,
+      instance,
+      this.byteSize
+    )
+    const writer = new BeetWriter(this.byteSize)
     writer.writeStruct(instance, this.fields)
     return writer.buffer.slice(0, this.byteSize)
   }
