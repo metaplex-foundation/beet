@@ -73,13 +73,14 @@ export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
 }
 
 export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
+  const arrayBufferBeet = fixedSizeBuffer(len)
   return {
     write: function (buf: Buffer, offset: number, value: Uint8Array): void {
       const valueBuf = Buffer.from(value)
-      fixedSizeBuffer(len).write(buf, offset, valueBuf)
+      arrayBufferBeet.write(buf, offset, valueBuf)
     },
     read: function (buf: Buffer, offset: number): Uint8Array {
-      const arrayBuffer = fixedSizeBuffer(len).read(buf, offset)
+      const arrayBuffer = arrayBufferBeet.read(buf, offset)
       return Uint8Array.from(arrayBuffer)
     },
 
