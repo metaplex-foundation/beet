@@ -58,16 +58,13 @@ export function fixedSizeArray<T>(element: Beet<T>, len: number): Beet<T[]> {
 export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
   return {
     write: function (buf: Buffer, offset: number, value: Buffer): void {
-      u32.write(buf, offset, bytes)
-      value.copy(buf, offset + 4, 0, bytes)
+      value.copy(buf, offset, 0, bytes)
     },
     read: function (buf: Buffer, offset: number): Buffer {
-      const size = u32.read(buf, offset)
-      assert.equal(size, bytes, 'invalid byte size')
-      return buf.slice(offset + 4, offset + 4 + bytes)
+      return buf.slice(offset, offset + bytes)
     },
 
-    byteSize: 4 + bytes,
+    byteSize: bytes,
     description: `Buffer(len)`,
   }
 }
@@ -84,7 +81,7 @@ export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
       return Uint8Array.from(arrayBuffer)
     },
 
-    byteSize: 4 + len,
+    byteSize: len,
     description: `Uint8Array(len)`,
   }
 }
