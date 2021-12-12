@@ -33,7 +33,19 @@ function checkCases<T>(
   }
 }
 
-test('collections: fixed size array of u8', (t) => {
+test('collections: fixed size array of u8, include size', (t) => {
+  const cases = [
+    [1, 2, 0xff],
+    [0, 1, 2],
+  ]
+  const offsets = [0, 4]
+  const beet = fixedSizeArray(u8, 3, true)
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('collections: fixed size array of u8, not including size', (t) => {
   const cases = [
     [1, 2, 0xff],
     [0, 1, 2],
@@ -45,19 +57,31 @@ test('collections: fixed size array of u8', (t) => {
   t.end()
 })
 
-test('collections: fixed size array of bool', (t) => {
+test('collections: fixed size array of bool, include size', (t) => {
   const cases = [
     [true, true, false, true],
     [false, true, false, true],
   ]
   const offsets = [0, 4]
-  const beet: Beet<boolean[]> = fixedSizeArray(bool, 4)
+  const beet: Beet<boolean[]> = fixedSizeArray(bool, 4, true)
 
   checkCases(offsets, cases, beet, t)
   t.end()
 })
 
-test('collections: fixed size array of string', (t) => {
+test('collections: fixed size array of string, include size', (t) => {
+  const cases = [
+    ['abc ', '*def', '😁'],
+    ['aaaa', 'bbbb', '*&#@'],
+  ]
+  const offsets = [0, 3]
+  const beet: Beet<string[]> = fixedSizeArray(fixedSizeUtf8String(4), 3, true)
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('collections: fixed size array of string, not including size', (t) => {
   const cases = [
     ['abc ', '*def', '😁'],
     ['aaaa', 'bbbb', '*&#@'],

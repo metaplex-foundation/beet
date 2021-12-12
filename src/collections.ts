@@ -28,7 +28,14 @@ export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
   }
 }
 
-export function fixedSizeArray<T>(element: Beet<T>, len: number): Beet<T[]> {
+export function fixedSizeArray<T>(
+  element: Beet<T>,
+  len: number,
+  lenPrefix: boolean = false
+): Beet<T[]> {
+  const arraySize = element.byteSize * len
+  const byteSize = lenPrefix ? 4 + arraySize : arraySize
+
   return {
     write: function (buf: Buffer, offset: number, value: T[]): void {
       assert.equal(
@@ -36,21 +43,28 @@ export function fixedSizeArray<T>(element: Beet<T>, len: number): Beet<T[]> {
         len,
         `array length ${value.length} should match len ${len}`
       )
-      u32.write(buf, offset, len)
+      if (lenPrefix) {
+        u32.write(buf, offset, len)
+        offset += 4
+      }
+
       for (let i = 0; i < len; i++) {
-        element.write(buf, offset + 4 + i * element.byteSize, value[i])
+        element.write(buf, offset + i * element.byteSize, value[i])
       }
     },
     read: function (buf: Buffer, offset: number): T[] {
-      const size = u32.read(buf, offset)
-      assert.equal(size, len, 'invalid byte size')
+      if (lenPrefix) {
+        const size = u32.read(buf, offset)
+        assert.equal(size, len, 'invalid byte size')
+        offset += 4
+      }
       const arr: T[] = new Array(len)
       for (let i = 0; i < len; i++) {
-        arr[i] = element.read(buf, offset + 4 + i * element.byteSize)
+        arr[i] = element.read(buf, offset + i * element.byteSize)
       }
       return arr
     },
-    byteSize: 4 + element.byteSize * len,
+    byteSize,
     description: `Array<${element.description}>(${len})`,
   }
 }
