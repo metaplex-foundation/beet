@@ -31,6 +31,6 @@ export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
       return inner.read(buf, offset + 4)
     },
     byteSize: 4 + inner.byteSize,
-    description: `option: ${inner.description}`,
+    description: `COption<${inner.description}>`,
   }
 }

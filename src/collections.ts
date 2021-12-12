@@ -24,7 +24,7 @@ export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
       return stringSlice.toString('utf8')
     },
     byteSize: 4 + stringByteLength,
-    description: 'primitive: fixed size utf8 string',
+    description: `utf8-string(${stringByteLength})`,
   }
 }
 
@@ -51,7 +51,7 @@ export function fixedSizeArray<T>(element: Beet<T>, len: number): Beet<T[]> {
       return arr
     },
     byteSize: 4 + element.byteSize * len,
-    description: `collection: Array of ${element.description}`,
+    description: `Array<${element.description}>(${len})`,
   }
 }
 
@@ -68,7 +68,7 @@ export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
     },
 
     byteSize: 4 + bytes,
-    description: 'collection: Buffer',
+    description: `Buffer(len)`,
   }
 }
 
@@ -84,6 +84,6 @@ export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
     },
 
     byteSize: 4 + len,
-    description: 'collection: Uint8Array',
+    description: `Uint8Array(len)`,
   }
 }
