@@ -1,4 +1,5 @@
 import { strict as assert } from 'assert'
+import { u8 } from './numbers'
 import { Beet } from './types'
 
 export type COption<T> = T | null
@@ -32,5 +33,25 @@ export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
     },
     byteSize: 4 + inner.byteSize,
     description: `COption<${inner.description}>`,
+  }
+}
+
+export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
+export function dataEnum<Kind, Data>(
+  inner: Beet<Data>
+): Beet<DataEnum<Kind, Data>> {
+  return {
+    write: function (buf: Buffer, offset: number, value: DataEnum<Kind, Data>) {
+      u8.write(buf, offset, value.kind)
+      inner.write(buf, offset + 1, value.data)
+    },
+
+    read: function (buf: Buffer, offset: number): DataEnum<Kind, Data> {
+      const kind = u8.read(buf, offset) as DataEnum<Kind, Data>['kind']
+      const data = inner.read(buf, offset + 1)
+      return { kind, data }
+    },
+    byteSize: 1 + inner.byteSize,
+    description: `DataEnum<${inner.description}>`,
   }
 }
