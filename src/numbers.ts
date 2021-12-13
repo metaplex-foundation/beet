@@ -12,7 +12,7 @@ export const u8: Beet<number> = {
     return buf.readUInt8(offset)
   },
   byteSize: 1,
-  description: 'primitive: u8',
+  description: 'u8',
 }
 
 export const u16: Beet<number> = {
@@ -23,7 +23,7 @@ export const u16: Beet<number> = {
     return buf.readUInt16LE(offset)
   },
   byteSize: 2,
-  description: 'primitive: u16',
+  description: 'u16',
 }
 
 export const u32: Beet<number> = {
@@ -34,7 +34,7 @@ export const u32: Beet<number> = {
     return buf.readUInt32LE(offset)
   },
   byteSize: 4,
-  description: 'primitive: u32',
+  description: 'u32',
 }
 
 function unsignedLargeBeet(byteSize: number, description: string) {
@@ -54,10 +54,10 @@ function unsignedLargeBeet(byteSize: number, description: string) {
   }
 }
 
-export const u64: Beet<bignum> = unsignedLargeBeet(8, 'primitive: u64')
-export const u128: Beet<bignum> = unsignedLargeBeet(16, 'primitive: u128')
-export const u256: Beet<bignum> = unsignedLargeBeet(32, 'primitive: u256')
-export const u512: Beet<bignum> = unsignedLargeBeet(64, 'primitive: u512')
+export const u64: Beet<bignum> = unsignedLargeBeet(8, 'u64')
+export const u128: Beet<bignum> = unsignedLargeBeet(16, 'u128')
+export const u256: Beet<bignum> = unsignedLargeBeet(32, 'u256')
+export const u512: Beet<bignum> = unsignedLargeBeet(64, 'u512')
 
 // -----------------
 // Signed
@@ -70,7 +70,7 @@ export const i8: Beet<number> = {
     return buf.readInt8(offset)
   },
   byteSize: 1,
-  description: 'primitive: i8',
+  description: 'i8',
 }
 
 export const i16: Beet<number> = {
@@ -81,7 +81,7 @@ export const i16: Beet<number> = {
     return buf.readInt16LE(offset)
   },
   byteSize: 2,
-  description: 'primitive: i16',
+  description: 'i16',
 }
 
 export const i32: Beet<number> = {
@@ -92,5 +92,20 @@ export const i32: Beet<number> = {
     return buf.readInt32LE(offset)
   },
   byteSize: 4,
-  description: 'primitive: i32',
+  description: 'i32',
+}
+
+// -----------------
+// Boolean
+// -----------------
+export const bool: Beet<boolean> = {
+  write: function (buf: Buffer, offset: number, value: boolean): void {
+    const n = value ? 1 : 0
+    u8.write(buf, offset, n)
+  },
+  read: function (buf: Buffer, offset: number): boolean {
+    return u8.read(buf, offset) === 1
+  },
+  byteSize: 1,
+  description: 'bool',
 }
