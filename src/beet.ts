@@ -83,6 +83,7 @@ export class BeetReader {
 function bytes(val: { byteSize: number }) {
   return brightBlack(prettyBytes(val.byteSize))
 }
+
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
@@ -143,4 +144,19 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   }
 
   static description = 'BeetStruct'
+}
+
+/**
+ * Convenience wrapper around {@link BeetStruct} which is used for plain JavasScript
+ * objects, like are used for option args passed to functions.
+ */
+export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
+  constructor(
+    fields: BeetField<Args>[],
+    description: string = BeetArgsStruct.description
+  ) {
+    super(fields, (args) => args, description)
+  }
+
+  static description = 'BeetArgsStruct'
 }
