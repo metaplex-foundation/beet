@@ -1,8 +1,8 @@
 import { Beet, BeetField } from './types'
-import { logDebug, logTrace } from './utils'
 import { strict as assert } from 'assert'
 import colors from 'ansicolors'
 import prettyBytes from 'pretty-bytes'
+import { logDebug, logTrace } from './utils'
 
 const { brightBlack } = colors
 
@@ -126,7 +126,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     return [this.construct(args), reader.offset]
   }
 
-  serialize(instance: Args): Buffer {
+  serialize(instance: Args): [Buffer, number] {
     logTrace(
       'serializing [%s] %o to %d bytes buffer',
       this.description,
@@ -135,7 +135,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     )
     const writer = new BeetWriter(this.byteSize)
     writer.writeStruct(instance, this.fields)
-    return writer.buffer.slice(0, this.byteSize)
+    return [writer.buffer, writer.offset]
   }
 
   private getByteSize() {
