@@ -5,14 +5,14 @@ import { logDebug, logTrace } from './utils'
 import {
   CollectionsExports,
   collectionsTypeMap,
-  CollectionsTypeMapKeys,
+  CollectionsTypeMapKey,
 } from './collections'
 import {
   CompositesExports,
   compositesTypeMap,
-  CompositesTypeMapKeys,
+  CompositesTypeMapKey,
 } from './composites'
-import { NumbersExports, numbersTypeMap, NumbersTypeMapKeys } from './numbers'
+import { NumbersExports, numbersTypeMap, NumbersTypeMapKey } from './numbers'
 
 const { brightBlack } = colors
 
@@ -21,13 +21,13 @@ export * from './composites'
 export * from './numbers'
 export * from './types'
 
-export type BeetTypeMapKeys =
-  | CollectionsTypeMapKeys
-  | CompositesTypeMapKeys
-  | NumbersTypeMapKeys
+export type BeetTypeMapKey =
+  | CollectionsTypeMapKey
+  | CompositesTypeMapKey
+  | NumbersTypeMapKey
 
 export const supportedTypeMap: Record<
-  BeetTypeMapKeys,
+  BeetTypeMapKey,
   SupportedTypeDefinition & {
     beet: CollectionsExports | CompositesExports | NumbersExports
   }

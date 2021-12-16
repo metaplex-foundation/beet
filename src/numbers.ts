@@ -111,7 +111,7 @@ export const bool: Beet<boolean> = {
 }
 
 export type NumbersExports = keyof typeof import('./numbers')
-export type NumbersTypeMapKeys =
+export type NumbersTypeMapKey =
   | 'u8'
   | 'u16'
   | 'u32'
@@ -124,21 +124,21 @@ export type NumbersTypeMapKeys =
   | 'i32'
   | 'bool'
 export type NumbersTypeMap = Record<
-  NumbersTypeMapKeys,
+  NumbersTypeMapKey,
   SupportedTypeDefinition & { beet: NumbersExports }
 >
 
 // prettier-ignore
 export const numbersTypeMap: NumbersTypeMap = {
-  u8   : { beet: 'u8',   ts: 'number' },
-  u16  : { beet: 'u16',  ts: 'number' },
-  u32  : { beet: 'u32',  ts: 'number' },
-  u64  : { beet: 'u64',  ts: 'bignum' },
-  u128 : { beet: 'u128', ts: 'bignum' },
-  u256 : { beet: 'u256', ts: 'bignum' },
-  u512 : { beet: 'u512', ts: 'bignum' },
-  i8   : { beet: 'i8',   ts: 'number' },
-  i16  : { beet: 'i16',  ts: 'number' },
-  i32  : { beet: 'i32',  ts: 'number' },
-  bool : { beet: 'bool', ts: 'number' },
+  u8   : { beet: 'u8',   ts: 'number'      },
+  u16  : { beet: 'u16',  ts: 'number'      },
+  u32  : { beet: 'u32',  ts: 'number'      },
+  u64  : { beet: 'u64',  ts: 'beet.bignum' },
+  u128 : { beet: 'u128', ts: 'beet.bignum' },
+  u256 : { beet: 'u256', ts: 'beet.bignum' },
+  u512 : { beet: 'u512', ts: 'beet.bignum' },
+  i8   : { beet: 'i8',   ts: 'number'      },
+  i16  : { beet: 'i16',  ts: 'number'      },
+  i32  : { beet: 'i32',  ts: 'number'      },
+  bool : { beet: 'bool', ts: 'boolean'      },
 }

@@ -56,9 +56,9 @@ export function dataEnum<Kind, Data>(
   }
 }
 export type CompositesExports = keyof typeof import('./composites')
-export type CompositesTypeMapKeys = 'option' | 'enum'
+export type CompositesTypeMapKey = 'option' | 'enum'
 export type CompositesTypeMap = Record<
-  CompositesTypeMapKeys,
+  CompositesTypeMapKey,
   SupportedTypeDefinition & { beet: CompositesExports }
 >
 

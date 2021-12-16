@@ -101,13 +101,9 @@ export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
 }
 
 export type CollectionsExports = keyof typeof import('./collections')
-export type CollectionsTypeMapKeys =
-  | 'string'
-  | 'Array'
-  | 'Buffer'
-  | 'Uint8Array'
+export type CollectionsTypeMapKey = 'string' | 'Array' | 'Buffer' | 'Uint8Array'
 export type CollectionsTypeMap = Record<
-  CollectionsTypeMapKeys,
+  CollectionsTypeMapKey,
   SupportedTypeDefinition & { beet: CollectionsExports }
 >
 
