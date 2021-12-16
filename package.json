@@ -1,56 +1,16 @@
 {
   "name": "@metaplex-foundation/beet",
   "version": "0.0.0",
-  "description": "Strict borsh compatible de/serializer",
-  "main": "dist/src/beet.js",
-  "types": "dist/src/beet.d.ts",
+  "description": "Strict borsh compatible de/serializer and related extensions",
   "scripts": {
-    "check:publish-ready": "yarn build && yarn test",
-    "preversion": "yarn check:publish-ready",
-    "postversion": "git add package.json && git commit -m \"chore: update to v$npm_package_version\" && git tag $npm_package_version",
-    "prepublishOnly": "yarn check:publish-ready",
-    "postpublish": "git push origin && git push origin --tags",
-    "build": "rimraf dist && tsc -p tsconfig.json",
-    "pretest": "yarn build",
-    "test": "tape dist/test/*.js",
-    "test:browser": "airtap ./test/*.ts",
-    "lint": "prettier -c ./src/",
-    "lint:fix": "prettier --format ./src",
-    "doc": "typedoc src/*.ts --readme README.md"
+    "test:beet": "cd ./beet && yarn test && yarn test:browser"
+  },
+  "workspaces": {
+    "packages": [
+      "beet"
+    ]
   },
   "repository": "git@github.com:metaplex-foundation/beet.git",
   "author": "Thorsten Lorenz <thlorenz@gmx.de>",
-  "license": "MIT",
-  "private": false,
-  "directories": {
-    "dist": "./dist/src"
-  },
-  "files": [
-    "dist/src/*"
-  ],
-  "dependencies": {
-    "ansicolors": "^0.3.2",
-    "bn.js": "^5.2.0",
-    "bs58": "^4.0.1",
-    "debug": "^4.3.3",
-    "text-encoding-utf-8": "^1.0.2"
-  },
-  "devDependencies": {
-    "@types/ansicolors": "^0.0.33",
-    "@types/bn.js": "^5.1.0",
-    "@types/debug": "^4.1.7",
-    "@types/node": "^14.18.0",
-    "@types/tape": "^4.13.2",
-    "airtap": "^4.0.4",
-    "airtap-system": "^0.1.0",
-    "browserify": "^17.0.0",
-    "prettier": "^2.5.1",
-    "rimraf": "^3.0.2",
-    "spok": "^1.4.3",
-    "supports-color": "^8.1.1",
-    "tape": "^5.3.2",
-    "tsify": "^5.0.4",
-    "typedoc": "^0.22.10",
-    "typescript": "^4.5.2"
-  }
+  "private": true
 }
