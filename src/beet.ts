@@ -1,8 +1,18 @@
-import { Beet, BeetField } from './types'
-import { logDebug, logTrace } from './utils'
+import { Beet, BeetField, SupportedTypeDefinition } from './types'
 import { strict as assert } from 'assert'
 import colors from 'ansicolors'
-import prettyBytes from 'pretty-bytes'
+import { logDebug, logTrace } from './utils'
+import {
+  CollectionsExports,
+  collectionsTypeMap,
+  CollectionsTypeMapKey,
+} from './collections'
+import {
+  CompositesExports,
+  compositesTypeMap,
+  CompositesTypeMapKey,
+} from './composites'
+import { NumbersExports, numbersTypeMap, NumbersTypeMapKey } from './numbers'
 
 const { brightBlack } = colors
 
@@ -10,6 +20,22 @@ export * from './collections'
 export * from './composites'
 export * from './numbers'
 export * from './types'
+
+export type BeetTypeMapKey =
+  | CollectionsTypeMapKey
+  | CompositesTypeMapKey
+  | NumbersTypeMapKey
+
+export const supportedTypeMap: Record<
+  BeetTypeMapKey,
+  SupportedTypeDefinition & {
+    beet: CollectionsExports | CompositesExports | NumbersExports
+  }
+> = {
+  ...collectionsTypeMap,
+  ...compositesTypeMap,
+  ...numbersTypeMap,
+}
 
 // -----------------
 // Writer
@@ -81,8 +107,9 @@ export class BeetReader {
 }
 
 function bytes(val: { byteSize: number }) {
-  return brightBlack(prettyBytes(val.byteSize))
+  return brightBlack(`${val.byteSize} B`)
 }
+
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
@@ -126,16 +153,16 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     return [this.construct(args), reader.offset]
   }
 
-  serialize(instance: Args): Buffer {
+  serialize(instance: Args, byteSize = this.byteSize): [Buffer, number] {
     logTrace(
       'serializing [%s] %o to %d bytes buffer',
       this.description,
       instance,
       this.byteSize
     )
-    const writer = new BeetWriter(this.byteSize)
+    const writer = new BeetWriter(byteSize)
     writer.writeStruct(instance, this.fields)
-    return writer.buffer.slice(0, this.byteSize)
+    return [writer.buffer, writer.offset]
   }
 
   private getByteSize() {
@@ -143,4 +170,19 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   }
 
   static description = 'BeetStruct'
+}
+
+/**
+ * Convenience wrapper around {@link BeetStruct} which is used for plain JavasScript
+ * objects, like are used for option args passed to functions.
+ */
+export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
+  constructor(
+    fields: BeetField<Args>[],
+    description: string = BeetArgsStruct.description
+  ) {
+    super(fields, (args) => args, description)
+  }
+
+  static description = 'BeetArgsStruct'
 }

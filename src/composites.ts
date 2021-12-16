@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert'
 import { u8 } from './numbers'
-import { Beet } from './types'
+import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from './types'
 
 export type COption<T> = T | null
 
@@ -54,4 +54,16 @@ export function dataEnum<Kind, Data>(
     byteSize: 1 + inner.byteSize,
     description: `DataEnum<${inner.description}>`,
   }
+}
+export type CompositesExports = keyof typeof import('./composites')
+export type CompositesTypeMapKey = 'option' | 'enum'
+export type CompositesTypeMap = Record<
+  CompositesTypeMapKey,
+  SupportedTypeDefinition & { beet: CompositesExports }
+>
+
+// prettier-ignore
+export const compositesTypeMap: CompositesTypeMap = {
+  option: { beet: 'coption',  ts: 'beet.COption<Inner>',        arg: BEET_TYPE_ARG_INNER },
+  enum:   { beet: 'dataEnum', ts: 'beet.DataEnum<Kind, Inner>', arg: BEET_TYPE_ARG_INNER }
 }

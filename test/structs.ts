@@ -56,7 +56,7 @@ test('struct: static properties', (t) => {
 })
 
 test('struct: roundtrip one numbers only struct', (t) => {
-  const buf = GameScore.struct.serialize(gs1)
+  const [buf, _] = GameScore.struct.serialize(gs1)
   const [deserialized, offset] = GameScore.struct.deserialize(buf)
   t.equal(
     offset,
@@ -73,8 +73,8 @@ test('struct: roundtrip one numbers only struct', (t) => {
 
 test('struct: roundtrip two numbers only structs', (t) => {
   const buf = Buffer.concat([
-    GameScore.struct.serialize(gs1),
-    GameScore.struct.serialize(gs2),
+    GameScore.struct.serialize(gs1)[0],
+    GameScore.struct.serialize(gs2)[0],
   ])
   const [first, firstOffset] = GameScore.struct.deserialize(buf)
   const [second, secondOffset] = GameScore.struct.deserialize(buf, firstOffset)
