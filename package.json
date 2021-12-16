@@ -7,7 +7,8 @@
   },
   "workspaces": {
     "packages": [
-      "beet"
+      "beet",
+      "beet-solana"
     ]
   },
   "repository": "git@github.com:metaplex-foundation/beet.git",
