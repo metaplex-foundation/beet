@@ -1,7 +1,6 @@
 import { Beet, BeetField } from './types'
 import { strict as assert } from 'assert'
 import colors from 'ansicolors'
-import prettyBytes from 'pretty-bytes'
 import { logDebug, logTrace } from './utils'
 
 const { brightBlack } = colors
@@ -81,7 +80,7 @@ export class BeetReader {
 }
 
 function bytes(val: { byteSize: number }) {
-  return brightBlack(prettyBytes(val.byteSize))
+  return brightBlack(`${val.byteSize} B`)
 }
 
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
