@@ -1,7 +1,18 @@
-import { Beet, BeetField } from './types'
+import { Beet, BeetField, SupportedTypeDefinition } from './types'
 import { strict as assert } from 'assert'
 import colors from 'ansicolors'
 import { logDebug, logTrace } from './utils'
+import {
+  CollectionsExports,
+  collectionsTypeMap,
+  CollectionsTypeMapKeys,
+} from './collections'
+import {
+  CompositesExports,
+  compositesTypeMap,
+  CompositesTypeMapKeys,
+} from './composites'
+import { NumbersExports, numbersTypeMap, NumbersTypeMapKeys } from './numbers'
 
 const { brightBlack } = colors
 
@@ -9,6 +20,22 @@ export * from './collections'
 export * from './composites'
 export * from './numbers'
 export * from './types'
+
+export type BeetTypeMapKeys =
+  | CollectionsTypeMapKeys
+  | CompositesTypeMapKeys
+  | NumbersTypeMapKeys
+
+export const supportedTypeMap: Record<
+  BeetTypeMapKeys,
+  SupportedTypeDefinition & {
+    beet: CollectionsExports | CompositesExports | NumbersExports
+  }
+> = {
+  ...collectionsTypeMap,
+  ...compositesTypeMap,
+  ...numbersTypeMap,
+}
 
 // -----------------
 // Writer

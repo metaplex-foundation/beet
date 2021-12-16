@@ -1,4 +1,4 @@
-import { Beet } from './types'
+import { Beet, BEET_TYPE_ARG_LEN, SupportedTypeDefinition } from './types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
 
@@ -98,4 +98,23 @@ export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
     byteSize: len,
     description: `Uint8Array(len)`,
   }
+}
+
+export type CollectionsExports = keyof typeof import('./collections')
+export type CollectionsTypeMapKeys =
+  | 'string'
+  | 'Array'
+  | 'Buffer'
+  | 'Uint8Array'
+export type CollectionsTypeMap = Record<
+  CollectionsTypeMapKeys,
+  SupportedTypeDefinition & { beet: CollectionsExports }
+>
+
+// prettier-ignore
+export const collectionsTypeMap: CollectionsTypeMap = {
+  string     : { beet: 'fixedSizeUtf8String', ts: 'string',     arg: BEET_TYPE_ARG_LEN },
+  Array      : { beet: 'fixedSizeArray',      ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
+  Buffer     : { beet: 'fixedSizeBuffer',     ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
+  Uint8Array : { beet: 'fixedSizeUint8Array', ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
 }
