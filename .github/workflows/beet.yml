@@ -33,5 +33,6 @@ jobs:
         yarn run build
         yarn run lint
         yarn run test
+        yarn run test:browser
       env:
         CI: true
