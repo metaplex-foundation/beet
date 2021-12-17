@@ -1,4 +1,4 @@
-name: Build Lint and Test Beet
+name: Build Lint and Test Beet Solana
 
 on:
   push:
@@ -21,13 +21,22 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install, build, lint and test
-      working-directory: ./beet
+
+    - name: yarn install in root
+      working-directory: ./
       run: |
         yarn install
+
+    - name: yarn build beet dependency
+      working-directory: ./beet
+      run: |
+        yarn run build
+
+    - name: yarn build, lint and test
+      working-directory: ./beet-solana
+      run: |
         yarn run build
         yarn run lint
         yarn run test
-        yarn run test:browser
       env:
         CI: true
