@@ -4,10 +4,11 @@ import { KeysExports, keysTypeMap, KeysTypeMapKey } from './keys'
 export * from './keys'
 
 export type BeetSolanaTypeMapKey = KeysTypeMapKey
+export type BeetSolanaExports = KeysExports
 
 export const supportedTypeMap: Record<
   BeetSolanaTypeMapKey,
   SupportedTypeDefinition & {
-    beet: KeysExports
+    beet: BeetSolanaExports
   }
 > = keysTypeMap

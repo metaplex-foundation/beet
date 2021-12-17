@@ -26,10 +26,15 @@ export type BeetTypeMapKey =
   | CompositesTypeMapKey
   | NumbersTypeMapKey
 
+export type BeetExports =
+  | CollectionsExports
+  | CompositesExports
+  | NumbersExports
+
 export const supportedTypeMap: Record<
   BeetTypeMapKey,
   SupportedTypeDefinition & {
-    beet: CollectionsExports | CompositesExports | NumbersExports
+    beet: BeetExports
   }
 > = {
   ...collectionsTypeMap,
