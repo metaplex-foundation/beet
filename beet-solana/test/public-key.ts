@@ -1,6 +1,6 @@
 import { Beet } from '@metaplex-foundation/beet'
 import { PublicKey, Keypair } from '@solana/web3.js'
-import { publicKey } from 'src/public-key'
+import { publicKey } from '../src/public-key'
 import test from 'tape'
 
 function checkCases(

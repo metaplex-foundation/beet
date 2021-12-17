@@ -1,0 +1,43 @@
+name: Build Lint and Test Beet Solana
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-lint-and-test-beet:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: yarn install monorepo
+      working-directory: ./
+      run: |
+        yarn install
+
+    - name: yarn build beet dependency
+      working-directory: ./beet
+      run: |
+        yarn run build
+
+    - name: yarn build, lint and test
+      working-directory: ./beet-solana
+      run: |
+        yarn run build
+        yarn run lint
+        yarn run test
+        yarn run test:browser
+      env:
+        CI: true
