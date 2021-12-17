@@ -28,7 +28,7 @@ jobs:
         yarn install
 
     - name: yarn build, lint and test
-      working-directory: ./beet-solana
+      working-directory: ./beet
       run: |
         yarn run build
         yarn run lint
