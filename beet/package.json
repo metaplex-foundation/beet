@@ -15,7 +15,7 @@
     "test": "tape dist/test/*.js",
     "test:browser": "airtap ./test/*.ts",
     "lint": "prettier -c ./src/",
-    "lint:fix": "prettier --format ./src",
+    "lint:fix": "prettier --write ./src",
     "doc": "typedoc src/*.ts --readme README.md"
   },
   "repository": "git@github.com:metaplex-foundation/beet.git",

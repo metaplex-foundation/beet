@@ -14,7 +14,7 @@
     "pretest": "yarn build",
     "test": "tape dist/test/*.js",
     "lint": "prettier -c ./src/",
-    "lint:fix": "prettier --format ./src",
+    "lint:fix": "prettier --write ./src",
     "doc": "typedoc src/*.ts --readme README.md"
   },
   "repository": "git@github.com:metaplex-foundation/beet-solana.git",
