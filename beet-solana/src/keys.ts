@@ -1,5 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
-import { Beet, fixedSizeUint8Array } from '@metaplex-foundation/beet'
+import {
+  Beet,
+  fixedSizeUint8Array,
+  SupportedTypeDefinition,
+} from '@metaplex-foundation/beet'
 
 const uint8Array32 = fixedSizeUint8Array(32)
 
@@ -15,4 +19,15 @@ export const publicKey: Beet<PublicKey> = {
 
   byteSize: uint8Array32.byteSize,
   description: 'PublicKey',
+}
+
+export type KeysExports = keyof typeof import('./keys')
+export type KeysTypeMapKey = 'publicKey'
+export type KeysTypeMap = Record<
+  KeysTypeMapKey,
+  SupportedTypeDefinition & { beet: KeysExports }
+>
+
+export const keysTypeMap: KeysTypeMap = {
+  publicKey: { beet: 'publicKey', ts: 'PublicKey' },
 }
