@@ -22,7 +22,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: yarn install monorepo
+    - name: yarn install in root
       working-directory: ./
       run: |
         yarn install
