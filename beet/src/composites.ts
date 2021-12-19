@@ -62,8 +62,10 @@ export type CompositesTypeMap = Record<
   SupportedTypeDefinition & { beet: CompositesExports }
 >
 
+const BEET_PACKAGE: string = require('../package.json').name
+
 // prettier-ignore
 export const compositesTypeMap: CompositesTypeMap = {
-  option: { beet: 'coption',  ts: 'beet.COption<Inner>',        arg: BEET_TYPE_ARG_INNER },
-  enum:   { beet: 'dataEnum', ts: 'beet.DataEnum<Kind, Inner>', arg: BEET_TYPE_ARG_INNER }
+  option: { beet: 'coption',  ts: 'COption<Inner>',        arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE },
+  enum:   { beet: 'dataEnum', ts: 'DataEnum<Kind, Inner>', arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE}
 }

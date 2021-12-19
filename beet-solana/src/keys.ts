@@ -28,6 +28,12 @@ export type KeysTypeMap = Record<
   SupportedTypeDefinition & { beet: KeysExports }
 >
 
+const BEET_SOLANA_PACKAGE: string = require('../package.json').name
+
 export const keysTypeMap: KeysTypeMap = {
-  publicKey: { beet: 'publicKey', ts: 'PublicKey' },
+  publicKey: {
+    beet: 'publicKey',
+    ts: 'PublicKey',
+    pack: BEET_SOLANA_PACKAGE,
+  },
 }
