@@ -1,6 +1,8 @@
 import { Beet, BEET_TYPE_ARG_LEN, SupportedTypeDefinition } from './types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
+import { name } from '../package.json'
+const BEET_PACKAGE: string = name
 
 export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
   stringByteLength: number
@@ -109,8 +111,8 @@ export type CollectionsTypeMap = Record<
 
 // prettier-ignore
 export const collectionsTypeMap: CollectionsTypeMap = {
-  string     : { beet: 'fixedSizeUtf8String', ts: 'string',     arg: BEET_TYPE_ARG_LEN },
-  Array      : { beet: 'fixedSizeArray',      ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
-  Buffer     : { beet: 'fixedSizeBuffer',     ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
-  Uint8Array : { beet: 'fixedSizeUint8Array', ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
+  string     : { beet: 'fixedSizeUtf8String', sourcePack: BEET_PACKAGE, ts: 'string',     arg: BEET_TYPE_ARG_LEN },
+  Array      : { beet: 'fixedSizeArray',      sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
+  Buffer     : { beet: 'fixedSizeBuffer',     sourcePack: BEET_PACKAGE, ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
+  Uint8Array : { beet: 'fixedSizeUint8Array', sourcePack: BEET_PACKAGE, ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
 }

@@ -6,6 +6,7 @@ import {
 } from '@metaplex-foundation/beet'
 import { name } from '../package.json'
 const BEET_SOLANA_PACKAGE: string = name
+const SOLANA_WEB3_PACKAGE = '@solana/web3.js'
 
 const uint8Array32 = fixedSizeUint8Array(32)
 
@@ -33,7 +34,8 @@ export type KeysTypeMap = Record<
 export const keysTypeMap: KeysTypeMap = {
   publicKey: {
     beet: 'publicKey',
+    sourcePack: BEET_SOLANA_PACKAGE,
     ts: 'PublicKey',
-    pack: BEET_SOLANA_PACKAGE,
+    pack: SOLANA_WEB3_PACKAGE,
   },
 }
