@@ -1,5 +1,7 @@
 import BN from 'bn.js'
 import { bignum, Beet, SupportedTypeDefinition } from './types'
+import { name } from '../package.json'
+const BEET_PACKAGE: string = name
 
 // -----------------
 // Unsigned
@@ -127,8 +129,6 @@ export type NumbersTypeMap = Record<
   NumbersTypeMapKey,
   SupportedTypeDefinition & { beet: NumbersExports }
 >
-
-const BEET_PACKAGE: string = require('../package.json').name
 
 // prettier-ignore
 export const numbersTypeMap: NumbersTypeMap = {

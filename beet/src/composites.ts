@@ -1,6 +1,8 @@
 import { strict as assert } from 'assert'
 import { u8 } from './numbers'
 import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from './types'
+import { name } from '../package.json'
+const BEET_PACKAGE: string = name
 
 export type COption<T> = T | null
 
@@ -61,8 +63,6 @@ export type CompositesTypeMap = Record<
   CompositesTypeMapKey,
   SupportedTypeDefinition & { beet: CompositesExports }
 >
-
-const BEET_PACKAGE: string = require('../package.json').name
 
 // prettier-ignore
 export const compositesTypeMap: CompositesTypeMap = {

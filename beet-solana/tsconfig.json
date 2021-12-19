@@ -16,7 +16,8 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "incremental": false
+    "incremental": false,
+    "resolveJsonModule": true
   },
   "include": ["src", "test"]
 }

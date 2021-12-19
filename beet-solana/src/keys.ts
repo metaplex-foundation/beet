@@ -4,6 +4,8 @@ import {
   fixedSizeUint8Array,
   SupportedTypeDefinition,
 } from '@metaplex-foundation/beet'
+import { name } from '../package.json'
+const BEET_SOLANA_PACKAGE: string = name
 
 const uint8Array32 = fixedSizeUint8Array(32)
 
@@ -27,8 +29,6 @@ export type KeysTypeMap = Record<
   KeysTypeMapKey,
   SupportedTypeDefinition & { beet: KeysExports }
 >
-
-const BEET_SOLANA_PACKAGE: string = require('../package.json').name
 
 export const keysTypeMap: KeysTypeMap = {
   publicKey: {
