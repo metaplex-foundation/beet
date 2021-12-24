@@ -115,6 +115,15 @@ function bytes(val: { byteSize: number }) {
   return brightBlack(`${val.byteSize} B`)
 }
 
+export type BeetOptions<Class> = {
+  byteSize: (instance: Class) => number
+  postSerialize: (
+    instance: Class,
+    buf: Buffer,
+    offset: number
+  ) => [Buffer, number]
+}
+
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
@@ -140,7 +149,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   }
 
   write(buf: Buffer, offset: number, value: Args): void {
-    const [innerBuf, innerOffset] = this.serialize(value, offset)
+    const [innerBuf, innerOffset] = this.serialize(value)
     innerBuf.copy(buf, offset, 0, innerOffset)
   }
 
