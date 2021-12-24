@@ -134,13 +134,14 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     }
   }
 
-  // TODO: support nested structs by implementing these methods
-  read(_buf: Buffer, _offset: number): Class {
-    throw new Error('Method not implemented.')
+  read(buf: Buffer, offset: number): Class {
+    const [value] = this.deserialize(buf, offset)
+    return value
   }
 
-  write(_buf: Buffer, _offset: number, _value: Class): void {
-    throw new Error('Method not implemented.')
+  write(buf: Buffer, offset: number, value: Args): void {
+    const [innerBuf, innerOffset] = this.serialize(value, offset)
+    innerBuf.copy(buf, offset, 0, innerOffset)
   }
 
   deserialize(buffer: Buffer, offset: number = 0): [Class, number] {
