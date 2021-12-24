@@ -19,8 +19,8 @@ function checkCases<T>(
       {
         // Larger buffer
         const buf = Buffer.alloc(offset + beet.byteSize + offset)
-        beet.write(buf, 0, x)
-        const y = beet.read(buf, 0)
+        beet.write(buf, offset, x)
+        const y = beet.read(buf, offset)
         t.equal(x, y, `round trip ${x}, offset ${offset} larger buffer`)
       }
       {

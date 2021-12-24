@@ -115,6 +115,15 @@ function bytes(val: { byteSize: number }) {
   return brightBlack(`${val.byteSize} B`)
 }
 
+export type BeetOptions<Class> = {
+  byteSize: (instance: Class) => number
+  postSerialize: (
+    instance: Class,
+    buf: Buffer,
+    offset: number
+  ) => [Buffer, number]
+}
+
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
   constructor(
@@ -134,13 +143,14 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     }
   }
 
-  // TODO: support nested structs by implementing these methods
-  read(_buf: Buffer, _offset: number): Class {
-    throw new Error('Method not implemented.')
+  read(buf: Buffer, offset: number): Class {
+    const [value] = this.deserialize(buf, offset)
+    return value
   }
 
-  write(_buf: Buffer, _offset: number, _value: Class): void {
-    throw new Error('Method not implemented.')
+  write(buf: Buffer, offset: number, value: Args): void {
+    const [innerBuf, innerOffset] = this.serialize(value)
+    innerBuf.copy(buf, offset, 0, innerOffset)
   }
 
   deserialize(buffer: Buffer, offset: number = 0): [Class, number] {

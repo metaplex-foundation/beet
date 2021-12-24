@@ -32,8 +32,8 @@ function checkCases<Kind, Data>(
       {
         // Larger buffer
         const buf = Buffer.alloc(offset + beet.byteSize + offset)
-        beet.write(buf, 0, expected)
-        const actual = beet.read(buf, 0)
+        beet.write(buf, offset, expected)
+        const actual = beet.read(buf, offset)
         t.deepEqual(
           actual,
           expected,
