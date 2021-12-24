@@ -1,8 +1,6 @@
 {
-  "name": "@metaplex-foundation/beet",
-  "version": "0.0.0",
-  "description": "Strict borsh compatible de/serializer and related extensions",
   "scripts": {
+    "build": "(cd ./beet && yarn build) && (cd ./beet-solana && yarn build)",
     "test:beet": "cd ./beet && yarn test && yarn test:browser"
   },
   "workspaces": {

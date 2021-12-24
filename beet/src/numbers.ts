@@ -1,5 +1,7 @@
 import BN from 'bn.js'
 import { bignum, Beet, SupportedTypeDefinition } from './types'
+import { name } from '../package.json'
+const BEET_PACKAGE: string = name
 
 // -----------------
 // Unsigned
@@ -130,15 +132,17 @@ export type NumbersTypeMap = Record<
 
 // prettier-ignore
 export const numbersTypeMap: NumbersTypeMap = {
-  u8   : { beet: 'u8',   ts: 'number'      },
-  u16  : { beet: 'u16',  ts: 'number'      },
-  u32  : { beet: 'u32',  ts: 'number'      },
-  u64  : { beet: 'u64',  ts: 'beet.bignum' },
-  u128 : { beet: 'u128', ts: 'beet.bignum' },
-  u256 : { beet: 'u256', ts: 'beet.bignum' },
-  u512 : { beet: 'u512', ts: 'beet.bignum' },
-  i8   : { beet: 'i8',   ts: 'number'      },
-  i16  : { beet: 'i16',  ts: 'number'      },
-  i32  : { beet: 'i32',  ts: 'number'      },
-  bool : { beet: 'bool', ts: 'boolean'      },
+  // <= 32-bit numbers and boolean
+  u8   : { beet: 'u8',   sourcePack: BEET_PACKAGE, ts: 'number'  },
+  u16  : { beet: 'u16',  sourcePack: BEET_PACKAGE, ts: 'number'  },
+  u32  : { beet: 'u32',  sourcePack: BEET_PACKAGE, ts: 'number'  },
+  i8   : { beet: 'i8',   sourcePack: BEET_PACKAGE, ts: 'number'  },
+  i16  : { beet: 'i16',  sourcePack: BEET_PACKAGE, ts: 'number'  },
+  i32  : { beet: 'i32',  sourcePack: BEET_PACKAGE, ts: 'number'  },
+  bool : { beet: 'bool', sourcePack: BEET_PACKAGE, ts: 'boolean' },
+  // Big Number, they use, the 'bignum' type which is defined in this package
+  u64  : { beet: 'u64',  sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  u128 : { beet: 'u128', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  u256 : { beet: 'u256', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  u512 : { beet: 'u512', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
 }
