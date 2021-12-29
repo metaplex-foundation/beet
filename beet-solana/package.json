@@ -20,7 +20,6 @@
   "repository": "git@github.com:metaplex-foundation/beet-solana.git",
   "author": "Thorsten Lorenz <thlorenz@gmx.de>",
   "license": "Apache-2.0",
-  "private": false,
   "directories": {
     "dist": "./dist/src"
   },

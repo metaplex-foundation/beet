@@ -9,7 +9,11 @@
       "beet-solana"
     ]
   },
-  "repository": "git@github.com:metaplex-foundation/beet.git",
-  "author": "Thorsten Lorenz <thlorenz@gmx.de>",
-  "private": true
+  "author": "Metaplex Maintainers <contact@metaplex.com>",
+  "homepage": "https://metaplex.com",
+  "repository": {
+    "url": "https://github.com/metaplex/beet.git"
+  },
+  "private": true,
+  "packageManager": "yarn@3.1.1"
 }
