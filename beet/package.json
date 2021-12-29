@@ -21,7 +21,6 @@
   "repository": "git@github.com:metaplex-foundation/beet.git",
   "author": "Thorsten Lorenz <thlorenz@gmx.de>",
   "license": "Apache-2.0",
-  "private": false,
   "directories": {
     "dist": "./dist/src"
   },
