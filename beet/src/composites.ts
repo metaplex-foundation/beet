@@ -4,11 +4,28 @@ import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from './types'
 import { name } from '../package.json'
 const BEET_PACKAGE: string = name
 
+/**
+ * Represents the Rust Option type {@link T}.
+ *
+ * @template T inner option type
+ */
 export type COption<T> = T | null
 
 const SOME = Buffer.from(Uint8Array.from([1, 0, 0, 0])).slice(0, 4)
 const NONE = Buffer.from(Uint8Array.from([0, 0, 0, 0])).slice(0, 4)
 
+/**
+ * De/Serializes an _Option_ of type {@link T} represented by {@link COption}.
+ *
+ * The de/serialized type is prefixed with `[1, 0, 0, 0]` if the inner value is
+ * present and with `[0, 0, 0, 0]` if not.
+ * This matches the `COption` type borsh representation.
+ *
+ * @template T inner option type
+ * @param inner the De/Serializer for the inner type
+ *
+ * @category beet/composite
+ */
 export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
@@ -38,7 +55,24 @@ export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
   }
 }
 
+/**
+ * Represents an {@link Enum} type which contains data.
+ *
+ * @template Kind the enum variant, i.e. `Color.Red`
+ * @template Data the data value, i.e. '#f00'
+ */
 export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
+/**
+ * De/Serializes an {@link Enum} that contains a type of data, i.e. a {@link Struct}.
+ * The main difference to a Rust enum is that the type of data has to be the
+ * same for all enum variants.
+ *
+ * @template T inner enum data type
+ *
+ * @param inner the De/Serializer for the data type
+ *
+ * @category beet/composite
+ */
 export function dataEnum<Kind, Data>(
   inner: Beet<Data>
 ): Beet<DataEnum<Kind, Data>> {
@@ -57,13 +91,29 @@ export function dataEnum<Kind, Data>(
     description: `DataEnum<${inner.description}>`,
   }
 }
+/**
+ * @category TypeDefinition
+ */
 export type CompositesExports = keyof typeof import('./composites')
+/**
+ * @category TypeDefinition
+ */
 export type CompositesTypeMapKey = 'option' | 'enum'
+/**
+ * @category TypeDefinition
+ */
 export type CompositesTypeMap = Record<
   CompositesTypeMapKey,
   SupportedTypeDefinition & { beet: CompositesExports }
 >
 
+/**
+ * Maps primitive beet exports to metadata which describes in which package it
+ * is defined as well as which TypeScript type is used to represent the
+ * deserialized value in JavaScript.
+ *
+ * @category TypeDefinition
+ */
 // prettier-ignore
 export const compositesTypeMap: CompositesTypeMap = {
   option: { beet: 'coption', sourcePack: BEET_PACKAGE, ts: 'COption<Inner>',        arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE },
