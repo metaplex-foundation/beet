@@ -1,5 +1,5 @@
 {
-  "entryPoints": ["src/beet.ts"],
+  "entryPoints": ["src/beet-solana.ts"],
   "excludePrivate": true,
   "categorizeByGroup": false,
   "readme": "none",
