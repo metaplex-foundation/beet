@@ -108,7 +108,7 @@ export type CompositesTypeMap = Record<
 >
 
 /**
- * Maps primitive beet exports to metadata which describes in which package it
+ * Maps composite beet exports to metadata which describes in which package it
  * is defined as well as which TypeScript type is used to represent the
  * deserialized value in JavaScript.
  *
