@@ -8,6 +8,8 @@ const BEET_PACKAGE: string = name
  * Represents the Rust Option type {@link T}.
  *
  * @template T inner option type
+ *
+ * @category beet/composite
  */
 export type COption<T> = T | null
 
@@ -60,6 +62,8 @@ export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
  *
  * @template Kind the enum variant, i.e. `Color.Red`
  * @template Data the data value, i.e. '#f00'
+ *
+ * @category beet/composite
  */
 export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
 /**

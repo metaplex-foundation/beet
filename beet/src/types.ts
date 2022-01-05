@@ -55,11 +55,14 @@ export type BeetField<T> = [keyof T, Beet<T[keyof T]>]
  */
 export type bignum = number | BN
 
-/*
+/**
+ * @private
  * @category beet
  */
 export const BEET_TYPE_ARG_LEN = 'len'
-/*
+
+/**
+ * @private
  * @category beet
  */
 export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'

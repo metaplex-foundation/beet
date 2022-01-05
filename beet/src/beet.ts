@@ -248,6 +248,8 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
 /**
  * Convenience wrapper around {@link BeetStruct} which is used for plain JavasScript
  * objects, like are used for option args passed to functions.
+ *
+ * @category beet/struct
  */
 export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
   constructor(

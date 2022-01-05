@@ -115,6 +115,7 @@ export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
  * A De/Serializer for {@link Uint8Array}s that just copies/reads the array bytes
  * to/from the provided buffer.
  *
+ * @category beet/collection
  */
 export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
   const arrayBufferBeet = fixedSizeBuffer(len)
