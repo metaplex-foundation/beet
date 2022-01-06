@@ -151,6 +151,54 @@ export const i32: Beet<number> = {
   description: 'i32',
 }
 
+function signedLargeBeet(byteSize: number, description: string) {
+  const bitSize = byteSize * 8
+  return {
+    write: function (buf: Buffer, offset: number, value: bignum) {
+      const bn = (BN.isBN(value) ? value : new BN(value)).toTwos(bitSize)
+      const bytesArray = bn.toArray('le', this.byteSize)
+      const bytesArrayBuf = Buffer.from(bytesArray)
+      bytesArrayBuf.copy(buf, offset, 0, this.byteSize)
+    },
+    read: function (buf: Buffer, offset: number): bignum {
+      const slice = buf.slice(offset, offset + this.byteSize)
+      const x = new BN(slice, 'le')
+      return x.fromTwos(bitSize)
+    },
+    byteSize,
+    description,
+  }
+}
+
+/**
+ * De/Serializer for 64-bit signed integers aka `i64` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
+export const i64: Beet<bignum> = signedLargeBeet(8, 'i64')
+/**
+ * De/Serializer for 128-bit signed integers aka `i128` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
+export const i128: Beet<bignum> = signedLargeBeet(16, 'i128')
+/**
+ * De/Serializer for 256-bit signed integers aka `i256` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
+export const i256: Beet<bignum> = signedLargeBeet(32, 'i256')
+/**
+ * De/Serializer for 512-bit signed integers aka `i512` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
+export const i512: Beet<bignum> = signedLargeBeet(64, 'i512')
+
 // -----------------
 // Boolean
 // -----------------
@@ -189,6 +237,10 @@ export type NumbersTypeMapKey =
   | 'i8'
   | 'i16'
   | 'i32'
+  | 'i64'
+  | 'i128'
+  | 'i256'
+  | 'i512'
   | 'bool'
 /**
  * @category TypeDefinition
@@ -220,4 +272,8 @@ export const numbersTypeMap: NumbersTypeMap = {
   u128 : { beet: 'u128', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
   u256 : { beet: 'u256', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
   u512 : { beet: 'u512', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  i64  : { beet: 'i64',  sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  i128 : { beet: 'i128', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  i256 : { beet: 'i256', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
+  i512 : { beet: 'i512', sourcePack: BEET_PACKAGE, ts: 'bignum', pack: BEET_PACKAGE  },
 }
