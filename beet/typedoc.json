@@ -4,5 +4,5 @@
   "categorizeByGroup": false,
   "readme": "none",
   "emit": "both",
-  "out": "../docs/beet-solana"
+  "out": "../docs/beet"
 }
