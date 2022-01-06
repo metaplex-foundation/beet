@@ -4,8 +4,7 @@ import {
   fixedSizeUint8Array,
   SupportedTypeDefinition,
 } from '@metaplex-foundation/beet'
-import { name } from '../package.json'
-const BEET_SOLANA_PACKAGE: string = name
+const BEET_SOLANA_PACKAGE = '@metaplex-foundation/beet-solana'
 const SOLANA_WEB3_PACKAGE = '@solana/web3.js'
 
 const uint8Array32 = fixedSizeUint8Array(32)
