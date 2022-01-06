@@ -2,6 +2,27 @@
 
 Strict borsh compatible de/serializer.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Features](#features)
+- [Non-Features](#non-features)
+- [API](#api)
+- [Examples](#examples)
+  - [Single Struct Configuration](#single-struct-configuration)
+  - [Nested Struct Configuration](#nested-struct-configuration)
+  - [Struct with non-primitive fields](#struct-with-non-primitive-fields)
+  - [Using Beet Primitives Directly](#using-beet-primitives-directly)
+  - [Using Beet Composites Directly](#using-beet-composites-directly)
+    - [Option](#option)
+    - [Array](#array)
+    - [Enum with Data Variants](#enum-with-data-variants)
+- [LICENSE](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 ## Features
 
 - fully composable, i.e. `coption(fixedSizeArray(fixedSizeUtf8String(4), 8))` is handled
