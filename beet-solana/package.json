@@ -15,7 +15,7 @@
     "test": "tape dist/test/*.js",
     "lint": "prettier -c ./src/",
     "lint:fix": "prettier --write ./src",
-    "doc": "typedoc src/*.ts --readme README.md"
+    "doc": "rimraf ../docs/beet-solana && typedoc"
   },
   "repository": "git@github.com:metaplex-foundation/beet-solana.git",
   "author": "Thorsten Lorenz <thlorenz@gmx.de>",

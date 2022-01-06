@@ -21,16 +21,29 @@ export * from './composites'
 export * from './numbers'
 export * from './types'
 
+/**
+ * @category TypeDefinition
+ */
 export type BeetTypeMapKey =
   | CollectionsTypeMapKey
   | CompositesTypeMapKey
   | NumbersTypeMapKey
 
+/**
+ * @category TypeDefinition
+ */
 export type BeetExports =
   | CollectionsExports
   | CompositesExports
   | NumbersExports
 
+/**
+ * Maps all {@link Beet} de/serializers to metadata which describes in which
+ * package it is defined as well as which TypeScript type is used to represent
+ * the deserialized value in JavaScript.
+ *
+ * @category TypeDefinition
+ */
 export const supportedTypeMap: Record<
   BeetTypeMapKey,
   SupportedTypeDefinition & {
@@ -45,6 +58,12 @@ export const supportedTypeMap: Record<
 // -----------------
 // Writer
 // -----------------
+/**
+ * Underlying writer used to serialize structs.
+ *
+ * @private
+ * @category beet/struct
+ */
 export class BeetWriter {
   private buf: Buffer
   private _offset: number
@@ -89,6 +108,12 @@ export class BeetWriter {
 // -----------------
 // Reader
 // -----------------
+/**
+ * Underlying reader used to deserialize structs.
+ *
+ * @private
+ * @category beet/struct
+ */
 export class BeetReader {
   constructor(private readonly buffer: Buffer, private _offset: number = 0) {}
 
@@ -115,17 +140,27 @@ function bytes(val: { byteSize: number }) {
   return brightBlack(`${val.byteSize} B`)
 }
 
-export type BeetOptions<Class> = {
-  byteSize: (instance: Class) => number
-  postSerialize: (
-    instance: Class,
-    buf: Buffer,
-    offset: number
-  ) => [Buffer, number]
-}
-
+/**
+ * Configures a class or any JavaScript object type for de/serialization aka
+ * read/write.
+ *
+ * @template Class the type to produce when deserializing
+ * @template Args contains all fields, is typically a subset of Class and is
+ * used to construct an instance of it
+ *
+ * @category beet/struct
+ */
 export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
   readonly byteSize: number
+  /**
+   * Creates an instance of the BeetStruct.
+   *
+   * @param fields de/serializers for each field of the {@link Class}
+   * @param construct the function that creates an instance of {@link Class}
+   * from the args
+   * @param description identifies this struct for diagnostics/debugging
+   * purposes
+   */
   constructor(
     private readonly fields: BeetField<Args>[],
     private readonly construct: (args: Args) => Class,
@@ -143,16 +178,32 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     }
   }
 
+  /**
+   * Along with `write` this allows structs to be treated as {@link Beet}s and
+   * thus supports composing/nesting them the same way.
+   * @private
+   */
   read(buf: Buffer, offset: number): Class {
     const [value] = this.deserialize(buf, offset)
     return value
   }
 
+  /**
+   * Along with `read` this allows structs to be treated as {@link Beet}s and
+   * thus supports composing/nesting them the same way.
+   * @private
+   */
   write(buf: Buffer, offset: number, value: Args): void {
     const [innerBuf, innerOffset] = this.serialize(value)
     innerBuf.copy(buf, offset, 0, innerOffset)
   }
 
+  /**
+   * Deserializes an instance of the Class from the provided buffer starting to
+   * read at the provided offset.
+   *
+   * @returns `[instance of Class, offset into buffer after deserialization completed]`
+   */
   deserialize(buffer: Buffer, offset: number = 0): [Class, number] {
     if (logTrace.enabled) {
       logTrace(
@@ -168,6 +219,13 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     return [this.construct(args), reader.offset]
   }
 
+  /**
+   * Serializes the provided instance into a new {@link Buffer}
+   *
+   * @param instance of the struct to serialize
+   * @param byteSize allows to override the size fo the created Buffer and
+   * defaults to the size of the struct to serialize
+   */
   serialize(instance: Args, byteSize = this.byteSize): [Buffer, number] {
     logTrace(
       'serializing [%s] %o to %d bytes buffer',
@@ -190,6 +248,8 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
 /**
  * Convenience wrapper around {@link BeetStruct} which is used for plain JavasScript
  * objects, like are used for option args passed to functions.
+ *
+ * @category beet/struct
  */
 export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
   constructor(

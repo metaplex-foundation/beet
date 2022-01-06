@@ -4,6 +4,13 @@ import { u32 } from './numbers'
 import { name } from '../package.json'
 const BEET_PACKAGE: string = name
 
+/**
+ * De/Serializes a UTF8 string of a particular size.
+ *
+ * @param stringByteLength the number of bytes of the string
+ *
+ * @category beet/collection
+ */
 export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
   stringByteLength: number
 ) => {
@@ -30,6 +37,18 @@ export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
   }
 }
 
+/**
+ * De/Serializes an array with a specific number of elements of type {@link T}.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param element the De/Serializer for the element type
+ * @param len the number of elements in the array
+ * @param lenPrefix if `true` a 4 byte number indicating the size of the array
+ * will be included before serialized array data
+ *
+ * @category beet/collection
+ */
 export function fixedSizeArray<T>(
   element: Beet<T>,
   len: number,
@@ -71,6 +90,13 @@ export function fixedSizeArray<T>(
   }
 }
 
+/**
+ * A De/Serializer for raw {@link Buffer}s that just copies/reads the buffer bytes
+ * to/from the provided buffer.
+ *
+ * @param bytes the byte size of the buffer to de/serialize
+ * @category beet/collection
+ */
 export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
   return {
     write: function (buf: Buffer, offset: number, value: Buffer): void {
@@ -85,6 +111,12 @@ export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
   }
 }
 
+/**
+ * A De/Serializer for {@link Uint8Array}s that just copies/reads the array bytes
+ * to/from the provided buffer.
+ *
+ * @category beet/collection
+ */
 export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
   const arrayBufferBeet = fixedSizeBuffer(len)
   return {
@@ -102,13 +134,29 @@ export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
   }
 }
 
+/**
+ * @category TypeDefinition
+ */
 export type CollectionsExports = keyof typeof import('./collections')
+/**
+ * @category TypeDefinition
+ */
 export type CollectionsTypeMapKey = 'string' | 'Array' | 'Buffer' | 'Uint8Array'
+/**
+ * @category TypeDefinition
+ */
 export type CollectionsTypeMap = Record<
   CollectionsTypeMapKey,
   SupportedTypeDefinition & { beet: CollectionsExports }
 >
 
+/**
+ * Maps collections beet exports to metadata which describes in which package it
+ * is defined as well as which TypeScript type is used to represent the
+ * deserialized value in JavaScript.
+ *
+ * @category TypeDefinition
+ */
 // prettier-ignore
 export const collectionsTypeMap: CollectionsTypeMap = {
   string     : { beet: 'fixedSizeUtf8String', sourcePack: BEET_PACKAGE, ts: 'string',     arg: BEET_TYPE_ARG_LEN },

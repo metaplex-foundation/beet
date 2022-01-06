@@ -6,6 +6,12 @@ const BEET_PACKAGE: string = name
 // -----------------
 // Unsigned
 // -----------------
+
+/**
+ * De/Serializer for 8-bit unsigned integers aka `u8`.
+ *
+ * @category beet/primitive
+ */
 export const u8: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt8(value, offset)
@@ -17,6 +23,11 @@ export const u8: Beet<number> = {
   description: 'u8',
 }
 
+/**
+ * De/Serializer 16-bit unsigned integers aka `u16`.
+ *
+ * @category beet/primitive
+ */
 export const u16: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt16LE(value, offset)
@@ -28,6 +39,11 @@ export const u16: Beet<number> = {
   description: 'u16',
 }
 
+/**
+ * De/Serializer for 32-bit unsigned integers aka `u32`.
+ *
+ * @category beet/primitive
+ */
 export const u32: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt32LE(value, offset)
@@ -56,14 +72,43 @@ function unsignedLargeBeet(byteSize: number, description: string) {
   }
 }
 
+/**
+ * De/Serializer for 64-bit unsigned integers aka `u64` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
 export const u64: Beet<bignum> = unsignedLargeBeet(8, 'u64')
+/**
+ * De/Serializer for 128-bit unsigned integers aka `u128` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
 export const u128: Beet<bignum> = unsignedLargeBeet(16, 'u128')
+/**
+ * De/Serializer for 256-bit unsigned integers aka `u256` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
 export const u256: Beet<bignum> = unsignedLargeBeet(32, 'u256')
+/**
+ * De/Serializer for 512-bit unsigned integers aka `u512` which serializes to a JavaScript
+ * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
+ *
+ * @category beet/primitive
+ */
 export const u512: Beet<bignum> = unsignedLargeBeet(64, 'u512')
 
 // -----------------
 // Signed
 // -----------------
+/**
+ * De/Serializer 8-bit signed integers aka `i8`.
+ *
+ * @category beet/primitive
+ */
 export const i8: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt8(value, offset)
@@ -75,6 +120,11 @@ export const i8: Beet<number> = {
   description: 'i8',
 }
 
+/**
+ * De/Serializer 16-bit signed integers aka `i16`.
+ *
+ * @category beet/primitive
+ */
 export const i16: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt16LE(value, offset)
@@ -86,6 +136,11 @@ export const i16: Beet<number> = {
   description: 'i16',
 }
 
+/**
+ * De/Serializer 32-bit signed integers aka `i32`.
+ *
+ * @category beet/primitive
+ */
 export const i32: Beet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt32LE(value, offset)
@@ -100,6 +155,11 @@ export const i32: Beet<number> = {
 // -----------------
 // Boolean
 // -----------------
+/**
+ * De/Serializer booleans aka `bool`.
+ *
+ * @category beet/primitive
+ */
 export const bool: Beet<boolean> = {
   write: function (buf: Buffer, offset: number, value: boolean): void {
     const n = value ? 1 : 0
@@ -112,7 +172,13 @@ export const bool: Beet<boolean> = {
   description: 'bool',
 }
 
+/**
+ * @category TypeDefinition
+ */
 export type NumbersExports = keyof typeof import('./numbers')
+/**
+ * @category TypeDefinition
+ */
 export type NumbersTypeMapKey =
   | 'u8'
   | 'u16'
@@ -125,11 +191,21 @@ export type NumbersTypeMapKey =
   | 'i16'
   | 'i32'
   | 'bool'
+/**
+ * @category TypeDefinition
+ */
 export type NumbersTypeMap = Record<
   NumbersTypeMapKey,
   SupportedTypeDefinition & { beet: NumbersExports }
 >
 
+/**
+ * Maps primitive beet exports to metadata which describes in which package it
+ * is defined as well as which TypeScript type is used to represent the
+ * deserialized value in JavaScript.
+ *
+ * @category TypeDefinition
+ */
 // prettier-ignore
 export const numbersTypeMap: NumbersTypeMap = {
   // <= 32-bit numbers and boolean
