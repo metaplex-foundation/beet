@@ -57,7 +57,7 @@ precompute byte sizes and would make it necessary to resize buffers which negati
 performance.
 
 If you need dynamically sized data types please use borsh implementation that implements the
-entire borsh spec instead.
+entire [borsh spec](https://borsh.io/) instead, i.e. [borsh-js](https://github.com/near/borsh-js).
 
 ## API
 
