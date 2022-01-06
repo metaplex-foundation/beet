@@ -1,6 +1,13 @@
 import BN from 'bn.js'
 
 /**
+ * Matches name in package.json
+ *
+ * @private
+ */
+export const BEET_PACKAGE = '@metaplex-foundation/beet'
+
+/**
  * Template for De/Serializer.
  *
  * @template T is the data type which is being de/serialized
