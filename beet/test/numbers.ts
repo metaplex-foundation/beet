@@ -14,6 +14,9 @@ import {
   u64,
   u8,
   bool,
+  i64,
+  i128,
+  i256,
 } from '../src/beet'
 
 function oneType(
@@ -185,6 +188,76 @@ test('numbers: round trip i32', (t) => {
   const beet = i32
   const cases = [0, 1, -1, 0x7f, -0x80, 0x7fff, -0x8000, 0x7fffff, -0x800000]
   const offsets = [0, beet.byteSize, 2 * beet.byteSize]
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('numbers: round trip i64', (t) => {
+  const cases = [
+    0,
+    -0xff,
+    0xff,
+    0xffff,
+    -0xffff,
+    0xffffffff,
+    -0xffffffff,
+    new BN('9223372036854775807'),
+    new BN('-9223372036854775808'),
+  ]
+
+  const offsets = [0, i64.byteSize, 2 * i64.byteSize]
+  const beet = i64
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('numbers: round trip i128', (t) => {
+  const cases = [
+    0,
+    -0xff,
+    0xff,
+    0xffff,
+    -0xffff,
+    0xffffffff,
+    -0xffffffff,
+    new BN('9223372036854775807'),
+    new BN('-9223372036854775808'),
+    new BN('170141183460469231731687303715884105727'),
+    new BN('-170141183460469231731687303715884105728'),
+  ]
+
+  const offsets = [0, i64.byteSize, 2 * i64.byteSize]
+  const beet = i128
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('numbers: round trip i256', (t) => {
+  const cases = [
+    0,
+    -0xff,
+    0xff,
+    0xffff,
+    -0xffff,
+    0xffffffff,
+    -0xffffffff,
+    new BN('9223372036854775807'),
+    new BN('-9223372036854775808'),
+    new BN('170141183460469231731687303715884105727'),
+    new BN('-170141183460469231731687303715884105728'),
+    new BN('170141183460469231731687303715884105727').mul(
+      new BN('170141183460469231731687303715884105727')
+    ),
+    new BN('-170141183460469231731687303715884105728').mul(
+      new BN('170141183460469231731687303715884105727')
+    ),
+  ]
+
+  const offsets = [0, i64.byteSize, 2 * i64.byteSize]
+  const beet = i256
 
   checkCases(offsets, cases, beet, t)
   t.end()
