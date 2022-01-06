@@ -3,7 +3,8 @@
     "build": "(cd ./beet && yarn build) && (cd ./beet-solana && yarn build)",
     "test:beet": "cd ./beet && yarn test && yarn test:browser",
     "test:beet-solana": "cd ./beet-solana && yarn test",
-    "doc": "(cd ./beet && yarn doc); (cd ./beet-solana && yarn doc)"
+    "doc": "(cd ./beet && yarn doc); (cd ./beet-solana && yarn doc)",
+    "doc:update": "./sh/update-docs"
   },
   "workspaces": {
     "packages": [
