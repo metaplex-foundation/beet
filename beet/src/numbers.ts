@@ -1,7 +1,6 @@
 import BN from 'bn.js'
 import { bignum, Beet, SupportedTypeDefinition } from './types'
-import { name } from '../package.json'
-const BEET_PACKAGE: string = name
+import { BEET_PACKAGE } from './types'
 
 // -----------------
 // Unsigned
