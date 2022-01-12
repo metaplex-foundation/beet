@@ -1,6 +1,10 @@
-# beet
-
-Strict borsh compatible de/serializer and related extensions
+<p align="center">
+  <h1 align="center">Beet</h1>
+  <p align="center">
+    <img height="128" width="128" src="./assets/beet-logo.png">
+  </p>
+  <p align="center">Strict borsh compatible de/serializer and related extensions</p>
+</p>
 
 ## Packages
 
