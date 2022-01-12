@@ -1,10 +1,10 @@
-import { Beet, fixedSizeUtf8String } from '../src/beet'
+import { fixedSizeUtf8String, StaticBeet } from '../src/beet'
 import test from 'tape'
 
 function checkCases(
   offsets: number[],
   cases: string[],
-  beet: Beet<string>,
+  beet: StaticBeet<string>,
   t: test.Test
 ) {
   for (const offset of offsets) {

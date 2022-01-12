@@ -2,7 +2,6 @@ import BN from 'bn.js'
 import test from 'tape'
 import {
   bignum,
-  Beet,
   i16,
   i32,
   i8,
@@ -17,6 +16,7 @@ import {
   i64,
   i128,
   i256,
+  StaticBeet,
 } from '../src/beet'
 
 function oneType(
@@ -34,7 +34,7 @@ function oneType(
 function checkCases(
   offsets: number[],
   cases: bignum[],
-  beet: Beet<bignum>,
+  beet: StaticBeet<bignum>,
   t: test.Test
 ) {
   for (const offset of offsets) {

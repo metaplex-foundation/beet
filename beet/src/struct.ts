@@ -1,12 +1,6 @@
 import { BeetReader, BeetWriter } from './read-write'
-import { Beet, BeetField } from './types'
-import { logDebug, logTrace } from './utils'
-import colors from 'ansicolors'
-
-const { brightBlack } = colors
-function bytes(val: { byteSize: number }) {
-  return brightBlack(`${val.byteSize} B`)
-}
+import { StaticBeet, StaticBeetField } from './types'
+import { bytes, logDebug, logTrace } from './utils'
 
 /**
  * Configures a class or any JavaScript object type for de/serialization aka
@@ -18,7 +12,9 @@ function bytes(val: { byteSize: number }) {
  *
  * @category beet/struct
  */
-export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
+export class BeetStruct<Class, Args = Partial<Class>>
+  implements StaticBeet<Class>
+{
   readonly byteSize: number
   /**
    * Creates an instance of the BeetStruct.
@@ -30,7 +26,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
    * purposes
    */
   constructor(
-    private readonly fields: BeetField<Args>[],
+    private readonly fields: StaticBeetField<Args>[],
     private readonly construct: (args: Args) => Class,
     readonly description = BeetStruct.description
   ) {
@@ -38,7 +34,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
     if (logDebug.enabled) {
       const flds = fields
         .map(
-          ([key, val]: BeetField<Args>) =>
+          ([key, val]: StaticBeetField<Args>) =>
             `${key}: ${val.description} ${bytes(val)}`
         )
         .join('\n  ')
@@ -121,7 +117,7 @@ export class BeetStruct<Class, Args = Partial<Class>> implements Beet<Class> {
  */
 export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
   constructor(
-    fields: BeetField<Args>[],
+    fields: StaticBeetField<Args>[],
     description: string = BeetArgsStruct.description
   ) {
     super(fields, (args) => args, description)

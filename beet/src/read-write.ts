@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert'
-import { Beet, BeetField } from './types'
+import { StaticBeet, StaticBeetField } from './types'
 
 /**
  * Underlying writer used to serialize structs.
@@ -34,13 +34,13 @@ export class BeetWriter {
     }
   }
 
-  write<T>(beet: Beet<T>, value: T) {
+  write<T>(beet: StaticBeet<T>, value: T) {
     this.maybeResize(beet.byteSize)
     beet.write(this.buf, this._offset, value)
     this._offset += beet.byteSize
   }
 
-  writeStruct<T>(instance: T, fields: BeetField<T>[]) {
+  writeStruct<T>(instance: T, fields: StaticBeetField<T>[]) {
     for (const [key, beet] of fields) {
       const value = instance[key]
       this.write(beet, value)
@@ -61,13 +61,13 @@ export class BeetReader {
     return this._offset
   }
 
-  read<T>(beet: Beet<T>): T {
+  read<T>(beet: StaticBeet<T>): T {
     const value = beet.read(this.buffer, this._offset)
     this._offset += beet.byteSize
     return value
   }
 
-  readStruct<T>(fields: BeetField<T>[]) {
+  readStruct<T>(fields: StaticBeetField<T>[]) {
     const acc: T = <T>{}
     for (const [key, beet] of fields) {
       acc[key] = this.read(beet)

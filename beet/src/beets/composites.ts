@@ -1,6 +1,10 @@
 import { strict as assert } from 'assert'
 import { u8 } from './numbers'
-import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from '../types'
+import {
+  BEET_TYPE_ARG_INNER,
+  StaticBeet,
+  SupportedTypeDefinition,
+} from '../types'
 import { BEET_PACKAGE } from '../types'
 
 /**
@@ -27,7 +31,7 @@ const NONE = Buffer.from(Uint8Array.from([0, 0, 0, 0])).slice(0, 4)
  *
  * @category beet/composite
  */
-export function coption<T>(inner: Beet<T>): Beet<COption<T>> {
+export function coption<T>(inner: StaticBeet<T>): StaticBeet<COption<T>> {
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
       if (value == null) {
@@ -77,8 +81,8 @@ export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
  * @category beet/composite
  */
 export function dataEnum<Kind, Data>(
-  inner: Beet<Data>
-): Beet<DataEnum<Kind, Data>> {
+  inner: StaticBeet<Data>
+): StaticBeet<DataEnum<Kind, Data>> {
   return {
     write: function (buf: Buffer, offset: number, value: DataEnum<Kind, Data>) {
       u8.write(buf, offset, value.kind)

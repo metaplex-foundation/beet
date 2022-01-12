@@ -16,7 +16,7 @@ export const BEET_PACKAGE = '@metaplex-foundation/beet'
  *
  * @category beet
  */
-export type Beet<T, V = Partial<T>> = {
+export type StaticBeet<T, V = Partial<T>> = {
   /**
    * Writes the value of type {@link T} to the provided buffer.
    *
@@ -46,13 +46,50 @@ export type Beet<T, V = Partial<T>> = {
 }
 
 /**
+ * Type that includes function that returns a {@link Beet} when the lens are
+ * provided.
+ *
+ * @param lens amount of elements for each dynamic part of the Beet ordered
+ * inside out
+ */
+export type DynamicSizeBeet<T, V = Partial<T>> = {
+  makeStatic: (lens: DynamicSizeLens) => StaticBeet<T, V>
+}
+
+export type Beet<T, V = Partial<T>> = StaticBeet<T, V> | DynamicSizeBeet<T, V>
+
+export type StaticBeetCollection<T, V = Partial<T>> = StaticBeet<T[], V[]> & {
+  element: StaticBeet<T, V>
+}
+
+export type DynamicSizeLens = number[] | number
+
+/**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
  *
  * @template T the type of which the field is a member
  *
  * @category beet
  */
-export type BeetField<T> = [keyof T, Beet<T[keyof T]>]
+export type StaticBeetField<T> = [keyof T, StaticBeet<T[keyof T]>]
+
+/**
+ * Specifies a field that is part of the type {@link T} along with its De/Serializer.
+ *
+ * @template T the type of which the field is a member
+ *
+ * @category beet
+ */
+export type DynamicSizeBeetField<T> = [keyof T, DynamicSizeBeet<T[keyof T]>]
+
+/**
+ * Specifies a field that is part of the type {@link T} along with its De/Serializer.
+ *
+ * @template T the type of which the field is a member
+ *
+ * @category beet
+ */
+export type BeetField<T> = StaticBeetField<T> | DynamicSizeBeetField<T>
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
@@ -95,4 +132,57 @@ export type SupportedTypeDefinition = {
   ts: string
   arg?: typeof BEET_TYPE_ARG_LEN | typeof BEET_TYPE_ARG_INNER
   pack?: string
+}
+
+// -----------------
+// Guards
+// -----------------
+/**
+ * @private
+ */
+export function isStaticBeet<T>(x: Beet<T> | DynamicSizeBeet<T>): x is Beet<T> {
+  return typeof x !== 'function'
+}
+
+/**
+ * @private
+ */
+export function isDynamicSizeBeet<T>(
+  x: Beet<T> | DynamicSizeBeet<T>
+): x is DynamicSizeBeet<T> {
+  return typeof x === 'function'
+}
+
+/**
+ * @private
+ */
+export function isStaticBeetField<T>(f: BeetField<T>) {
+  const [, beet] = f
+  return isStaticBeet(beet)
+}
+
+/**
+ * @private
+ */
+export function isDynamicSizeBeetField<T>(
+  f: BeetField<T> | DynamicSizeBeetField<T>
+) {
+  const [, beet] = f
+  return isDynamicSizeBeet(beet)
+}
+
+/**
+ * @private
+ */
+export function isBeetCollection(
+  beet: Beet<any>
+): beet is StaticBeetCollection<any> {
+  return (beet as StaticBeetCollection<any>).element != null
+}
+
+/**
+ * @private
+ */
+export function isBeetPrimitive(beet: Beet<any>) {
+  return !isBeetCollection(beet)
 }
