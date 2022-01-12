@@ -1,7 +1,7 @@
-import { Beet, BEET_TYPE_ARG_LEN, SupportedTypeDefinition } from './types'
+import { Beet, BEET_TYPE_ARG_LEN, SupportedTypeDefinition } from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
-import { BEET_PACKAGE } from './types'
+import { BEET_PACKAGE } from '../types'
 
 /**
  * De/Serializes a UTF8 string of a particular size.

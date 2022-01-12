@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert'
 import { u8 } from './numbers'
-import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from './types'
-import { BEET_PACKAGE } from './types'
+import { Beet, BEET_TYPE_ARG_INNER, SupportedTypeDefinition } from '../types'
+import { BEET_PACKAGE } from '../types'
 
 /**
  * Represents the Rust Option type {@link T}.

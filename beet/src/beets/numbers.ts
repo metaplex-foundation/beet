@@ -1,6 +1,6 @@
 import BN from 'bn.js'
-import { bignum, Beet, SupportedTypeDefinition } from './types'
-import { BEET_PACKAGE } from './types'
+import { bignum, Beet, SupportedTypeDefinition } from '../types'
+import { BEET_PACKAGE } from '../types'
 
 // -----------------
 // Unsigned
