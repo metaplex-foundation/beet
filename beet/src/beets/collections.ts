@@ -1,7 +1,9 @@
 import {
-  FixedBeetCollection,
+  Beet,
+  FixedSizeCollectionBeet,
+  FixedSizeCompositeBeet,
   BEET_TYPE_ARG_LEN,
-  FixedBeet,
+  FixedSizeBeet,
   SupportedTypeDefinition,
 } from '../types'
 import { strict as assert } from 'assert'
@@ -17,7 +19,7 @@ import { BEET_PACKAGE } from '../types'
  */
 export const fixedSizeUtf8String: (
   stringByteLength: number
-) => FixedBeet<string> = (stringByteLength: number) => {
+) => FixedSizeBeet<string> = (stringByteLength: number) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
       const stringBuf = Buffer.from(value, 'utf8')
@@ -54,14 +56,15 @@ export const fixedSizeUtf8String: (
  * @category beet/collection
  */
 export function fixedSizeArray<T>(
-  element: FixedBeet<T>,
+  element: FixedSizeBeet<T>,
   len: number,
   lenPrefix: boolean = false
-): FixedBeetCollection<T> {
+): FixedSizeCompositeBeet<T[], T> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
   return {
+    // @ts-ignore
     write: function (buf: Buffer, offset: number, value: T[]): void {
       assert.equal(
         value.length,
@@ -90,8 +93,17 @@ export function fixedSizeArray<T>(
       return arr
     },
     byteSize,
-    element,
     description: `Array<${element.description}>(${len})`,
+
+    // @ts-ignore
+    get inner(): FixedSizeBeet<T, Partial<T>> {
+      return element
+    },
+
+    // @ts-ignore
+    withFixedSizeInner(inner: FixedSizeBeet<T>) {
+      return fixedSizeArray(inner, len, lenPrefix)
+    },
   }
 }
 /**
@@ -101,7 +113,7 @@ export function fixedSizeArray<T>(
  * @param bytes the byte size of the buffer to de/serialize
  * @category beet/collection
  */
-export function fixedSizeBuffer(bytes: number): FixedBeet<Buffer> {
+export function fixedSizeBuffer(bytes: number): FixedSizeBeet<Buffer> {
   return {
     write: function (buf: Buffer, offset: number, value: Buffer): void {
       value.copy(buf, offset, 0, bytes)
@@ -121,7 +133,7 @@ export function fixedSizeBuffer(bytes: number): FixedBeet<Buffer> {
  *
  * @category beet/collection
  */
-export function fixedSizeUint8Array(len: number): FixedBeet<Uint8Array> {
+export function fixedSizeUint8Array(len: number): FixedSizeBeet<Uint8Array> {
   const arrayBufferBeet = fixedSizeBuffer(len)
   return {
     write: function (buf: Buffer, offset: number, value: Uint8Array): void {

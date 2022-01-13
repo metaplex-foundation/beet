@@ -1,10 +1,10 @@
-import { Beet, fixedSizeBuffer, FixedBeet } from '../src/beet'
+import { Beet, fixedSizeBuffer, FixedSizeBeet } from '../src/beet'
 import test from 'tape'
 
 function checkCases(
   offsets: number[],
   cases: Buffer[],
-  beet: FixedBeet<Buffer>,
+  beet: FixedSizeBeet<Buffer>,
   t: test.Test
 ) {
   for (const offset of offsets) {

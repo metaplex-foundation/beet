@@ -3,7 +3,7 @@ import {
   coption,
   COption,
   fixedSizeUtf8String,
-  FixedBeet,
+  FixedSizeBeet,
   u32,
   u8,
 } from '../src/beet'
@@ -12,7 +12,7 @@ import test from 'tape'
 function checkCases<T>(
   offsets: number[],
   cases: COption<T>[],
-  beet: FixedBeet<COption<T>>,
+  beet: FixedSizeBeet<COption<T>>,
   t: test.Test
 ) {
   for (const offset of offsets) {

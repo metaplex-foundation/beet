@@ -9,7 +9,7 @@ import {
   DataEnum,
   fixedSizeArray,
   i32,
-  FixedBeetCollection,
+  FixedSizeCollectionBeet,
   u16,
   u8,
 } from '../src/beet'
@@ -50,7 +50,7 @@ test('struct: roundtrip COption<struct>', (t) => {
 })
 
 test('struct: roundtrip Array<struct>', (t) => {
-  const beet: FixedBeetCollection<Result> = fixedSizeArray(Result.struct, 3)
+  const beet: FixedSizeCollectionBeet<Result> = fixedSizeArray(Result.struct, 3)
   const offsets = [0, 8]
 
   for (const offset of offsets) {

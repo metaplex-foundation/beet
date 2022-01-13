@@ -3,7 +3,7 @@ import {
   bool,
   fixedSizeArray,
   fixedSizeUtf8String,
-  FixedBeet,
+  FixedSizeBeet,
   u8,
 } from '../src/beet'
 import test from 'tape'
@@ -11,7 +11,7 @@ import test from 'tape'
 function checkCases<T>(
   offsets: number[],
   cases: T[][],
-  beet: FixedBeet<T[]>,
+  beet: FixedSizeBeet<T[]>,
   t: test.Test
 ) {
   for (const offset of offsets) {

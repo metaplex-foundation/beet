@@ -1,5 +1,5 @@
 import { BeetReader, BeetWriter } from './read-write'
-import { FixedBeet, FixedBeetField } from './types'
+import { FixedSizeBeet, FixedBeetField } from './types'
 import { bytes, logDebug, logTrace } from './utils'
 
 /**
@@ -13,7 +13,7 @@ import { bytes, logDebug, logTrace } from './utils'
  * @category beet/struct
  */
 export class BeetStruct<Class, Args = Partial<Class>>
-  implements FixedBeet<Class>
+  implements FixedSizeBeet<Class>
 {
   readonly byteSize: number
   /**

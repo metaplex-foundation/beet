@@ -1,8 +1,10 @@
 import { strict as assert } from 'assert'
 import { u8 } from './numbers'
 import {
+  assertFixedSizeBeet,
+  Beet,
   BEET_TYPE_ARG_INNER,
-  FixedBeet,
+  FixedSizeBeet,
   SupportedTypeDefinition,
 } from '../types'
 import { BEET_PACKAGE } from '../types'
@@ -31,9 +33,13 @@ const NONE = Buffer.from(Uint8Array.from([0, 0, 0, 0])).slice(0, 4)
  *
  * @category beet/composite
  */
-export function coption<T>(inner: FixedBeet<T>): FixedBeet<COption<T>> {
+export function coption<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before calling write`
+      )
       if (value == null) {
         NONE.copy(buf, offset, 0, 4)
         // NOTE: here we leave the remaining part of the buffer unchanged
@@ -46,6 +52,10 @@ export function coption<T>(inner: FixedBeet<T>): FixedBeet<COption<T>> {
     },
 
     read: function (buf: Buffer, offset: number): COption<T> {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before calling read`
+      )
       if (buf.compare(NONE, 0, 4, offset, offset + 4) === 0) {
         return null
       }
@@ -55,8 +65,24 @@ export function coption<T>(inner: FixedBeet<T>): FixedBeet<COption<T>> {
       )
       return inner.read(buf, offset + 4)
     },
-    byteSize: 4 + inner.byteSize,
+
+    get byteSize() {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before getting byte size`
+      )
+      return 4 + inner.byteSize
+    },
     description: `COption<${inner.description}>`,
+
+    // @ts-ignore
+    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
+      return coption(fixedInner)
+    },
+
+    get inner() {
+      return inner
+    },
   }
 }
 
@@ -81,8 +107,8 @@ export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
  * @category beet/composite
  */
 export function dataEnum<Kind, Data>(
-  inner: FixedBeet<Data>
-): FixedBeet<DataEnum<Kind, Data>> {
+  inner: FixedSizeBeet<Data>
+): FixedSizeBeet<DataEnum<Kind, Data>> {
   return {
     write: function (buf: Buffer, offset: number, value: DataEnum<Kind, Data>) {
       u8.write(buf, offset, value.kind)
