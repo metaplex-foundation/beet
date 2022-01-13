@@ -7,7 +7,7 @@ import {
   isCompositeBeet,
   isDynamicSizeBeet,
 } from './types'
-import { fixedSizeArray } from './beets/collections'
+import { fixedSizeArray, fixedSizeUtf8String } from './beets/collections'
 import { strict as assert } from 'assert'
 
 /**
@@ -51,6 +51,15 @@ export function toFixed<T, V = T>(
   return beet
 }
 
+/**
+ * De/Serializes an array with a dynamic number of elements of type {@link T}.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param element the De/Serializer for the element type
+ *
+ * @category beet/collection
+ */
 export function dynamicSizeArray<T, V = Partial<T>>(
   element: Beet<T, V>
 ): Collection<T[], V[]> & DynamicSizeBeet<T[], V[]> {
@@ -59,7 +68,6 @@ export function dynamicSizeArray<T, V = Partial<T>>(
       return element
     },
 
-    // @ts-ignore
     withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
       return dynamicSizeArray(fixedInner)
     },
@@ -73,5 +81,19 @@ export function dynamicSizeArray<T, V = Partial<T>>(
     },
 
     description: `DynamicArray<${element.description}>`,
+  }
+}
+
+/**
+ * De/Serializes a UTF8 string of dynamic size.
+ *
+ * @category beet/collection
+ */
+export function dynamicSizeUtf8String(): DynamicSizeBeet<string> {
+  return {
+    toFixed(len: number): FixedSizeBeet<string> {
+      return fixedSizeUtf8String(len)
+    },
+    description: 'Utf8String',
   }
 }

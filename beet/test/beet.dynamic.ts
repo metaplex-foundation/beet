@@ -1,6 +1,10 @@
 import spok from 'spok'
 import test from 'tape'
-import { dynamicSizeArray, toFixed } from '../src/beet.dynamic'
+import {
+  dynamicSizeArray,
+  dynamicSizeUtf8String,
+  toFixed,
+} from '../src/beet.dynamic'
 import { coption } from '../src/beets/composites'
 import {
   bool,
@@ -14,7 +18,6 @@ import {
   u64,
   u8,
 } from '../src/beets/numbers'
-import { BeetArgsStruct } from '../src/struct'
 import { Beet, bignum } from '../src/types'
 
 test('toFixed: fixed primitives are already fixed', (t) => {
@@ -93,6 +96,59 @@ test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) =>
   t.end()
 })
 
+test('toFixed: string([12])', (t) => {
+  const beet = dynamicSizeUtf8String()
+  const fixed = toFixed(beet, [12])
+  spok(t, fixed, {
+    byteSize: 4 + 12,
+    description: 'Utf8String(12)',
+  })
+  t.end()
+})
+
+test('toFixed: coption(string)([8])', (t) => {
+  const beet = coption(dynamicSizeUtf8String())
+  const fixed = toFixed(beet, [8])
+  spok(t, fixed, {
+    byteSize: 4 + 4 + 8,
+    description: 'COption<Utf8String(8)>',
+  })
+  t.end()
+})
+
+test('toFixed: array(string)([10, 8])', (t) => {
+  const beet = dynamicSizeArray(dynamicSizeUtf8String())
+  const fixed = toFixed(beet, [10, 8])
+  spok(t, fixed, {
+    byteSize: 4 + 10 * (4 + 8),
+    description: 'Array<Utf8String(8)>(10)',
+  })
+  t.end()
+})
+
+test('toFixed: array(coption(string))([10, 8])', (t) => {
+  const beet = dynamicSizeArray(coption(dynamicSizeUtf8String()))
+  const fixed = toFixed(beet, [10, 8])
+  spok(t, fixed, {
+    byteSize: 4 + 10 * (4 + 4 + 8),
+    description: 'Array<COption<Utf8String(8)>>(10)',
+  })
+  t.end()
+})
+
+test('toFixed: array(coption(array(string)))([10, 3, 8])', (t) => {
+  const beet = dynamicSizeArray(
+    coption(dynamicSizeArray(dynamicSizeUtf8String()))
+  )
+  const fixed = toFixed(beet, [10, 3, 8])
+  spok(t, fixed, {
+    byteSize: 4 + 10 * (4 + 4 + 3 * (4 + 8)),
+    description: 'Array<COption<Array<Utf8String(8)>(3)>>(10)',
+  })
+  t.end()
+})
+
+/*
 test('toFixed: struct with top level vec', (t) => {
   const struct = new BeetArgsStruct(
     // @ts-ignore
@@ -104,3 +160,4 @@ test('toFixed: struct with top level vec', (t) => {
   console.log(fixed)
   t.end()
 })
+*/

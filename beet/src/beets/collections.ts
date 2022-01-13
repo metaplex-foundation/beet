@@ -37,7 +37,7 @@ export const fixedSizeUtf8String: (
       return stringSlice.toString('utf8')
     },
     byteSize: 4 + stringByteLength,
-    description: `utf8-string(${stringByteLength})`,
+    description: `Utf8String(${stringByteLength})`,
   }
 }
 
