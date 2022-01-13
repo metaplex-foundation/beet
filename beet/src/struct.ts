@@ -1,5 +1,5 @@
 import { BeetReader, BeetWriter } from './read-write'
-import { StaticBeet, StaticBeetField } from './types'
+import { FixedBeet, FixedBeetField } from './types'
 import { bytes, logDebug, logTrace } from './utils'
 
 /**
@@ -13,7 +13,7 @@ import { bytes, logDebug, logTrace } from './utils'
  * @category beet/struct
  */
 export class BeetStruct<Class, Args = Partial<Class>>
-  implements StaticBeet<Class>
+  implements FixedBeet<Class>
 {
   readonly byteSize: number
   /**
@@ -26,7 +26,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
    * purposes
    */
   constructor(
-    private readonly fields: StaticBeetField<Args>[],
+    private readonly fields: FixedBeetField<Args>[],
     private readonly construct: (args: Args) => Class,
     readonly description = BeetStruct.description
   ) {
@@ -34,7 +34,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
     if (logDebug.enabled) {
       const flds = fields
         .map(
-          ([key, val]: StaticBeetField<Args>) =>
+          ([key, val]: FixedBeetField<Args>) =>
             `${key}: ${val.description} ${bytes(val)}`
         )
         .join('\n  ')
@@ -117,7 +117,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
  */
 export class BeetArgsStruct<Args> extends BeetStruct<Args, Args> {
   constructor(
-    fields: StaticBeetField<Args>[],
+    fields: FixedBeetField<Args>[],
     description: string = BeetArgsStruct.description
   ) {
     super(fields, (args) => args, description)

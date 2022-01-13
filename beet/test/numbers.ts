@@ -16,7 +16,7 @@ import {
   i64,
   i128,
   i256,
-  StaticBeet,
+  FixedBeet,
 } from '../src/beet'
 
 function oneType(
@@ -34,7 +34,7 @@ function oneType(
 function checkCases(
   offsets: number[],
   cases: bignum[],
-  beet: StaticBeet<bignum>,
+  beet: FixedBeet<bignum>,
   t: test.Test
 ) {
   for (const offset of offsets) {

@@ -1,7 +1,7 @@
 import {
-  StaticBeetCollection,
+  FixedBeetCollection,
   BEET_TYPE_ARG_LEN,
-  StaticBeet,
+  FixedBeet,
   SupportedTypeDefinition,
 } from '../types'
 import { strict as assert } from 'assert'
@@ -17,7 +17,7 @@ import { BEET_PACKAGE } from '../types'
  */
 export const fixedSizeUtf8String: (
   stringByteLength: number
-) => StaticBeet<string> = (stringByteLength: number) => {
+) => FixedBeet<string> = (stringByteLength: number) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
       const stringBuf = Buffer.from(value, 'utf8')
@@ -54,10 +54,10 @@ export const fixedSizeUtf8String: (
  * @category beet/collection
  */
 export function fixedSizeArray<T>(
-  element: StaticBeet<T>,
+  element: FixedBeet<T>,
   len: number,
   lenPrefix: boolean = false
-): StaticBeetCollection<T> {
+): FixedBeetCollection<T> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
@@ -101,7 +101,7 @@ export function fixedSizeArray<T>(
  * @param bytes the byte size of the buffer to de/serialize
  * @category beet/collection
  */
-export function fixedSizeBuffer(bytes: number): StaticBeet<Buffer> {
+export function fixedSizeBuffer(bytes: number): FixedBeet<Buffer> {
   return {
     write: function (buf: Buffer, offset: number, value: Buffer): void {
       value.copy(buf, offset, 0, bytes)
@@ -121,7 +121,7 @@ export function fixedSizeBuffer(bytes: number): StaticBeet<Buffer> {
  *
  * @category beet/collection
  */
-export function fixedSizeUint8Array(len: number): StaticBeet<Uint8Array> {
+export function fixedSizeUint8Array(len: number): FixedBeet<Uint8Array> {
   const arrayBufferBeet = fixedSizeBuffer(len)
   return {
     write: function (buf: Buffer, offset: number, value: Uint8Array): void {

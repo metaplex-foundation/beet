@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { bignum, SupportedTypeDefinition, StaticBeet } from '../types'
+import { bignum, SupportedTypeDefinition, FixedBeet } from '../types'
 import { BEET_PACKAGE } from '../types'
 
 // -----------------
@@ -11,7 +11,7 @@ import { BEET_PACKAGE } from '../types'
  *
  * @category beet/primitive
  */
-export const u8: StaticBeet<number> = {
+export const u8: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt8(value, offset)
   },
@@ -27,7 +27,7 @@ export const u8: StaticBeet<number> = {
  *
  * @category beet/primitive
  */
-export const u16: StaticBeet<number> = {
+export const u16: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt16LE(value, offset)
   },
@@ -43,7 +43,7 @@ export const u16: StaticBeet<number> = {
  *
  * @category beet/primitive
  */
-export const u32: StaticBeet<number> = {
+export const u32: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeUInt32LE(value, offset)
   },
@@ -77,28 +77,28 @@ function unsignedLargeBeet(byteSize: number, description: string) {
  *
  * @category beet/primitive
  */
-export const u64: StaticBeet<bignum> = unsignedLargeBeet(8, 'u64')
+export const u64: FixedBeet<bignum> = unsignedLargeBeet(8, 'u64')
 /**
  * De/Serializer for 128-bit unsigned integers aka `u128` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const u128: StaticBeet<bignum> = unsignedLargeBeet(16, 'u128')
+export const u128: FixedBeet<bignum> = unsignedLargeBeet(16, 'u128')
 /**
  * De/Serializer for 256-bit unsigned integers aka `u256` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const u256: StaticBeet<bignum> = unsignedLargeBeet(32, 'u256')
+export const u256: FixedBeet<bignum> = unsignedLargeBeet(32, 'u256')
 /**
  * De/Serializer for 512-bit unsigned integers aka `u512` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const u512: StaticBeet<bignum> = unsignedLargeBeet(64, 'u512')
+export const u512: FixedBeet<bignum> = unsignedLargeBeet(64, 'u512')
 
 // -----------------
 // Signed
@@ -108,7 +108,7 @@ export const u512: StaticBeet<bignum> = unsignedLargeBeet(64, 'u512')
  *
  * @category beet/primitive
  */
-export const i8: StaticBeet<number> = {
+export const i8: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt8(value, offset)
   },
@@ -124,7 +124,7 @@ export const i8: StaticBeet<number> = {
  *
  * @category beet/primitive
  */
-export const i16: StaticBeet<number> = {
+export const i16: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt16LE(value, offset)
   },
@@ -140,7 +140,7 @@ export const i16: StaticBeet<number> = {
  *
  * @category beet/primitive
  */
-export const i32: StaticBeet<number> = {
+export const i32: FixedBeet<number> = {
   write: function (buf: Buffer, offset: number, value: number) {
     buf.writeInt32LE(value, offset)
   },
@@ -176,28 +176,28 @@ function signedLargeBeet(byteSize: number, description: string) {
  *
  * @category beet/primitive
  */
-export const i64: StaticBeet<bignum> = signedLargeBeet(8, 'i64')
+export const i64: FixedBeet<bignum> = signedLargeBeet(8, 'i64')
 /**
  * De/Serializer for 128-bit signed integers aka `i128` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const i128: StaticBeet<bignum> = signedLargeBeet(16, 'i128')
+export const i128: FixedBeet<bignum> = signedLargeBeet(16, 'i128')
 /**
  * De/Serializer for 256-bit signed integers aka `i256` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const i256: StaticBeet<bignum> = signedLargeBeet(32, 'i256')
+export const i256: FixedBeet<bignum> = signedLargeBeet(32, 'i256')
 /**
  * De/Serializer for 512-bit signed integers aka `i512` which serializes to a JavaScript
  * _BigNum_ via {@link https://github.com/indutny/bn.js | BN}.
  *
  * @category beet/primitive
  */
-export const i512: StaticBeet<bignum> = signedLargeBeet(64, 'i512')
+export const i512: FixedBeet<bignum> = signedLargeBeet(64, 'i512')
 
 // -----------------
 // Boolean
@@ -207,7 +207,7 @@ export const i512: StaticBeet<bignum> = signedLargeBeet(64, 'i512')
  *
  * @category beet/primitive
  */
-export const bool: StaticBeet<boolean> = {
+export const bool: FixedBeet<boolean> = {
   write: function (buf: Buffer, offset: number, value: boolean): void {
     const n = value ? 1 : 0
     u8.write(buf, offset, n)
