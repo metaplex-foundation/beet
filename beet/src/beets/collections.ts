@@ -1,10 +1,8 @@
 import {
-  Beet,
-  FixedSizeCollectionBeet,
-  FixedSizeCompositeBeet,
   BEET_TYPE_ARG_LEN,
   FixedSizeBeet,
   SupportedTypeDefinition,
+  Collection,
 } from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
@@ -55,17 +53,16 @@ export const fixedSizeUtf8String: (
  *
  * @category beet/collection
  */
-export function fixedSizeArray<T>(
-  element: FixedSizeBeet<T>,
+export function fixedSizeArray<T, V = Partial<T>>(
+  element: FixedSizeBeet<T, V>,
   len: number,
   lenPrefix: boolean = false
-): FixedSizeCompositeBeet<T[], T> {
+): Collection<T[], V[]> & FixedSizeBeet<T[], V[]> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
   return {
-    // @ts-ignore
-    write: function (buf: Buffer, offset: number, value: T[]): void {
+    write: function (buf: Buffer, offset: number, value: V[]): void {
       assert.equal(
         value.length,
         len,
@@ -80,6 +77,7 @@ export function fixedSizeArray<T>(
         element.write(buf, offset + i * element.byteSize, value[i])
       }
     },
+
     read: function (buf: Buffer, offset: number): T[] {
       if (lenPrefix) {
         const size = u32.read(buf, offset)
@@ -95,12 +93,11 @@ export function fixedSizeArray<T>(
     byteSize,
     description: `Array<${element.description}>(${len})`,
 
-    // @ts-ignore
+    // Composite
     get inner(): FixedSizeBeet<T, Partial<T>> {
       return element
     },
 
-    // @ts-ignore
     withFixedSizeInner(inner: FixedSizeBeet<T>) {
       return fixedSizeArray(inner, len, lenPrefix)
     },

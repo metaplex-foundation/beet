@@ -14,6 +14,7 @@ import {
   u64,
   u8,
 } from '../src/beets/numbers'
+import { BeetArgsStruct } from '../src/struct'
 import { Beet, bignum } from '../src/types'
 
 test('toFixed: fixed primitives are already fixed', (t) => {
@@ -77,7 +78,8 @@ test('toFixed: coption<dynamicSizeArray<u8>>(2)', (t) => {
 
 test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) => {
   // This means I have 3 elements which each contain an option of an array with 4 u8s each
-  const beet = dynamicSizeArray(coption(dynamicSizeArray(u64)))
+  const innerArray: Beet<bignum[], bignum[]> = dynamicSizeArray<bignum>(u64)
+  const beet = dynamicSizeArray(coption(innerArray))
   const fixed = toFixed(beet, [3, 4])
   spok(t, fixed, {
     byteSize:
@@ -88,5 +90,17 @@ test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) =>
           4 * /* Inner [] */ 8) /* u64 */,
     description: 'Array<COption<Array<u64>(4)>>(3)',
   })
+  t.end()
+})
+
+test('toFixed: struct with top level vec', (t) => {
+  const struct = new BeetArgsStruct(
+    // @ts-ignore
+    [['ids', dynamicSizeArray(u32)]],
+    'VecStruct'
+  )
+
+  const fixed = toFixed(struct, [3])
+  console.log(fixed)
   t.end()
 })

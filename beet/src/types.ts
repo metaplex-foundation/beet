@@ -64,49 +64,19 @@ export type Beet<T, V = Partial<T>> =
   | FixedSizeBeet<T, V>
   | DynamicSizeBeet<T, V>
 
-export type CompositeBeet<T, V> = Beet<T, V> & {
-  inner: Beet<T, V>
-  withFixedSizeInner(fixedInner: FixedSizeBeet<T, V>): CompositeBeet<T, V>
+export type Composite<T, V, InnerT, InnerV = Partial<InnerT>> = Beet<T, V> & {
+  inner: Beet<InnerT, InnerV>
+  withFixedSizeInner(
+    fixedInner: FixedSizeBeet<InnerT, InnerV>
+  ): Composite<T, V, InnerT, InnerV>
 }
 
-export type FixedSizeCompositeBeet<T, V> = FixedSizeBeet<T, V> &
-  CompositeBeet<T, V> & {
-    withFixedInner(
-      fixedInner: FixedSizeBeet<T, V>
-    ): FixedSizeCompositeBeet<T, V>
-  }
-
-export type DynamicSizeCompositeBeet<
-  T,
-  InnerT,
-  V = T,
-  InnerV = V
-> = DynamicSizeBeet<T, V> &
-  CompositeBeet<T, V> & {
-    withFixedSizeInner(
-      fixedInner: FixedSizeBeet<InnerT, InnerV>
-    ): DynamicSizeCompositeBeet<T, InnerT, V, InnerV>
-  }
-
-export type FixedSizeCollectionBeet<T> = FixedSizeCompositeBeet<
-  T[],
-  Partial<T[]>
->
-export type DynamicSizeCollectionBeet<T> = DynamicSizeCompositeBeet<
-  T[],
-  Partial<T[]>
->
-
-export type BeetCollectionExplicit<T> = FixedSizeBeet<T[]> & {
-  inner: Beet<T>
-  withFixedInner(fixedInner: FixedSizeBeet<T>): BeetCollectionExplicit<T>
-}
-
-export type DynamicBeetCollectionExplicit<T> = DynamicSizeBeet<T[]> & {
-  inner: Beet<T>
-  withFixedInner(fixedInner: FixedSizeBeet<T>): DynamicBeetCollectionExplicit<T>
-  toFixed: (len: number) => FixedSizeCollectionBeet<T>
-}
+export type Collection<
+  T extends InnerT[],
+  V extends InnerV[],
+  InnerT = T[number],
+  InnerV = V[number]
+> = Beet<T, V> & Composite<T, V, InnerT, InnerV>
 
 /**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
@@ -198,8 +168,19 @@ export function assertFixedSizeBeet<T>(
 /**
  * @private
  */
-export function isDynamicSizeBeet<T>(x: Beet<T>): x is DynamicSizeBeet<T> {
-  return typeof (x as DynamicSizeBeet<T>).toFixed === 'function'
+export function isDynamicSizeBeet<T, V>(
+  x: Beet<T, V>
+): x is DynamicSizeBeet<T, V> {
+  return typeof (x as DynamicSizeBeet<T, V>).toFixed === 'function'
+}
+
+/**
+ * @private
+ */
+export function isCompositeBeet<T, V = Partial<T>>(
+  x: Beet<T, V> | Composite<T, V, any, any>
+): x is Composite<T, V, any, any> {
+  return (x as Composite<T, V, any, any>).inner != null
 }
 
 /**
@@ -218,20 +199,4 @@ export function isDynamicSizeBeetField<T>(
 ) {
   const [, beet] = f
   return isDynamicSizeBeet(beet)
-}
-
-/**
- * @private
- */
-export function isCompositeBeet<T, V>(x: Beet<T, V>): x is CompositeBeet<T, V> {
-  return (x as CompositeBeet<T, V>).inner != null
-}
-
-/**
- * @private
- */
-export function isDynamicSizeCompositeBeet<T, V>(
-  x: Beet<T, V>
-): x is DynamicSizeCompositeBeet<T, V> {
-  return typeof (x as DynamicSizeCompositeBeet<T, V>).toFixed === 'function'
 }
