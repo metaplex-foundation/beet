@@ -1,5 +1,6 @@
 import BN from 'bn.js'
 import { strict as assert } from 'assert'
+import { DynamicSizeBeetStruct } from './struct.dynamic'
 
 /**
  * Matches name in package.json
@@ -177,6 +178,15 @@ export function isDynamicSizeBeet<T, V>(
   x: Beet<T, V>
 ): x is DynamicSizeBeet<T, V> {
   return typeof (x as DynamicSizeBeet<T, V>).toFixed === 'function'
+}
+
+/**
+ * @private
+ */
+export function isDynamicSizeBeetStruct<T, V>(
+  x: Beet<T, V>
+): x is DynamicSizeBeetStruct<T, V> {
+  return typeof (x as DynamicSizeBeetStruct<T, V>).toFixedFromMap === 'function'
 }
 
 /**

@@ -6,7 +6,7 @@ import { strict as assert } from 'assert'
 
 const LOG_LENGTHS = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-export class DynamicBeetStruct<Class, Args = Partial<Class>> {
+export class DynamicSizeBeetStruct<Class, Args = Partial<Class>> {
   /**
    * Creates an instance of the DynamicBeetStruct.
    *
@@ -19,7 +19,7 @@ export class DynamicBeetStruct<Class, Args = Partial<Class>> {
   constructor(
     private readonly fields: BeetField<Args, any>[],
     private readonly construct: (args: Args) => Class,
-    readonly description = DynamicBeetStruct.description
+    readonly description = DynamicSizeBeetStruct.description
   ) {
     if (logDebug.enabled) {
       let byteSize = 0
@@ -40,9 +40,14 @@ export class DynamicBeetStruct<Class, Args = Partial<Class>> {
     }
   }
 
-  toFixed(
+  // TODO(thlorenz): fix types so we don't need this
+  toFixed(_len: number): BeetStruct<Class, Args> {
+    return null as unknown as BeetStruct<Class, Args>
+  }
+
+  toFixedFromMap(
     lengthsMap: Map<keyof Args, number[]>
-  ): BeetStruct<Class, Args> | null {
+  ): BeetStruct<Class, Args> {
     const fixedFields: FixedBeetField<Args>[] = this.fields.map(
       ([key, val]) => {
         const lengths = lengthsMap.get(key)
@@ -69,12 +74,15 @@ export class DynamicBeetStruct<Class, Args = Partial<Class>> {
 }
 
 /**
- * Convenience wrapper around {@link DynamicBeetStruct} which is used for plain JavasScript
+ * Convenience wrapper around {@link DynamicSizeBeetStruct} which is used for plain JavasScript
  * objects, like are used for option args passed to functions.
  *
  * @category beet/struct
  */
-export class DynamicBeetArgsStruct<Args> extends DynamicBeetStruct<Args, Args> {
+export class DynamicBeetArgsStruct<Args> extends DynamicSizeBeetStruct<
+  Args,
+  Args
+> {
   constructor(
     fields: BeetField<Args, any>[],
     description: string = DynamicBeetArgsStruct.description
