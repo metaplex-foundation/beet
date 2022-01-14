@@ -36,6 +36,9 @@ export const fixedSizeUtf8String: (
       const stringSlice = buf.slice(offset + 4, offset + 4 + stringByteLength)
       return stringSlice.toString('utf8')
     },
+    elementByteSize: 1,
+    len: stringByteLength,
+    lenPrefixByteSize: 4,
     byteSize: 4 + stringByteLength,
     description: `Utf8String(${stringByteLength})`,
   }
@@ -91,6 +94,7 @@ export function fixedSizeArray<T, V = Partial<T>>(
       return arr
     },
     byteSize,
+    lenPrefixByteSize: 4,
     description: `Array<${element.description}>(${len})`,
 
     // Composite

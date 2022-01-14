@@ -17,16 +17,7 @@ export type BeetBase = {
   description: string
 }
 
-/**
- * Template for De/Serializer.
- *
- * @template T is the data type which is being de/serialized
- * @template V is the value type passed to the write which includes all
- * properties needed to produce {@link T}, defaults to `Partial<T>`
- *
- * @category beet
- */
-export type FixedSizeBeet<T, V = Partial<T>> = BeetBase & {
+export type BeetReadWrite<T, V = Partial<T>> = {
   /**
    * Writes the value of type {@link T} to the provided buffer.
    *
@@ -50,6 +41,46 @@ export type FixedSizeBeet<T, V = Partial<T>> = BeetBase & {
    */
   byteSize: number
 }
+
+export type ElementCollectionBeet = {
+  /**
+   * For arrays and strings this indicates the byte size of each element.
+   */
+  elementByteSize: number
+
+  /**
+   * For arrays and strings this indicates the amount of elements/chars.
+   */
+  len: number
+
+  /**
+   * For arrays and strings this indicates the byte size of the number that
+   * indicates its length.
+   *
+   * Thus the size of each element for arrays is `(this.byteSize - lenPrefixSize) / elementCount`
+   */
+  lenPrefixByteSize: number
+}
+
+export type ScalarFixedSizeBeet<T, V = Partial<T>> = BeetBase &
+  BeetReadWrite<T, V>
+
+export type ElementCollectionFixedSizeBeet<T, V = Partial<T>> = BeetBase &
+  BeetReadWrite<T, V> &
+  ElementCollectionBeet
+
+/**
+ * Template for De/Serializer.
+ *
+ * @template T is the data type which is being de/serialized
+ * @template V is the value type passed to the write which includes all
+ * properties needed to produce {@link T}, defaults to `Partial<T>`
+ *
+ * @category beet
+ */
+export type FixedSizeBeet<T, V = Partial<T>> =
+  | ScalarFixedSizeBeet<T, V>
+  | ElementCollectionFixedSizeBeet<T, V>
 
 /**
  * Type that includes function that returns a {@link FixedSizeBeet} when the lens are
@@ -196,4 +227,18 @@ export function isCompositeBeet<T, V = Partial<T>>(
   x: Beet<T, V> | Composite<T, V, any, any>
 ): x is Composite<T, V, any, any> {
   return (x as Composite<T, V, any, any>).inner != null
+}
+
+/**
+ * @private
+ */
+export function isElementCollectionFixedSizeBeet<T, V = Partial<T>>(
+  x: FixedSizeBeet<T, V>
+): x is ElementCollectionFixedSizeBeet<T, V> {
+  const keys = Object.keys(x)
+  return (
+    keys.includes('len') &&
+    keys.includes('elementByteSize') &&
+    keys.includes('lenPrefixByteSize')
+  )
 }

@@ -1,6 +1,6 @@
 import { BeetReader, BeetWriter } from './read-write'
-import { FixedSizeBeet, FixedBeetField } from './types'
-import { bytes, logDebug, logTrace } from './utils'
+import { FixedBeetField, ScalarFixedSizeBeet } from './types'
+import { beetBytes, logDebug, logTrace } from './utils'
 
 /**
  * Configures a class or any JavaScript object type for de/serialization aka
@@ -13,7 +13,7 @@ import { bytes, logDebug, logTrace } from './utils'
  * @category beet/struct
  */
 export class BeetStruct<Class, Args = Partial<Class>>
-  implements FixedSizeBeet<Class>
+  implements ScalarFixedSizeBeet<Class>
 {
   readonly byteSize: number
   /**
@@ -35,10 +35,10 @@ export class BeetStruct<Class, Args = Partial<Class>>
       const flds = fields
         .map(
           ([key, val]: FixedBeetField<Args>) =>
-            `${key}: ${val.description} ${bytes(val)}`
+            `${key}: ${val.description} ${beetBytes(val)}`
         )
         .join('\n  ')
-      logDebug(`struct ${description} {\n  ${flds}\n} ${bytes(this)}`)
+      logDebug(`struct ${description} {\n  ${flds}\n} ${beetBytes(this)}`)
     }
   }
 
