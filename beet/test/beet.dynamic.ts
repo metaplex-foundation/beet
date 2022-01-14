@@ -97,7 +97,7 @@ test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) =>
 })
 
 test('toFixed: string([12])', (t) => {
-  const beet = dynamicSizeUtf8String()
+  const beet = dynamicSizeUtf8String
   const fixed = toFixed(beet, [12])
   spok(t, fixed, {
     byteSize: 4 + 12,
@@ -107,7 +107,7 @@ test('toFixed: string([12])', (t) => {
 })
 
 test('toFixed: coption(string)([8])', (t) => {
-  const beet = coption(dynamicSizeUtf8String())
+  const beet = coption(dynamicSizeUtf8String)
   const fixed = toFixed(beet, [8])
   spok(t, fixed, {
     byteSize: 4 + 4 + 8,
@@ -117,7 +117,7 @@ test('toFixed: coption(string)([8])', (t) => {
 })
 
 test('toFixed: array(string)([10, 8])', (t) => {
-  const beet = dynamicSizeArray(dynamicSizeUtf8String())
+  const beet = dynamicSizeArray(dynamicSizeUtf8String)
   const fixed = toFixed(beet, [10, 8])
   spok(t, fixed, {
     byteSize: 4 + 10 * (4 + 8),
@@ -127,7 +127,7 @@ test('toFixed: array(string)([10, 8])', (t) => {
 })
 
 test('toFixed: array(coption(string))([10, 8])', (t) => {
-  const beet = dynamicSizeArray(coption(dynamicSizeUtf8String()))
+  const beet = dynamicSizeArray(coption(dynamicSizeUtf8String))
   const fixed = toFixed(beet, [10, 8])
   spok(t, fixed, {
     byteSize: 4 + 10 * (4 + 4 + 8),
@@ -138,7 +138,7 @@ test('toFixed: array(coption(string))([10, 8])', (t) => {
 
 test('toFixed: array(coption(array(string)))([10, 3, 8])', (t) => {
   const beet = dynamicSizeArray(
-    coption(dynamicSizeArray(dynamicSizeUtf8String()))
+    coption(dynamicSizeArray(dynamicSizeUtf8String))
   )
   const fixed = toFixed(beet, [10, 3, 8])
   spok(t, fixed, {
@@ -147,17 +147,3 @@ test('toFixed: array(coption(array(string)))([10, 3, 8])', (t) => {
   })
   t.end()
 })
-
-/*
-test('toFixed: struct with top level vec', (t) => {
-  const struct = new BeetArgsStruct(
-    // @ts-ignore
-    [['ids', dynamicSizeArray(u32)]],
-    'VecStruct'
-  )
-
-  const fixed = toFixed(struct, [3])
-  console.log(fixed)
-  t.end()
-})
-*/

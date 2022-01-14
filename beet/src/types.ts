@@ -103,7 +103,12 @@ export type DynamicSizeBeetField<T> = [keyof T, DynamicSizeBeet<T[keyof T]>]
  *
  * @category beet
  */
-export type BeetField<T> = FixedBeetField<T> | DynamicSizeBeetField<T>
+export type BeetField<T, V = Partial<T>> = [
+  keyof T,
+  FixedSizeBeet<T[keyof T], V> | DynamicSizeBeet<T[keyof T], V>
+]
+
+// FixedBeetField<T> | DynamicSizeBeetField<T>
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
@@ -155,7 +160,7 @@ export type SupportedTypeDefinition = {
  * @private
  */
 export function isFixedSizeBeet<T>(x: Beet<T>): x is FixedSizeBeet<T> {
-  return typeof (x as FixedSizeBeet<T>).byteSize != null
+  return Object.keys(x).includes('byteSize')
 }
 
 export function assertFixedSizeBeet<T>(
@@ -181,22 +186,4 @@ export function isCompositeBeet<T, V = Partial<T>>(
   x: Beet<T, V> | Composite<T, V, any, any>
 ): x is Composite<T, V, any, any> {
   return (x as Composite<T, V, any, any>).inner != null
-}
-
-/**
- * @private
- */
-export function isFixedSizeBeetField<T>(f: BeetField<T>) {
-  const [, beet] = f
-  return isFixedSizeBeet(beet)
-}
-
-/**
- * @private
- */
-export function isDynamicSizeBeetField<T>(
-  f: BeetField<T> | DynamicSizeBeetField<T>
-) {
-  const [, beet] = f
-  return isDynamicSizeBeet(beet)
 }

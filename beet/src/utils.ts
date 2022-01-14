@@ -10,3 +10,7 @@ export const logTrace = debug('beet:trace')
 export function bytes(val: { byteSize: number }) {
   return brightBlack(`${val.byteSize} B`)
 }
+
+export function dynamicBytes(val: { byteSize: number }) {
+  return brightBlack(`${val.byteSize} B * length`)
+}

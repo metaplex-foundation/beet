@@ -9,7 +9,11 @@ import {
   compositesTypeMap,
   CompositesTypeMapKey,
 } from './beets/composites'
-import { NumbersExports, numbersTypeMap, NumbersTypeMapKey } from './beets/numbers'
+import {
+  NumbersExports,
+  numbersTypeMap,
+  NumbersTypeMapKey,
+} from './beets/numbers'
 
 export * from './beets/collections'
 export * from './beets/composites'

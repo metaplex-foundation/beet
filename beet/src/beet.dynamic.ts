@@ -6,29 +6,30 @@ import {
   FixedSizeBeet,
   isCompositeBeet,
   isDynamicSizeBeet,
+  isFixedSizeBeet,
 } from './types'
 import { fixedSizeArray, fixedSizeUtf8String } from './beets/collections'
 import { strict as assert } from 'assert'
 
 /**
  * Resolves all contained dynamic size beets to a static version using the
- * provided lens.
+ * provided lengths.
  *
  */
 export function toFixed<T, V = T>(
   beet: Beet<T, V>,
-  lens: number[]
+  lengths: number[]
 ): FixedSizeBeet<T, V> {
   if (isCompositeBeet(beet)) {
     // Handle inner beets first, i.e. make them fixed inside out
-    const inner = toFixed(beet.inner, lens)
+    const inner = toFixed(beet.inner, lengths)
     const withFixedInner = beet.withFixedSizeInner(inner) as Beet<T, V>
 
     if (isDynamicSizeBeet(withFixedInner)) {
-      const len = lens.pop()
+      const len = lengths.pop()
       assert(
         len != null,
-        `Should provide enough 'lens', ran out for ${beet.description}`
+        `Should provide enough 'lengths', ran out for ${beet.description}`
       )
       return withFixedInner.toFixed(len)
     }
@@ -39,16 +40,25 @@ export function toFixed<T, V = T>(
   }
   // Non Composites
   if (isDynamicSizeBeet(beet)) {
-    const len = lens.pop()
+    const len = lengths.pop()
     assert(
       len != null,
-      `Should provide enough 'lens', ran out for ${beet.description}`
+      `Should provide enough 'lengths', ran out for ${beet.description}`
     )
     return beet.toFixed(len)
   }
   assertFixedSizeBeet(beet)
 
   return beet
+}
+
+export function isFixedRecursively<T, V = T>(
+  beet: Beet<T, V>
+): beet is FixedSizeBeet<T, V> {
+  if (isCompositeBeet(beet)) {
+    return isFixedRecursively(beet.inner) && isFixedSizeBeet(beet)
+  }
+  return isFixedSizeBeet(beet)
 }
 
 /**
@@ -89,11 +99,9 @@ export function dynamicSizeArray<T, V = Partial<T>>(
  *
  * @category beet/collection
  */
-export function dynamicSizeUtf8String(): DynamicSizeBeet<string> {
-  return {
-    toFixed(len: number): FixedSizeBeet<string> {
-      return fixedSizeUtf8String(len)
-    },
-    description: 'Utf8String',
-  }
+export const dynamicSizeUtf8String: DynamicSizeBeet<string, string> = {
+  toFixed(len: number): FixedSizeBeet<string> {
+    return fixedSizeUtf8String(len)
+  },
+  description: 'Utf8String',
 }
