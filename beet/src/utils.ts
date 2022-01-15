@@ -25,3 +25,8 @@ export function beetBytes<T, V = Partial<T>>(beet: FixedSizeBeet<T, V>) {
 export function bytes(n: number) {
   return brightBlack(`${n} B`)
 }
+
+/**
+ * Use this to provide a map for structs which need no lengths
+ */
+export const EMPTY_MAP = new Map()

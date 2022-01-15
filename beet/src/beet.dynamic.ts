@@ -23,14 +23,7 @@ export function toFixed<T, V = T>(
   structMaps: Map<string, number[]>[] = []
 ): FixedSizeBeet<T, V> {
   if (isDynamicSizeBeetStruct(beet)) {
-    const map = structMaps.pop()
-    assert(
-      map != null,
-      `Missing struct entry for ${beet.description}, inside ${structMaps}`
-    )
-    // TODO(thlorenz): How can we verify this is really Map<keyof V, number[]>?
-    // (most likely via beet.fields)
-    return beet.toFixedFromMap(map as Map<keyof V, number[]>)
+    return beet.toFixedFromMap(beetLengths, structMaps)
   }
 
   if (isCompositeBeet(beet)) {

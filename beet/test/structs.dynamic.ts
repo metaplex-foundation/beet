@@ -7,7 +7,7 @@ import {
   toFixed,
 } from '../src/beet.dynamic'
 import { DynamicBeetArgsStruct } from '../src/struct.dynamic'
-import { deepLog } from './utils'
+import { EMPTY_MAP } from '../src/utils'
 
 test('toFixed: struct with top level vec', (t) => {
   type Args = {
@@ -24,7 +24,7 @@ test('toFixed: struct with top level vec', (t) => {
   {
     t.comment('+++ not providing length for ids')
     try {
-      struct.toFixedFromMap(new Map())
+      struct.toFixedFromMap([], [EMPTY_MAP])
       t.fail('should throw for missing map entry')
     } catch (err: any) {
       t.match(err.message, /ids: .+ not fixed.+missing a lengths entry/)
@@ -48,7 +48,7 @@ test('toFixed: struct with top level string', (t) => {
     'CustomerStruct'
   )
 
-  const fixed = struct.toFixedFromMap(new Map().set('name', [8]))
+  const fixed = struct.toFixedFromMap([], [new Map().set('name', [8])])
   spok(t, fixed, <Specifications<BeetStruct<Args>>>{
     fields: [
       [
@@ -87,7 +87,8 @@ test('toFixed: struct with nested vec and string', (t) => {
   {
     t.comment('+++ with valid lengths map')
     const fixed = struct.toFixedFromMap(
-      new Map().set('maybeIds', [8]).set('contributors', [2, 16])
+      [],
+      [new Map().set('maybeIds', [8]).set('contributors', [2, 16])]
     )
 
     spok(t, fixed, <Specifications<BeetStruct<Args>>>{
@@ -116,7 +117,8 @@ test('toFixed: struct with nested vec and string', (t) => {
     t.comment('+++ with incomplete contributor length map')
     try {
       struct.toFixedFromMap(
-        new Map().set('maybeIds', [8]).set('contributors', [2])
+        [],
+        [new Map().set('maybeIds', [8]).set('contributors', [2])]
       )
       t.fail('should throw')
     } catch (err: any) {
@@ -128,7 +130,7 @@ test('toFixed: struct with nested vec and string', (t) => {
 })
 
 // -----------------
-// Nested Struct
+// Nested Dynamic Struct
 // -----------------
 
 test('toFixed: struct with top level string nested inside other struct', (t) => {
@@ -150,6 +152,67 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   spok(t, fixed, {
     byteSize: 4 + 4 + 8 + 1,
     description: 'COption<FixedInnerStruct>',
+  })
+
+  t.end()
+})
+
+test('toFixed: struct with top level string nested inside other struct', (t) => {
+  type InnerArgs = {
+    name: string
+    age: number
+  }
+  type Args = {
+    innerArgs: InnerArgs
+  }
+
+  const innerStruct = new DynamicBeetArgsStruct<InnerArgs>(
+    [
+      ['name', dynamicSizeUtf8String],
+      ['age', u8],
+    ],
+    'InnerStruct'
+  )
+  const innerMap = new Map().set('name', [8])
+
+  const struct = new DynamicBeetArgsStruct<Args>(
+    [['innerArgs', innerStruct]],
+    'OuterStruct'
+  )
+  const outerMap = EMPTY_MAP
+
+  const fixed = struct.toFixedStruct([outerMap, innerMap])
+  spok(t, fixed, <Specifications<BeetStruct<Args>>>{
+    fields: [
+      [
+        'innerArgs',
+        {
+          fields: [
+            [
+              'name',
+              {
+                elementByteSize: 1,
+                len: 8,
+                lenPrefixByteSize: 4,
+                byteSize: 12,
+                description: 'Utf8String(8)',
+              },
+            ],
+            [
+              'age',
+              {
+                byteSize: 1,
+                description: 'u8',
+              },
+            ],
+          ],
+          description: 'FixedInnerStruct',
+          byteSize: 13,
+        },
+      ],
+    ],
+    description: 'FixedOuterStruct',
+    byteSize: 13,
   })
 
   t.end()

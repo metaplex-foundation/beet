@@ -54,21 +54,53 @@ export class DynamicSizeBeetStruct<Class, Args = Partial<Class>>
 
   // TODO(thlorenz): fix types so we don't need this
   // @ts-ignore
-  toFixed: (len: number) => FixedSizeBeet<Class, Args>
+  toFixed(_len: number): FixedSizeBeet<Class, Args> {
+    assert.fail('should not call toFixed on a struct')
+  }
 
   toFixedStruct(
+    structMaps: Map<string, number[]>[] = []
+  ): BeetStruct<Class, Args> {
+    // Structs are processed outside in and beets inside out.
+    // Since elements are popped off the array for beets that means we define
+    // them starting with the most outer going further in.
+    // To provide a consistent API and allow both to be passed that way we reverse it here.
+    structMaps.reverse()
+    return toFixed(this, [], structMaps) as BeetStruct<Class, Args>
+  }
+
+  /**
+   * Called from `toFixedFromMap` which is called from `toFixed` and thus is part
+   * of a recursive call.
+   * Not meant to be used directly, use `toFixedStruct` instead.
+   */
+  private toFixedStructRec(
     beetLengths: number[],
     structMaps: Map<string, number[]>[] = []
   ): BeetStruct<Class, Args> {
     return toFixed(this, beetLengths, structMaps) as BeetStruct<Class, Args>
   }
 
+  /**
+   * @private
+   */
   toFixedFromMap(
-    lengthsMap: Map<keyof Args | typeof LOG_ID, number[]>
+    beetLengths: number[],
+    structMaps: Map<string, number[]>[]
   ): BeetStruct<Class, Args> {
+    const lengthsMap = structMaps.pop() as
+      | Map<keyof Args | typeof LOG_ID, number[]>
+      | undefined
+
+    assert(
+      lengthsMap != null,
+      `Missing struct entry for ${this.description}, inside ${structMaps}`
+    )
+
     const fixedFields: FixedBeetField<Args>[] = this.fields.map(
       ([key, val]) => {
         const lengths = lengthsMap.get(key)
+        // Beet with specified lengths
         if (lengths != null) {
           const fixedVal = toFixed(val, lengths)
           return [key, fixedVal]
@@ -79,9 +111,15 @@ export class DynamicSizeBeetStruct<Class, Args = Partial<Class>>
         // Only present when logging (see constructor)
         const logLengths = lengthsMap.get(LOG_ID)
         if (logLengths != null) {
-          const fixedVal = toFixed(val, logLengths.slice(0))
+          const fixedVal = toFixed(val, logLengths.slice(0), structMaps)
           return [key, fixedVal]
         }
+
+        // Nested Struct
+        if (val instanceof DynamicSizeBeetStruct) {
+          return [key, val.toFixedStructRec(beetLengths, structMaps)]
+        }
+
         assert.fail(
           `Field: ${key}: ${val.description} is not fixed but is missing a lengths entry in the map`
         )
