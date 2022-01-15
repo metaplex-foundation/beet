@@ -1,12 +1,13 @@
 import spok, { Specifications } from 'spok'
 import test from 'tape'
-import { BeetStruct, coption, COption, u32, u8 } from '../src/beet'
+import { BeetStruct, coption, COption, u16, u32, u8 } from '../src/beet'
 import {
   dynamicSizeArray,
   dynamicSizeUtf8String,
   toFixed,
 } from '../src/beet.dynamic'
 import { DynamicBeetArgsStruct } from '../src/struct.dynamic'
+import { fixedSizeUtf8String } from '../src/beet'
 import { EMPTY_MAP } from '../src/utils'
 
 test('toFixed: struct with top level vec', (t) => {
@@ -215,5 +216,110 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
     byteSize: 13,
   })
 
+  t.end()
+})
+
+test('toFixed: struct with nested struct and mixed nested dynamic and fixed beets ', (t) => {
+  type InnerArgs = {
+    housePrices: COption<number[]>
+    age: number
+  }
+  type Args = {
+    innerArgs: InnerArgs
+    name: string
+    symbol: string
+    count: number
+  }
+
+  const innerStruct = new DynamicBeetArgsStruct<InnerArgs>(
+    [
+      ['housePrices', coption(dynamicSizeArray(u16))],
+      ['age', u8],
+    ],
+    'InnerStruct'
+  )
+  const innerMap = new Map().set('housePrices', [2])
+
+  const struct = new DynamicBeetArgsStruct<Args>(
+    [
+      ['innerArgs', innerStruct],
+      ['name', dynamicSizeUtf8String],
+      ['symbol', fixedSizeUtf8String(4)],
+      ['count', u8],
+    ],
+    'OuterStruct'
+  )
+
+  const outerMap = new Map().set('name', [22])
+
+  const fixed = struct.toFixedStruct([outerMap, innerMap])
+
+  spok(t, fixed, <Specifications<BeetStruct<Args>>>{
+    fields: [
+      [
+        'innerArgs',
+        {
+          fields: [
+            [
+              'housePrices',
+              {
+                byteSize: 12,
+                description: 'COption<Array<u16>(2)>',
+                inner: {
+                  byteSize: 8,
+                  len: 2,
+                  elementByteSize: 2,
+                  lenPrefixByteSize: 4,
+                  description: 'Array<u16>(2)',
+                  inner: {
+                    byteSize: 2,
+                    description: 'u16',
+                  },
+                },
+              },
+            ],
+            [
+              'age',
+              {
+                byteSize: 1,
+                description: 'u8',
+              },
+            ],
+          ],
+          description: 'FixedInnerStruct',
+          byteSize: 13,
+        },
+      ],
+      [
+        'name',
+        {
+          elementByteSize: 1,
+          len: 22,
+          lenPrefixByteSize: 4,
+          byteSize: 26,
+          description: 'Utf8String(22)',
+        },
+      ],
+      [
+        'symbol',
+        {
+          elementByteSize: 1,
+          len: 4,
+          lenPrefixByteSize: 4,
+          byteSize: 8,
+          description: 'Utf8String(4)',
+        },
+      ],
+      [
+        'count',
+        {
+          byteSize: 1,
+          description: 'u8',
+        },
+      ],
+    ],
+    description: 'FixedOuterStruct',
+    byteSize: 48,
+  })
   t.end()
 })

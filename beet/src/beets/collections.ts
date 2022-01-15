@@ -3,6 +3,7 @@ import {
   FixedSizeBeet,
   SupportedTypeDefinition,
   Collection,
+  ElementCollectionBeet,
 } from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
@@ -60,7 +61,7 @@ export function fixedSizeArray<T, V = Partial<T>>(
   element: FixedSizeBeet<T, V>,
   len: number,
   lenPrefix: boolean = false
-): Collection<T[], V[]> & FixedSizeBeet<T[], V[]> {
+): Collection<T[], V[]> & ElementCollectionBeet & FixedSizeBeet<T[], V[]> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
@@ -94,6 +95,8 @@ export function fixedSizeArray<T, V = Partial<T>>(
       return arr
     },
     byteSize,
+    len,
+    elementByteSize: element.byteSize,
     lenPrefixByteSize: 4,
     description: `Array<${element.description}>(${len})`,
 
