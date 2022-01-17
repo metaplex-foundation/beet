@@ -8,14 +8,18 @@ export const logInfo = debug('beet:info')
 export const logDebug = debug('beet:debug')
 export const logTrace = debug('beet:trace')
 
-export function beetBytes<T, V = Partial<T>>(beet: FixedSizeBeet<T, V>) {
+export function beetBytes<T, V = Partial<T>>(
+  beet: FixedSizeBeet<T, V>,
+  isDynamic = false
+) {
   let bytes: string
   if (isElementCollectionFixedSizeBeet(beet)) {
+    const len = isDynamic ? 'length' : beet.len
     const lenBytes = beet.lenPrefixByteSize
     bytes =
       lenBytes > 0
-        ? `${lenBytes} + (${beet.elementByteSize} * length) B  (${beet.byteSize} B)`
-        : `(${beet.elementByteSize} * length) B (${beet.byteSize} B)`
+        ? `${lenBytes} + (${beet.elementByteSize} * ${len}) B  (${beet.byteSize} B)`
+        : `(${beet.elementByteSize} * ${len}) B (${beet.byteSize} B)`
   } else {
     bytes = `${beet.byteSize} B`
   }

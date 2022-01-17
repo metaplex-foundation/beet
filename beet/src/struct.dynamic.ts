@@ -39,11 +39,11 @@ export class DynamicSizeBeetStruct<Class, Args = Partial<Class>>
         .map(([key, val]: BeetField<Args, any>) => {
           if (isFixedRecursively(val)) {
             byteSize += val.byteSize
-            return `${key}: ${val.description} ${beetBytes(val)}`
+            return `${key}: ${val.description} ${beetBytes(val, true)}`
           }
           val = toFixed(val, LOG_LENGTHS.slice(), LMAPS)
           byteSize += val.byteSize
-          return `${key}: ${val.description} ${beetBytes(val)}`
+          return `${key}: ${val.description} ${beetBytes(val, true)}`
         })
         .join('\n  ')
       logDebug(
