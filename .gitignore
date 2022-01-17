@@ -2,3 +2,5 @@ dist/
 .idea/
 yarn.lock
 docs
+tools/bsamples/target/
+tools/bsamples/Cargo.lock
