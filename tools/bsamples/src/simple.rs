@@ -1,39 +1,33 @@
 use anyhow::Result;
-use borsh::BorshSerialize;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
-struct Sample<T> {
-    value: T,
-    data: Vec<u8>,
-}
-
-fn produce_samples<T>(xs: Vec<T>) -> Result<Vec<Sample<T>>>
-where
-    T: BorshSerialize,
-{
-    let samples: Vec<Sample<T>> = xs
-        .into_iter()
-        .filter_map(|x| match x.try_to_vec() {
-            Ok(data) => Some(Sample { value: x, data }),
-            Err(_) => None,
-        })
-        .collect();
-    Ok(samples)
-}
+use crate::samples::{produce_samples, Sample};
 
 #[derive(Serialize, Deserialize)]
 pub struct Simple {
     strings: Vec<Sample<String>>,
+    u8s: Vec<Sample<u8>>,
+    u128s: Vec<Sample<u128>>,
+    optu8s: Vec<Sample<Option<u8>>>,
 }
 
 pub fn produce_simple() -> Result<Simple> {
-    let xs: Vec<String> = vec!["", "Bob", "Harry and Bob"]
+    let strings: Vec<String> = vec!["", "Bob", "Harry and Bob"]
         .into_iter()
         .map(|x| x.to_string())
         .collect();
-    let strings = produce_samples(xs)?;
 
-    Ok(Simple { strings })
+    let strings = produce_samples(strings)?;
+    let u8s = produce_samples(vec![0, 1, 255])?;
+    let u128s = produce_samples(vec![0, 255, u128::MAX])?;
+
+    let optu8s = produce_samples(vec![None, Some(0), Some(1), Some(255)])?;
+
+    Ok(Simple {
+        strings,
+        u8s,
+        u128s,
+        optu8s,
+    })
 }

@@ -1,6 +1,7 @@
 use anyhow::Result;
 use borsh::{BorshDeserialize, BorshSerialize};
 use simple::produce_simple;
+mod samples;
 mod simple;
 
 fn try_from_slice_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T> {
