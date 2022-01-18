@@ -1,4 +1,11 @@
-import { array, utf8String, FixableBeet } from '../../src/beet'
+import {
+  array,
+  utf8String,
+  FixableBeet,
+  u8,
+  COption,
+  coption,
+} from '../../src/beet'
 
 import test from 'tape'
 
@@ -44,6 +51,20 @@ test('collections: non-uniform size array of strings', (t) => {
   const offsets = [0, 3]
   const beet = array(utf8String)
 
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('collections: non-uniform size array of options', (t) => {
+  const cases: COption<number>[][] = [
+    [],
+    [1, 2, 3],
+    [null, null, null],
+    [1, null, 255],
+  ]
+
+  const offsets = [0, 3]
+  const beet = array(coption(u8))
   checkCases(offsets, cases, beet, t)
   t.end()
 })
