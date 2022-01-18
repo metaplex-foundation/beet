@@ -5,11 +5,13 @@ import {
   Collection,
   ElementCollectionBeet,
   FixableBeet,
+  Beet,
 } from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
+import { fixBeetFromData, fixBeetFromValue } from '../beet.dynamic'
 
 /**
  * De/Serializes a UTF8 string of a particular size.
@@ -68,7 +70,8 @@ export const utf8String: FixableBeet<string, string> = {
 }
 
 /**
- * De/Serializes an array with a specific number of elements of type {@link T}.
+ * De/Serializes an array with a specific number of elements of type {@link T}
+ * which all have the same size.
  *
  * @template T type of elements held in the array
  *
@@ -79,7 +82,7 @@ export const utf8String: FixableBeet<string, string> = {
  *
  * @category beet/collection
  */
-export function fixedSizeArray<T, V = Partial<T>>(
+export function uniformFixedSizeArray<T, V = Partial<T>>(
   element: FixedSizeBeet<T, V>,
   len: number,
   lenPrefix: boolean = false
@@ -128,10 +131,105 @@ export function fixedSizeArray<T, V = Partial<T>>(
     },
 
     withFixedSizeInner(inner: FixedSizeBeet<T>) {
-      return fixedSizeArray(inner, len, lenPrefix)
+      return uniformFixedSizeArray(inner, len, lenPrefix)
     },
   }
 }
+
+/**
+ * De/Serializes an array with a specific number of elements of type {@link T}
+ * which do not all have the same size.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param element the De/Serializer for the element type
+ * @param len the number of elements in the array
+ * @param lenPrefix if `true` a 4 byte number indicating the size of the array
+ * will be included before serialized array data
+ *
+ * @category beet/collection
+ */
+export function fixedSizeArray<T, V = Partial<T>>(
+  elements: FixedSizeBeet<T, V>[],
+  elementsByteSize: number
+): FixedSizeBeet<T[], V[]> {
+  const len = elements.length
+  const firstElement = len === 0 ? '<EMPTY>' : elements[0].description
+
+  return {
+    write: function (buf: Buffer, offset: number, value: V[]): void {
+      assert.equal(
+        value.length,
+        len,
+        `array length ${value.length} should match len ${len}`
+      )
+      u32.write(buf, offset, len)
+
+      let cursor = offset + 4
+      for (let i = 0; i < len; i++) {
+        const element = elements[i]
+        element.write(buf, cursor, value[i])
+        cursor += element.byteSize
+      }
+    },
+
+    read: function (buf: Buffer, offset: number): T[] {
+      const size = u32.read(buf, offset)
+      assert.equal(size, len, 'invalid byte size')
+
+      let cursor = offset + 4
+      const arr: T[] = new Array(len)
+      for (let i = 0; i < len; i++) {
+        const element = elements[i]
+        arr[i] = element.read(buf, cursor)
+        cursor += element.byteSize
+      }
+      return arr
+    },
+    byteSize: 4 + elementsByteSize,
+    len,
+    description: `Array<${firstElement}>(${len})[ 4 + ${elementsByteSize} ]`,
+  }
+}
+
+export function array<T, V = Partial<T>>(
+  element: Beet<T, V>
+): FixableBeet<T[], V[]> {
+  return {
+    toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<T[], V[]> {
+      const len = u32.read(buf, offset)
+      logTrace(`${this.description}[${len}]`)
+
+      const cursorStart = offset + 4
+      let cursor = cursorStart
+
+      const fixedElements: FixedSizeBeet<T, V>[] = new Array(len)
+      for (let i = 0; i < len; i++) {
+        const fixedElement = fixBeetFromData(element, buf, cursor)
+        fixedElements.push(fixedElement)
+        cursor += fixedElement.byteSize
+      }
+      return fixedSizeArray(fixedElements, cursor - cursorStart)
+    },
+
+    toFixedFromValue(vals: V[]): FixedSizeBeet<T[], V[]> {
+      assert(Array.isArray(vals), `${vals} should be an array`)
+
+      let elementsSize = 0
+      const fixedElements: FixedSizeBeet<T, V>[] = new Array(vals.length)
+
+      for (const val of vals) {
+        const fixedElement = fixBeetFromValue(element, val)
+        fixedElements.push(fixedElement)
+        elementsSize += fixedElement.byteSize
+      }
+      return fixedSizeArray(fixedElements, elementsSize)
+    },
+
+    description: `Utf8String`,
+  }
+}
+
 /**
  * A De/Serializer for raw {@link Buffer}s that just copies/reads the buffer bytes
  * to/from the provided buffer.

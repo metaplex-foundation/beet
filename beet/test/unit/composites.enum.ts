@@ -2,7 +2,7 @@ import {
   Beet,
   dataEnum,
   DataEnum,
-  fixedSizeArray,
+  uniformFixedSizeArray,
   fixedSizeUtf8String,
   FixedSizeBeet,
   u8,
@@ -98,7 +98,9 @@ test('composites: DataEnum<Seats, u8[]>', (t) => {
   ]
 
   const offsets = [0, 4]
-  const beet: Beet<DataEnum<Seats, number[]>> = dataEnum(fixedSizeArray(u8, 9))
+  const beet: Beet<DataEnum<Seats, number[]>> = dataEnum(
+    uniformFixedSizeArray(u8, 9)
+  )
 
   checkCases(offsets, cases, beet, Seats, t)
   t.end()

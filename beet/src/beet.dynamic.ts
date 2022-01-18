@@ -7,9 +7,10 @@ import {
   isCompositeBeet,
   isDynamicSizeBeet,
   isDynamicSizeBeetStruct,
+  isFixableBeet,
   isFixedSizeBeet,
 } from './types'
-import { fixedSizeArray, fixedSizeUtf8String } from './beets/collections'
+import { uniformFixedSizeArray, fixedSizeUtf8String } from './beets/collections'
 import { strict as assert } from 'assert'
 
 /**
@@ -58,6 +59,30 @@ export function toFixed<T, V = T>(
   return beet
 }
 
+export function fixBeetFromData<T, V = Partial<T>>(
+  beet: Beet<T, V>,
+  buf: Buffer,
+  offset: number
+) {
+  if (isFixedSizeBeet(beet)) {
+    return beet
+  }
+  if (isFixableBeet(beet)) {
+    return beet.toFixedFromData(buf, offset)
+  }
+  throw new Error(`${beet.description} is neither fixed size nor fixable`)
+}
+
+export function fixBeetFromValue<T, V = Partial<T>>(beet: Beet<T, V>, val: V) {
+  if (isFixedSizeBeet(beet)) {
+    return beet
+  }
+  if (isFixableBeet(beet)) {
+    return beet.toFixedFromValue(val)
+  }
+  throw new Error(`${beet.description} is neither fixed size nor fixable`)
+}
+
 export function isFixedRecursively<T, V = T>(
   beet: Beet<T, V>
 ): beet is FixedSizeBeet<T, V> {
@@ -93,7 +118,7 @@ export function dynamicSizeArray<T, V = Partial<T>>(
         element,
         `Need to replace element ${element.description} of ${this.description} with fixed size version before calling 'toFixed'`
       )
-      return fixedSizeArray(element, len, true)
+      return uniformFixedSizeArray(element, len, true)
     },
 
     description: `DynamicArray<${element.description}>`,

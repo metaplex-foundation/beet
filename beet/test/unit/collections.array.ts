@@ -1,6 +1,6 @@
 import {
   bool,
-  fixedSizeArray,
+  uniformFixedSizeArray,
   fixedSizeUtf8String,
   FixedSizeBeet,
   u8,
@@ -39,7 +39,7 @@ test('collections: fixed size array of u8, include size', (t) => {
     [0, 1, 2],
   ]
   const offsets = [0, 4]
-  const beet = fixedSizeArray(u8, 3, true)
+  const beet = uniformFixedSizeArray(u8, 3, true)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -51,7 +51,7 @@ test('collections: fixed size array of u8, not including size', (t) => {
     [0, 1, 2],
   ]
   const offsets = [0, 4]
-  const beet = fixedSizeArray(u8, 3)
+  const beet = uniformFixedSizeArray(u8, 3)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -63,7 +63,7 @@ test('collections: fixed size array of bool, include size', (t) => {
     [false, true, false, true],
   ]
   const offsets = [0, 4]
-  const beet: FixedSizeBeet<boolean[]> = fixedSizeArray(bool, 4, true)
+  const beet: FixedSizeBeet<boolean[]> = uniformFixedSizeArray(bool, 4, true)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -75,7 +75,7 @@ test('collections: fixed size array of string, include size', (t) => {
     ['aaaa', 'bbbb', '*&#@'],
   ]
   const offsets = [0, 3]
-  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
+  const beet: FixedSizeBeet<string[]> = uniformFixedSizeArray(
     fixedSizeUtf8String(4),
     3,
     true
@@ -91,7 +91,7 @@ test('collections: fixed size array of string, not including size', (t) => {
     ['aaaa', 'bbbb', '*&#@'],
   ]
   const offsets = [0, 3]
-  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
+  const beet: FixedSizeBeet<string[]> = uniformFixedSizeArray(
     fixedSizeUtf8String(4),
     3
   )

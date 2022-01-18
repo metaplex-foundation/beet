@@ -12,6 +12,7 @@ import {
 } from '../types'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
+import { fixBeetFromData, fixBeetFromValue } from '../beet.dynamic'
 
 /**
  * Represents the Rust Option type {@link T}.
@@ -205,7 +206,7 @@ export function coptionSome<T>(
  *
  * @category beet/composite
  */
-export function coption<T, V = Partial<T>>(
+export function coption<T, V = COption<T>>(
   inner: Beet<T, V>
 ): FixableBeet<COption<T>> {
   return {
@@ -213,11 +214,7 @@ export function coption<T, V = Partial<T>>(
       // TODO(thlorenz): all beets should just have this
       // const [ innerFixed, innerByteSize ] = inner.toFixedFromData(buf, offset + byteSize)
       if (isSomeBuffer(buf, offset)) {
-        const innerFixed = isFixedSizeBeet(inner)
-          ? inner
-          : isFixableBeet(inner)
-          ? inner.toFixedFromData(buf, offset + 1)
-          : (inner as FixedSizeBeet<T, V>)
+        const innerFixed = fixBeetFromData(inner, buf, offset + 1)
         return coptionSome(innerFixed)
       } else {
         assert(isNoneBuffer(buf, offset), `Expected ${buf} to hold a COption`)
@@ -229,7 +226,7 @@ export function coption<T, V = Partial<T>>(
     // TODO(thlorenz): Fix type issue
     // @ts-ignore
     toFixedFromValue(val: V): FixedSizeBeet<COption<T>, V> {
-      const innerFixed = inner as FixedSizeBeet<T>
+      const innerFixed = fixBeetFromValue(inner, val)
       return val == null ? coptionNone(innerFixed) : coptionSome(innerFixed)
     },
 

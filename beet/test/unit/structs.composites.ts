@@ -7,7 +7,7 @@ import {
   fixedSizeOption,
   dataEnum,
   DataEnum,
-  fixedSizeArray,
+  uniformFixedSizeArray,
   i32,
   u16,
   u8,
@@ -49,7 +49,7 @@ test('struct: roundtrip COption<struct>', (t) => {
 })
 
 test('struct: roundtrip Array<struct>', (t) => {
-  const beet = fixedSizeArray(Result.struct, 3)
+  const beet = uniformFixedSizeArray(Result.struct, 3)
   const offsets = [0, 8]
 
   for (const offset of offsets) {
