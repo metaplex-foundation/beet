@@ -33,7 +33,7 @@ const NONE = Buffer.from(Uint8Array.from([0, 0, 0, 0])).slice(0, 4)
  *
  * @category beet/composite
  */
-export function coption<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
+export function fixedSizeOption<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
       assertFixedSizeBeet(
@@ -77,7 +77,108 @@ export function coption<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
 
     // @ts-ignore
     withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
-      return coption(fixedInner)
+      return fixedSizeOption(fixedInner)
+    },
+
+    get inner() {
+      return inner
+    },
+  }
+}
+
+/**
+ * De/Serializes `None` case of an _Option_ of type {@link T} represented by
+ * {@link COption}.
+ *
+ * The de/serialized type is prefixed with `[0, 0, 0, 0]`.
+ * This matches the `COption::None` type borsh representation.
+ *
+ * @template T inner option type
+ * @param inner the De/Serializer for the inner type
+ *
+ * @category beet/composite
+ */
+export function coptionNone<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
+  return {
+    write: function (buf: Buffer, offset: number, value: COption<T>) {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before calling write`
+      )
+      assert(value == null, 'coptionNone can only handle `null` values')
+      NONE.copy(buf, offset, 0, 4)
+    },
+
+    read: function (buf: Buffer, offset: number): COption<T> {
+      assert(
+        buf.compare(NONE, 0, 4, offset, offset + 4) === 0,
+        'coptionNone can only handle `NONE` data'
+      )
+      return null
+    },
+
+    byteSize: 4,
+    description: `COption<${inner.description}> None`,
+
+    // @ts-ignore
+    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
+      return fixedSizeOption(fixedInner)
+    },
+
+    get inner() {
+      return inner
+    },
+  }
+}
+
+/**
+ * De/Serializes `Some` case of an _Option_ of type {@link T} represented by
+ * {@link COption}.
+ *
+ * The de/serialized type is prefixed with `[1, 0, 0, 0]`.
+ * This matches the `COption::Some` type borsh representation.
+ *
+ * @template T inner option type
+ * @param inner the De/Serializer for the inner type
+ *
+ * @category beet/composite
+ */
+export function coptionSome<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
+  return {
+    write: function (buf: Buffer, offset: number, value: COption<T>) {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before calling write`
+      )
+      assert(value != null, 'coptionSome cannot handle `null` values')
+      SOME.copy(buf, offset, 0, 4)
+      inner.write(buf, offset + 4, value)
+    },
+
+    read: function (buf: Buffer, offset: number): COption<T> {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before calling read`
+      )
+      assert(
+        buf.compare(SOME, 0, 4, offset, offset + 4) === 0,
+        'coptionSome can only handle `SOME` data'
+      )
+      return inner.read(buf, offset + 4)
+    },
+
+    get byteSize() {
+      assertFixedSizeBeet(
+        inner,
+        `coption inner type ${inner.description} needs to be fixed before getting byte size`
+      )
+      return 4 + inner.byteSize
+    },
+    description: `COption<${inner.description}>`,
+
+    // @ts-ignore
+    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
+      return fixedSizeOption(fixedInner)
     },
 
     get inner() {

@@ -1,6 +1,13 @@
 import spok, { Specifications } from 'spok'
 import test from 'tape'
-import { BeetStruct, coption, COption, u16, u32, u8 } from '../../src/beet'
+import {
+  BeetStruct,
+  fixedSizeOption,
+  COption,
+  u16,
+  u32,
+  u8,
+} from '../../src/beet'
 import {
   dynamicSizeArray,
   dynamicSizeUtf8String,
@@ -80,7 +87,7 @@ test('toFixed: struct with nested vec and string', (t) => {
   }
   const struct = new DynamicBeetArgsStruct<Args>(
     [
-      ['maybeIds', coption(dynamicSizeArray(u32))],
+      ['maybeIds', fixedSizeOption(dynamicSizeArray(u32))],
       ['contributors', dynamicSizeArray(dynamicSizeUtf8String)],
     ],
     'NestedStruct'
@@ -148,7 +155,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   )
   const innerMap = new Map().set('name', [8])
 
-  const beet = coption(innerStruct)
+  const beet = fixedSizeOption(innerStruct)
   const fixed = toFixed(beet, [], [innerMap])
   spok(t, fixed, {
     byteSize: 4 + 4 + 8 + 1,
@@ -233,7 +240,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
 
   const innerStruct = new DynamicBeetArgsStruct<InnerArgs>(
     [
-      ['housePrices', coption(dynamicSizeArray(u16))],
+      ['housePrices', fixedSizeOption(dynamicSizeArray(u16))],
       ['age', u8],
     ],
     'InnerStruct'

@@ -4,7 +4,7 @@ import {
   Beet,
   BeetStruct,
   COption,
-  coption,
+  fixedSizeOption,
   dataEnum,
   DataEnum,
   fixedSizeArray,
@@ -35,7 +35,7 @@ const result2 = () => new Result(30, 100, -3)
 const result3 = () => new Result(3, 999, 0)
 
 test('struct: roundtrip COption<struct>', (t) => {
-  const beet: Beet<COption<Result>> = coption(Result.struct)
+  const beet: Beet<COption<Result>> = fixedSizeOption(Result.struct)
   const offsets = [0, 8]
 
   for (const offset of offsets) {

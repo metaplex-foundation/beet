@@ -1,6 +1,6 @@
 import {
   Beet,
-  coption,
+  fixedSizeOption,
   COption,
   fixedSizeUtf8String,
   FixedSizeBeet,
@@ -38,7 +38,7 @@ function checkCases<T>(
 test('composites: COption<u8>', (t) => {
   const cases = [1, 2, null, 0xff]
   const offsets = [0, 4]
-  const beet: Beet<COption<number>> = coption(u8)
+  const beet: Beet<COption<number>> = fixedSizeOption(u8)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -47,7 +47,7 @@ test('composites: COption<u8>', (t) => {
 test('composites: COption<u32>', (t) => {
   const cases = [1, null, 0xff, 0xffff, 0xffffffff]
   const offsets = [0, 4]
-  const beet: Beet<COption<number>> = coption(u32)
+  const beet: Beet<COption<number>> = fixedSizeOption(u32)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -56,7 +56,7 @@ test('composites: COption<u32>', (t) => {
 test('composites: COption<string>', (t) => {
   const cases = ['abc', 'xyz', null]
   const offsets = [0, 2]
-  const beet: Beet<COption<string>> = coption(fixedSizeUtf8String(3))
+  const beet: Beet<COption<string>> = fixedSizeOption(fixedSizeUtf8String(3))
 
   checkCases(offsets, cases, beet, t)
   t.end()
