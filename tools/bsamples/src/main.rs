@@ -1,6 +1,11 @@
+use std::{fs::File, io::Write};
+
 use anyhow::Result;
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::BorshDeserialize;
+use options::produce_options;
 use simple::produce_simple;
+
+mod options;
 mod samples;
 mod simple;
 
@@ -11,8 +16,16 @@ fn try_from_slice_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T> {
 }
 
 fn main() -> Result<()> {
-    let simple = produce_simple()?;
-    let simple_json = serde_json::to_string_pretty(&simple)?;
-    print!("{}", simple_json);
+    // TODO(thlorenz): Parse from args
+    let data_dir = "../../beet/test/compat/fixtures";
+
+    let simple_json = serde_json::to_string_pretty(&produce_simple()?)?;
+    let mut simple_file = File::create(format!("{}/simple.json", data_dir))?;
+    simple_file.write_all(simple_json.as_bytes())?;
+
+    let options_json = serde_json::to_string_pretty(&produce_options()?)?;
+    let mut options_file = File::create(format!("{}/options.json", data_dir))?;
+    options_file.write_all(options_json.as_bytes())?;
+
     Ok(())
 }
