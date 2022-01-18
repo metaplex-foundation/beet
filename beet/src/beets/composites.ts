@@ -106,8 +106,8 @@ export function isNoneBuffer(buf: Buffer, offset: number) {
  *
  * @category beet/composite
  */
-export function coptionNone<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
-  logTrace(`coptionNone(${inner.description})`)
+export function coptionNone<T>(description: string): FixedSizeBeet<COption<T>> {
+  logTrace(`coptionNone(${description})`)
   return {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
       assert(value == null, 'coptionNone can only handle `null` values')
@@ -123,15 +123,11 @@ export function coptionNone<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
     },
 
     byteSize: 1,
-    description: `COption<None(${inner.description})>`,
+    description: `COption<None(${description})>`,
 
     // @ts-ignore
     withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
       return fixedSizeOption(fixedInner)
-    },
-
-    get inner() {
-      return inner
     },
   }
 }
@@ -216,16 +212,16 @@ export function coption<T, V = COption<T>>(
         return coptionSome(innerFixed)
       } else {
         assert(isNoneBuffer(buf, offset), `Expected ${buf} to hold a COption`)
-        const innerFixed = inner as FixedSizeBeet<T, V>
-        return coptionNone(innerFixed)
+        return coptionNone(inner.description)
       }
     },
 
     // TODO(thlorenz): Fix type issue
     // @ts-ignore
     toFixedFromValue(val: V): FixedSizeBeet<COption<T>, V> {
-      const innerFixed = fixBeetFromValue(inner, val)
-      return val == null ? coptionNone(innerFixed) : coptionSome(innerFixed)
+      return val == null
+        ? coptionNone(inner.description)
+        : coptionSome(fixBeetFromValue(inner, val))
     },
 
     description: `COption<${inner.description}`,
