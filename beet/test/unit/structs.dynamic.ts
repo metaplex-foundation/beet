@@ -63,7 +63,7 @@ test('toFixed: struct with top level string', (t) => {
         'name',
         {
           byteSize: 12,
-          description: 'Utf8String(8)',
+          description: 'Utf8String(4 + 8)',
         },
       ],
       [
@@ -112,7 +112,7 @@ test('toFixed: struct with nested vec and string', (t) => {
           'contributors',
           {
             byteSize: 4 + 2 * (4 + 16),
-            description: 'Array<Utf8String(16)>(2)',
+            description: 'Array<Utf8String(4 + 16)>(2)',
           },
         ],
       ],
@@ -203,7 +203,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
                 len: 8,
                 lenPrefixByteSize: 4,
                 byteSize: 12,
-                description: 'Utf8String(8)',
+                description: 'Utf8String(4 + 8)',
               },
             ],
             [
@@ -304,7 +304,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
           len: 22,
           lenPrefixByteSize: 4,
           byteSize: 26,
-          description: 'Utf8String(22)',
+          description: 'Utf8String(4 + 22)',
         },
       ],
       [
@@ -314,7 +314,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
           len: 4,
           lenPrefixByteSize: 4,
           byteSize: 8,
-          description: 'Utf8String(4)',
+          description: 'Utf8String(4 + 4)',
         },
       ],
       [

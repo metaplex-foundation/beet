@@ -4,7 +4,10 @@ import {
   assertFixedSizeBeet,
   Beet,
   BEET_TYPE_ARG_INNER,
+  FixableBeet,
   FixedSizeBeet,
+  isFixableBeet,
+  isFixedSizeBeet,
   SupportedTypeDefinition,
 } from '../types'
 import { BEET_PACKAGE } from '../types'
@@ -149,8 +152,9 @@ export function coptionNone<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
 export function coptionSome<T>(
   inner: FixedSizeBeet<T>
 ): FixedSizeBeet<COption<T>> {
-  logTrace(`coptionSome(${inner.description})`)
-  return {
+  const byteSize = 1 + inner.byteSize
+
+  const beet = {
     write: function (buf: Buffer, offset: number, value: COption<T>) {
       assertFixedSizeBeet(
         inner,
@@ -173,24 +177,20 @@ export function coptionSome<T>(
       return inner.read(buf, offset + 1)
     },
 
-    get byteSize() {
-      assertFixedSizeBeet(
-        inner,
-        `coption inner type ${inner.description} needs to be fixed before getting byte size`
-      )
-      return 1 + inner.byteSize
-    },
-    description: `COption<${inner.description}>`,
+    description: `COption<${inner.description}>[1 + ${inner.byteSize}]`,
 
     // @ts-ignore
     withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
       return fixedSizeOption(fixedInner)
     },
 
+    byteSize,
     get inner() {
       return inner
     },
   }
+  logTrace(beet.description)
+  return beet
 }
 
 /**
@@ -205,26 +205,35 @@ export function coptionSome<T>(
  *
  * @category beet/composite
  */
-export function coption<T>(inner: Beet<T>) {
+export function coption<T, V = Partial<T>>(
+  inner: Beet<T, V>
+): FixableBeet<COption<T>> {
   return {
-    toFixedFromData(buf: Buffer, offset: number) {
+    toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<COption<T>, V> {
       // TODO(thlorenz): all beets should just have this
       // const [ innerFixed, innerByteSize ] = inner.toFixedFromData(buf, offset + byteSize)
       if (isSomeBuffer(buf, offset)) {
-        const innerFixed = inner as FixedSizeBeet<T>
+        const innerFixed = isFixedSizeBeet(inner)
+          ? inner
+          : isFixableBeet(inner)
+          ? inner.toFixedFromData(buf, offset + 1)
+          : (inner as FixedSizeBeet<T, V>)
         return coptionSome(innerFixed)
       } else {
-        assert(
-          isNoneBuffer(buf, offset),
-          `Expected ${buf.slice(0, 4)} to hold a COption`
-        )
-        return coptionNone(inner)
+        assert(isNoneBuffer(buf, offset), `Expected ${buf} to hold a COption`)
+        const innerFixed = inner as FixedSizeBeet<T, V>
+        return coptionNone(innerFixed)
       }
     },
 
-    toFixedFromValue(val: T | null | undefined) {
-      return val == null ? coptionNone(inner) : coptionNone(inner)
+    // TODO(thlorenz): Fix type issue
+    // @ts-ignore
+    toFixedFromValue(val: V): FixedSizeBeet<COption<T>, V> {
+      const innerFixed = inner as FixedSizeBeet<T>
+      return val == null ? coptionNone(innerFixed) : coptionSome(innerFixed)
     },
+
+    description: `COption<${inner.description}`,
   }
 }
 

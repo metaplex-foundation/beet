@@ -4,10 +4,12 @@ import {
   SupportedTypeDefinition,
   Collection,
   ElementCollectionBeet,
+  FixableBeet,
 } from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
 import { BEET_PACKAGE } from '../types'
+import { logTrace } from '../utils'
 
 /**
  * De/Serializes a UTF8 string of a particular size.
@@ -18,7 +20,7 @@ import { BEET_PACKAGE } from '../types'
  */
 export const fixedSizeUtf8String: (
   stringByteLength: number
-) => FixedSizeBeet<string> = (stringByteLength: number) => {
+) => FixedSizeBeet<string, string> = (stringByteLength: number) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
       const stringBuf = Buffer.from(value, 'utf8')
@@ -41,8 +43,28 @@ export const fixedSizeUtf8String: (
     len: stringByteLength,
     lenPrefixByteSize: 4,
     byteSize: 4 + stringByteLength,
-    description: `Utf8String(${stringByteLength})`,
+    description: `Utf8String(4 + ${stringByteLength})`,
   }
+}
+
+/**
+ * De/Serializes a UTF8 string of any size.
+ *
+ * @category beet/collection
+ */
+export const utf8String: FixableBeet<string, string> = {
+  toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<string, string> {
+    const len = u32.read(buf, offset)
+    logTrace(`${this.description}[${len}]`)
+    return fixedSizeUtf8String(len)
+  },
+
+  toFixedFromValue(val: string): FixedSizeBeet<string, string> {
+    const len = val.length
+    return fixedSizeUtf8String(len)
+  },
+
+  description: `Utf8String`,
 }
 
 /**

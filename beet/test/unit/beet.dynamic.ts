@@ -82,6 +82,8 @@ test('toFixed: coption<dynamicSizeArray<u8>>(2)', (t) => {
 test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) => {
   // This means I have 3 elements which each contain an option of an array with 4 u8s each
   const innerArray: Beet<bignum[], bignum[]> = dynamicSizeArray<bignum>(u64)
+  // TODO(thlorenz): This maybe obsolete soon
+  // @ts-ignore
   const beet = dynamicSizeArray(fixedSizeOption(innerArray))
   const fixed = toFixed(beet, [3, 4])
   spok(t, fixed, {
@@ -101,7 +103,7 @@ test('toFixed: string([12])', (t) => {
   const fixed = toFixed(beet, [12])
   spok(t, fixed, {
     byteSize: 4 + 12,
-    description: 'Utf8String(12)',
+    description: 'Utf8String(4 + 12)',
   })
   t.end()
 })
@@ -111,7 +113,7 @@ test('toFixed: coption(string)([8])', (t) => {
   const fixed = toFixed(beet, [8])
   spok(t, fixed, {
     byteSize: 1 + 4 + 8,
-    description: 'COption<Utf8String(8)>',
+    description: 'COption<Utf8String(4 + 8)>',
   })
   t.end()
 })
@@ -121,7 +123,7 @@ test('toFixed: array(string)([10, 8])', (t) => {
   const fixed = toFixed(beet, [10, 8])
   spok(t, fixed, {
     byteSize: 4 + 10 * (4 + 8),
-    description: 'Array<Utf8String(8)>(10)',
+    description: 'Array<Utf8String(4 + 8)>(10)',
   })
   t.end()
 })
@@ -131,7 +133,7 @@ test('toFixed: array(coption(string))([10, 8])', (t) => {
   const fixed = toFixed(beet, [10, 8])
   spok(t, fixed, {
     byteSize: 4 + 10 * (1 + 4 + 8),
-    description: 'Array<COption<Utf8String(8)>>(10)',
+    description: 'Array<COption<Utf8String(4 + 8)>>(10)',
   })
   t.end()
 })
@@ -143,7 +145,7 @@ test('toFixed: array(coption(array(string)))([10, 3, 8])', (t) => {
   const fixed = toFixed(beet, [10, 3, 8])
   spok(t, fixed, {
     byteSize: 4 + 10 * (1 + 4 + 3 * (4 + 8)),
-    description: 'Array<COption<Array<Utf8String(8)>(3)>>(10)',
+    description: 'Array<COption<Array<Utf8String(4 + 8)>(3)>>(10)',
   })
   t.end()
 })
