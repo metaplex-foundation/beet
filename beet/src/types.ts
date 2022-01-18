@@ -92,9 +92,15 @@ export type DynamicSizeBeet<T, V = Partial<T>> = BeetBase & {
   toFixed: (len: number) => FixedSizeBeet<T, V>
 }
 
+export type FixableBeet<T, V = Partial<T>> = BeetBase & {
+  toFixedFromData: (buf: Buffer, offset: number) => FixedSizeBeet<T, V>
+  toFixedFromValue: (val: V) => FixedSizeBeet<T, V>
+}
+
 export type Beet<T, V = Partial<T>> =
   | FixedSizeBeet<T, V>
   | DynamicSizeBeet<T, V>
+  | FixableBeet<T, V>
 
 export type Composite<T, V, InnerT, InnerV = Partial<InnerT>> = Beet<T, V> & {
   inner: Beet<InnerT, InnerV>
@@ -191,14 +197,16 @@ export type SupportedTypeDefinition = {
 /**
  * @private
  */
-export function isFixedSizeBeet<T>(x: Beet<T>): x is FixedSizeBeet<T> {
+export function isFixedSizeBeet<T, V = Partial<T>>(
+  x: Beet<T, V>
+): x is FixedSizeBeet<T> {
   return Object.keys(x).includes('byteSize')
 }
 
-export function assertFixedSizeBeet<T>(
-  x: Beet<T>,
+export function assertFixedSizeBeet<T, V = Partial<T>>(
+  x: Beet<T, V>,
   msg = `${x} should have been a fixed beet`
-): asserts x is FixedSizeBeet<T> {
+): asserts x is FixedSizeBeet<T, V> {
   assert(isFixedSizeBeet(x), msg)
 }
 
@@ -209,6 +217,16 @@ export function isDynamicSizeBeet<T, V>(
   x: Beet<T, V>
 ): x is DynamicSizeBeet<T, V> {
   return typeof (x as DynamicSizeBeet<T, V>).toFixed === 'function'
+}
+
+/**
+ * @private
+ */
+export function isFixableBeet<T, V>(x: Beet<T, V>): x is FixableBeet<T, V> {
+  return (
+    typeof (x as FixableBeet<T, V>).toFixedFromData === 'function' &&
+    typeof (x as FixableBeet<T, V>).toFixedFromValue === 'function'
+  )
 }
 
 /**

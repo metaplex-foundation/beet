@@ -1,10 +1,18 @@
-import { fixedSizeUtf8String, FixedSizeBeet } from '../src/beet'
+import {
+  Beet,
+  fixedSizeOption,
+  COption,
+  fixedSizeUtf8String,
+  FixedSizeBeet,
+  u32,
+  u8,
+} from '../../src/beet'
 import test from 'tape'
 
-function checkCases(
+function checkCases<T>(
   offsets: number[],
-  cases: string[],
-  beet: FixedSizeBeet<string>,
+  cases: COption<T>[],
+  beet: FixedSizeBeet<COption<T>>,
   t: test.Test
 ) {
   for (const offset of offsets) {
@@ -27,38 +35,29 @@ function checkCases(
   }
 }
 
-test('collections: fixed size utf8 strings size 1', (t) => {
-  const cases = ['a', 'b', 'z']
+test('composites: COption<u8>', (t) => {
+  const cases = [1, 2, null, 0xff]
   const offsets = [0, 4]
-  const beet = fixedSizeUtf8String(1)
+  const beet: Beet<COption<number>> = fixedSizeOption(u8)
 
   checkCases(offsets, cases, beet, t)
   t.end()
 })
 
-test('collections: fixed size utf8 strings size 3', (t) => {
-  const cases = ['abc', 'xYz']
+test('composites: COption<u32>', (t) => {
+  const cases = [1, null, 0xff, 0xffff, 0xffffffff]
   const offsets = [0, 4]
-  const beet = fixedSizeUtf8String(3)
+  const beet: Beet<COption<number>> = fixedSizeOption(u32)
 
   checkCases(offsets, cases, beet, t)
   t.end()
 })
 
-test('collections: fixed size utf8 strings size 4', (t) => {
-  const cases = ['abcd', '😁']
-  const offsets = [0, 4]
-  const beet = fixedSizeUtf8String(4)
+test('composites: COption<string>', (t) => {
+  const cases = ['abc', 'xyz', null]
+  const offsets = [0, 2]
+  const beet: Beet<COption<string>> = fixedSizeOption(fixedSizeUtf8String(3))
 
   checkCases(offsets, cases, beet, t)
-  t.end()
-})
-
-test('collections: fixed size utf8 incorrect size', (t) => {
-  const s = '😁'
-  const beet = fixedSizeUtf8String(3)
-  const buf = Buffer.alloc(4)
-  t.throws(() => beet.write(buf, 0, s), /invalid byte size/)
-
   t.end()
 })

@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import test from 'tape'
 import spok, { Specifications } from 'spok'
-import { BeetStruct, i32, u128, u16, u8 } from '../src/beet'
+import { BeetStruct, i32, u128, u16, u8 } from '../../src/beet'
 
 class GameScore {
   constructor(

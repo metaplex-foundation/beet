@@ -17,7 +17,7 @@ import {
   i128,
   i256,
   FixedSizeBeet,
-} from '../src/beet'
+} from '../../src/beet'
 
 function oneType(
   x: bignum,

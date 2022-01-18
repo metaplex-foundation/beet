@@ -1,4 +1,4 @@
-import { Beet, fixedSizeUint8Array, FixedSizeBeet } from '../src/beet'
+import { Beet, fixedSizeUint8Array, FixedSizeBeet } from '../../src/beet'
 import test from 'tape'
 
 function checkCases(

@@ -6,7 +6,7 @@ import {
   fixedSizeUtf8String,
   FixedSizeBeet,
   u8,
-} from '../src/beet'
+} from '../../src/beet'
 import test from 'tape'
 
 enum Color {
