@@ -58,7 +58,7 @@ export const utf8String: FixableBeet<string, string> = {
   },
 
   toFixedFromValue(val: string): FixedSizeBeet<string, string> {
-    const len = val.length
+    const len = Buffer.from(val).byteLength
     return fixedSizeUtf8String(len)
   },
 

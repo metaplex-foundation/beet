@@ -86,10 +86,8 @@ export function uniformFixedSizeArray<T, V = Partial<T>>(
  *
  * @template T type of elements held in the array
  *
- * @param element the De/Serializer for the element type
- * @param len the number of elements in the array
- * @param lenPrefix if `true` a 4 byte number indicating the size of the array
- * will be included before serialized array data
+ * @param elements the De/Serializers for the element types
+ * @param elementsByteSize size of all elements in the array combined
  *
  * @category beet/collection
  */
@@ -150,7 +148,7 @@ export function array<T, V = Partial<T>>(
       const fixedElements: FixedSizeBeet<T, V>[] = new Array(len)
       for (let i = 0; i < len; i++) {
         const fixedElement = fixBeetFromData(element, buf, cursor)
-        fixedElements.push(fixedElement)
+        fixedElements[i] = fixedElement
         cursor += fixedElement.byteSize
       }
       return fixedSizeArray(fixedElements, cursor - cursorStart)
@@ -162,15 +160,15 @@ export function array<T, V = Partial<T>>(
       let elementsSize = 0
       const fixedElements: FixedSizeBeet<T, V>[] = new Array(vals.length)
 
-      for (const val of vals) {
-        const fixedElement = fixBeetFromValue(element, val)
-        fixedElements.push(fixedElement)
+      for (let i = 0; i < vals.length; i++) {
+        const fixedElement = fixBeetFromValue(element, vals[i])
+        fixedElements[i] = fixedElement
         elementsSize += fixedElement.byteSize
       }
       return fixedSizeArray(fixedElements, elementsSize)
     },
 
-    description: `Utf8String`,
+    description: `array`,
   }
 }
 
