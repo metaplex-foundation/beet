@@ -2,10 +2,12 @@ use std::{fs::File, io::Write};
 
 use anyhow::Result;
 use borsh::BorshDeserialize;
+use composites::produce_composites;
 use options::produce_options;
 use simple::produce_simple;
 use vecs::produce_vecs;
 
+mod composites;
 mod options;
 mod samples;
 mod simple;
@@ -32,6 +34,10 @@ fn main() -> Result<()> {
     let vecs_json = serde_json::to_string_pretty(&produce_vecs()?)?;
     let mut vecs_file = File::create(format!("{}/vecs.json", data_dir))?;
     vecs_file.write_all(vecs_json.as_bytes())?;
+
+    let composites_json = serde_json::to_string_pretty(&produce_composites()?)?;
+    let mut composites_file = File::create(format!("{}/composites.json", data_dir))?;
+    composites_file.write_all(composites_json.as_bytes())?;
 
     Ok(())
 }
