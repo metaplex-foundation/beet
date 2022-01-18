@@ -2,13 +2,13 @@ use anyhow::Result;
 
 use serde::{Deserialize, Serialize};
 
-use crate::samples::{produce_samples, Sample};
+use crate::samples::{produce_samples, produce_stringified_samples, Sample};
 
 #[derive(Serialize, Deserialize)]
 pub struct Simple {
     strings: Vec<Sample<String>>,
     u8s: Vec<Sample<u8>>,
-    u128s: Vec<Sample<u128>>,
+    u128s: Vec<Sample<String>>,
 }
 
 pub fn produce_simple() -> Result<Simple> {
@@ -19,7 +19,7 @@ pub fn produce_simple() -> Result<Simple> {
 
     let strings = produce_samples(strings)?;
     let u8s = produce_samples(vec![0, 1, 255])?;
-    let u128s = produce_samples(vec![0, 255, u128::MAX])?;
+    let u128s = produce_stringified_samples(vec![0, 255, u128::MAX])?;
 
     Ok(Simple {
         strings,

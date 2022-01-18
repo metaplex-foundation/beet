@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use anyhow::Result;
 use borsh::BorshSerialize;
 
@@ -23,6 +25,20 @@ where
         .into_iter()
         .filter_map(|x| match x.try_to_vec() {
             Ok(data) => Some(Sample::new(x, data)),
+            Err(_) => None,
+        })
+        .collect();
+    Ok(samples)
+}
+
+pub fn produce_stringified_samples<T>(xs: Vec<T>) -> Result<Vec<Sample<String>>>
+where
+    T: BorshSerialize + Display,
+{
+    let samples: Vec<Sample<String>> = xs
+        .into_iter()
+        .filter_map(|x| match x.try_to_vec() {
+            Ok(data) => Some(Sample::new(x.to_string(), data)),
             Err(_) => None,
         })
         .collect();
