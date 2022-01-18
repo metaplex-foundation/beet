@@ -14,6 +14,7 @@
     "pretest": "yarn build",
     "test": "tape dist/test/{unit,compat}/*.js",
     "test:browser": "airtap ./test/{unit,compat}/*.ts",
+    "bsamples": "cd ../tools/bsamples && cargo run",
     "lint": "prettier -c ./src/",
     "lint:fix": "prettier --write ./src",
     "doc": "rimraf ../docs/beet && typedoc",

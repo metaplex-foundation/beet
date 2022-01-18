@@ -13,6 +13,7 @@ mod samples;
 mod simple;
 mod vecs;
 
+#[allow(unused)]
 fn try_from_slice_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T> {
     let mut data_mut = data;
     let result = T::deserialize(&mut data_mut)?;
@@ -20,7 +21,7 @@ fn try_from_slice_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T> {
 }
 
 fn main() -> Result<()> {
-    // TODO(thlorenz): Parse from args
+    // NOTE: needs to be run from ./tools/bsamples
     let data_dir = "../../beet/test/compat/fixtures";
 
     let simple_json = serde_json::to_string_pretty(&produce_simple()?)?;
