@@ -49,7 +49,7 @@ test('struct: roundtrip COption<struct>', (t) => {
 })
 
 test('struct: roundtrip Array<struct>', (t) => {
-  const beet: Beet<Array<Result>> = fixedSizeArray(Result.struct, 3)
+  const beet = fixedSizeArray(Result.struct, 3)
   const offsets = [0, 8]
 
   for (const offset of offsets) {

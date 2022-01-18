@@ -1,8 +1,8 @@
 import {
-  Beet,
   bool,
   fixedSizeArray,
   fixedSizeUtf8String,
+  FixedSizeBeet,
   u8,
 } from '../src/beet'
 import test from 'tape'
@@ -10,7 +10,7 @@ import test from 'tape'
 function checkCases<T>(
   offsets: number[],
   cases: T[][],
-  beet: Beet<T[]>,
+  beet: FixedSizeBeet<T[]>,
   t: test.Test
 ) {
   for (const offset of offsets) {
@@ -63,7 +63,7 @@ test('collections: fixed size array of bool, include size', (t) => {
     [false, true, false, true],
   ]
   const offsets = [0, 4]
-  const beet: Beet<boolean[]> = fixedSizeArray(bool, 4, true)
+  const beet: FixedSizeBeet<boolean[]> = fixedSizeArray(bool, 4, true)
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -75,7 +75,11 @@ test('collections: fixed size array of string, include size', (t) => {
     ['aaaa', 'bbbb', '*&#@'],
   ]
   const offsets = [0, 3]
-  const beet: Beet<string[]> = fixedSizeArray(fixedSizeUtf8String(4), 3, true)
+  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
+    fixedSizeUtf8String(4),
+    3,
+    true
+  )
 
   checkCases(offsets, cases, beet, t)
   t.end()
@@ -87,7 +91,10 @@ test('collections: fixed size array of string, not including size', (t) => {
     ['aaaa', 'bbbb', '*&#@'],
   ]
   const offsets = [0, 3]
-  const beet: Beet<string[]> = fixedSizeArray(fixedSizeUtf8String(4), 3)
+  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
+    fixedSizeUtf8String(4),
+    3
+  )
 
   checkCases(offsets, cases, beet, t)
   t.end()

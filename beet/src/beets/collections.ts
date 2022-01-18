@@ -1,7 +1,13 @@
-import { Beet, BEET_TYPE_ARG_LEN, SupportedTypeDefinition } from './types'
+import {
+  BEET_TYPE_ARG_LEN,
+  FixedSizeBeet,
+  SupportedTypeDefinition,
+  Collection,
+  ElementCollectionBeet,
+} from '../types'
 import { strict as assert } from 'assert'
 import { u32 } from './numbers'
-import { BEET_PACKAGE } from './types'
+import { BEET_PACKAGE } from '../types'
 
 /**
  * De/Serializes a UTF8 string of a particular size.
@@ -10,9 +16,9 @@ import { BEET_PACKAGE } from './types'
  *
  * @category beet/collection
  */
-export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
+export const fixedSizeUtf8String: (
   stringByteLength: number
-) => {
+) => FixedSizeBeet<string> = (stringByteLength: number) => {
   return {
     write: function (buf: Buffer, offset: number, value: string) {
       const stringBuf = Buffer.from(value, 'utf8')
@@ -31,8 +37,11 @@ export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
       const stringSlice = buf.slice(offset + 4, offset + 4 + stringByteLength)
       return stringSlice.toString('utf8')
     },
+    elementByteSize: 1,
+    len: stringByteLength,
+    lenPrefixByteSize: 4,
     byteSize: 4 + stringByteLength,
-    description: `utf8-string(${stringByteLength})`,
+    description: `Utf8String(${stringByteLength})`,
   }
 }
 
@@ -48,16 +57,16 @@ export const fixedSizeUtf8String: (stringByteLength: number) => Beet<string> = (
  *
  * @category beet/collection
  */
-export function fixedSizeArray<T>(
-  element: Beet<T>,
+export function fixedSizeArray<T, V = Partial<T>>(
+  element: FixedSizeBeet<T, V>,
   len: number,
   lenPrefix: boolean = false
-): Beet<T[]> {
+): Collection<T[], V[]> & ElementCollectionBeet & FixedSizeBeet<T[], V[]> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
   return {
-    write: function (buf: Buffer, offset: number, value: T[]): void {
+    write: function (buf: Buffer, offset: number, value: V[]): void {
       assert.equal(
         value.length,
         len,
@@ -72,6 +81,7 @@ export function fixedSizeArray<T>(
         element.write(buf, offset + i * element.byteSize, value[i])
       }
     },
+
     read: function (buf: Buffer, offset: number): T[] {
       if (lenPrefix) {
         const size = u32.read(buf, offset)
@@ -85,10 +95,21 @@ export function fixedSizeArray<T>(
       return arr
     },
     byteSize,
+    len,
+    elementByteSize: element.byteSize,
+    lenPrefixByteSize: 4,
     description: `Array<${element.description}>(${len})`,
+
+    // Composite
+    get inner(): FixedSizeBeet<T, Partial<T>> {
+      return element
+    },
+
+    withFixedSizeInner(inner: FixedSizeBeet<T>) {
+      return fixedSizeArray(inner, len, lenPrefix)
+    },
   }
 }
-
 /**
  * A De/Serializer for raw {@link Buffer}s that just copies/reads the buffer bytes
  * to/from the provided buffer.
@@ -96,7 +117,7 @@ export function fixedSizeArray<T>(
  * @param bytes the byte size of the buffer to de/serialize
  * @category beet/collection
  */
-export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
+export function fixedSizeBuffer(bytes: number): FixedSizeBeet<Buffer> {
   return {
     write: function (buf: Buffer, offset: number, value: Buffer): void {
       value.copy(buf, offset, 0, bytes)
@@ -116,7 +137,7 @@ export function fixedSizeBuffer(bytes: number): Beet<Buffer> {
  *
  * @category beet/collection
  */
-export function fixedSizeUint8Array(len: number): Beet<Uint8Array> {
+export function fixedSizeUint8Array(len: number): FixedSizeBeet<Uint8Array> {
   const arrayBufferBeet = fixedSizeBuffer(len)
   return {
     write: function (buf: Buffer, offset: number, value: Uint8Array): void {

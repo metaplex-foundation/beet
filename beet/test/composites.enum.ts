@@ -4,6 +4,7 @@ import {
   DataEnum,
   fixedSizeArray,
   fixedSizeUtf8String,
+  FixedSizeBeet,
   u8,
 } from '../src/beet'
 import test from 'tape'
@@ -23,7 +24,7 @@ enum Seats {
 function checkCases<Kind, Data>(
   offsets: number[],
   cases: DataEnum<Kind, Data>[],
-  beet: Beet<DataEnum<Kind, Data>>,
+  beet: FixedSizeBeet<DataEnum<Kind, Data>>,
   resolve: Record<number, string>,
   t: test.Test
 ) {
@@ -67,7 +68,9 @@ test('composites: DataEnum<Color, string>', (t) => {
   ]
 
   const offsets = [0, 4]
-  const beet: Beet<DataEnum<Color, string>> = dataEnum(fixedSizeUtf8String(5))
+  const beet: FixedSizeBeet<DataEnum<Color, string>> = dataEnum(
+    fixedSizeUtf8String(5)
+  )
 
   checkCases(offsets, cases, beet, Color, t)
   t.end()

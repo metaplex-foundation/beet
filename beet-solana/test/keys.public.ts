@@ -1,4 +1,4 @@
-import { Beet } from '@metaplex-foundation/beet'
+import { FixedSizeBeet } from '@metaplex-foundation/beet'
 import { PublicKey, Keypair } from '@solana/web3.js'
 import { publicKey } from '../src/beet-solana'
 import test from 'tape'
@@ -6,7 +6,7 @@ import test from 'tape'
 function checkCases(
   offsets: number[],
   cases: PublicKey[],
-  beet: Beet<PublicKey>,
+  beet: FixedSizeBeet<PublicKey>,
   t: test.Test
 ) {
   for (const offset of offsets) {

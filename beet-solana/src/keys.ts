@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import {
-  Beet,
+  FixedSizeBeet,
   fixedSizeUint8Array,
   SupportedTypeDefinition,
 } from '@metaplex-foundation/beet'
@@ -43,7 +43,7 @@ const uint8Array32 = fixedSizeUint8Array(32)
  *
  * @category beet/solana
  */
-export const publicKey: Beet<PublicKey> = {
+export const publicKey: FixedSizeBeet<PublicKey> = {
   write: function (buf: Buffer, offset: number, value: PublicKey): void {
     const arr = value.toBytes()
     uint8Array32.write(buf, offset, arr)
