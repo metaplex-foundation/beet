@@ -104,7 +104,7 @@ test('toFixed: struct with nested vec and string', (t) => {
         [
           'maybeIds',
           {
-            byteSize: 4 + 4 + 8 * 4,
+            byteSize: 1 + 4 + 8 * 4,
             description: 'COption<Array<u32>(8)>',
           },
         ],
@@ -117,7 +117,7 @@ test('toFixed: struct with nested vec and string', (t) => {
         ],
       ],
       description: 'FixedNestedStruct',
-      byteSize: 84,
+      byteSize: 81,
     })
   }
 
@@ -158,7 +158,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   const beet = fixedSizeOption(innerStruct)
   const fixed = toFixed(beet, [], [innerMap])
   spok(t, fixed, {
-    byteSize: 4 + 4 + 8 + 1,
+    byteSize: 1 + 4 + 8 + 1,
     description: 'COption<FixedInnerStruct>',
   })
 
@@ -270,7 +270,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
             [
               'housePrices',
               {
-                byteSize: 12,
+                byteSize: 9,
                 description: 'COption<Array<u16>(2)>',
                 inner: {
                   byteSize: 8,
@@ -294,7 +294,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
             ],
           ],
           description: 'FixedInnerStruct',
-          byteSize: 13,
+          byteSize: 10,
         },
       ],
       [
@@ -326,7 +326,7 @@ test('toFixed: struct with nested struct and mixed nested dynamic and fixed beet
       ],
     ],
     description: 'FixedOuterStruct',
-    byteSize: 48,
+    byteSize: 45,
   })
   t.end()
 })

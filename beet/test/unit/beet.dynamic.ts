@@ -63,7 +63,7 @@ test('toFixed: dynamicSizeArray<coption<u8>>(2)', (t) => {
   const beet = dynamicSizeArray(fixedSizeOption(u8))
   const fixed = toFixed(beet, [2])
   spok(t, fixed, {
-    byteSize: 4 + (4 + 1) * 2,
+    byteSize: 4 + (1 + 1) * 2,
     description: 'Array<COption<u8>>(2)',
   })
   t.end()
@@ -73,7 +73,7 @@ test('toFixed: coption<dynamicSizeArray<u8>>(2)', (t) => {
   const beet = fixedSizeOption(dynamicSizeArray(u8))
   const fixed = toFixed(beet, [2])
   spok(t, fixed, {
-    byteSize: 4 + 4 + 2 * 1,
+    byteSize: 1 + 4 + 2 * 1,
     description: 'COption<Array<u8>(2)>',
   })
   t.end()
@@ -88,7 +88,7 @@ test('toFixed: dynamicSizeArray<coption(dynamicSizeArray(u64))>([3, 4])', (t) =>
     byteSize:
       4 /* [] len */ +
       3 *
-        /* Outer[] */ (4 /* Option Disc */ +
+        /* Outer[] */ (1 /* Option Disc */ +
           4 /* [] len */ +
           4 * /* Inner [] */ 8) /* u64 */,
     description: 'Array<COption<Array<u64>(4)>>(3)',
@@ -110,7 +110,7 @@ test('toFixed: coption(string)([8])', (t) => {
   const beet = fixedSizeOption(dynamicSizeUtf8String)
   const fixed = toFixed(beet, [8])
   spok(t, fixed, {
-    byteSize: 4 + 4 + 8,
+    byteSize: 1 + 4 + 8,
     description: 'COption<Utf8String(8)>',
   })
   t.end()
@@ -130,7 +130,7 @@ test('toFixed: array(coption(string))([10, 8])', (t) => {
   const beet = dynamicSizeArray(fixedSizeOption(dynamicSizeUtf8String))
   const fixed = toFixed(beet, [10, 8])
   spok(t, fixed, {
-    byteSize: 4 + 10 * (4 + 4 + 8),
+    byteSize: 4 + 10 * (1 + 4 + 8),
     description: 'Array<COption<Utf8String(8)>>(10)',
   })
   t.end()
@@ -142,7 +142,7 @@ test('toFixed: array(coption(array(string)))([10, 3, 8])', (t) => {
   )
   const fixed = toFixed(beet, [10, 3, 8])
   spok(t, fixed, {
-    byteSize: 4 + 10 * (4 + 4 + 3 * (4 + 8)),
+    byteSize: 4 + 10 * (1 + 4 + 3 * (4 + 8)),
     description: 'Array<COption<Array<Utf8String(8)>(3)>>(10)',
   })
   t.end()

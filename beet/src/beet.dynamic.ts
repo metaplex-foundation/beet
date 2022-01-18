@@ -11,6 +11,12 @@ import {
 } from './types'
 import { fixedSizeArray, fixedSizeUtf8String } from './beets/collections'
 import { strict as assert } from 'assert'
+import {
+  coptionNone,
+  coptionSome,
+  isNoneBuffer,
+  isSomeBuffer,
+} from './beets/composites'
 
 /**
  * Resolves all contained dynamic size beets or structs to a static version
