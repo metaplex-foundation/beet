@@ -1,4 +1,4 @@
-import { fixedSizeUtf8String, FixedSizeBeet } from '../src/beet'
+import { fixedSizeUtf8String, FixedSizeBeet } from '../../src/beet'
 import test from 'tape'
 
 function checkCases(

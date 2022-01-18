@@ -1,4 +1,4 @@
-import { Beet, fixedSizeBuffer, FixedSizeBeet } from '../src/beet'
+import { Beet, fixedSizeBuffer, FixedSizeBeet } from '../../src/beet'
 import test from 'tape'
 
 function checkCases(

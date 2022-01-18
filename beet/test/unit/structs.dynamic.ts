@@ -1,14 +1,14 @@
 import spok, { Specifications } from 'spok'
 import test from 'tape'
-import { BeetStruct, coption, COption, u16, u32, u8 } from '../src/beet'
+import { BeetStruct, coption, COption, u16, u32, u8 } from '../../src/beet'
 import {
   dynamicSizeArray,
   dynamicSizeUtf8String,
   toFixed,
-} from '../src/beet.dynamic'
-import { DynamicBeetArgsStruct } from '../src/struct.dynamic'
-import { fixedSizeUtf8String } from '../src/beet'
-import { EMPTY_MAP } from '../src/utils'
+} from '../../src/beet.dynamic'
+import { DynamicBeetArgsStruct } from '../../src/struct.dynamic'
+import { fixedSizeUtf8String } from '../../src/beet'
+import { EMPTY_MAP } from '../../src/utils'
 
 test('toFixed: struct with top level vec', (t) => {
   type Args = {

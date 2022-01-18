@@ -1,6 +1,6 @@
 import test from 'tape'
 import spok from 'spok'
-import { BeetStruct, fixedSizeUtf8String, i32, u16, u8 } from '../src/beet'
+import { BeetStruct, fixedSizeUtf8String, i32, u16, u8 } from '../../src/beet'
 
 class Results {
   constructor(

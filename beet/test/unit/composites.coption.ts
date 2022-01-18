@@ -6,7 +6,7 @@ import {
   FixedSizeBeet,
   u32,
   u8,
-} from '../src/beet'
+} from '../../src/beet'
 import test from 'tape'
 
 function checkCases<T>(

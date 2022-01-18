@@ -11,7 +11,7 @@ import {
   i32,
   u16,
   u8,
-} from '../src/beet'
+} from '../../src/beet'
 
 class Result {
   constructor(

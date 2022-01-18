@@ -4,8 +4,8 @@ import {
   dynamicSizeArray,
   dynamicSizeUtf8String,
   toFixed,
-} from '../src/beet.dynamic'
-import { coption } from '../src/beets/composites'
+} from '../../src/beet.dynamic'
+import { coption } from '../../src/beets/composites'
 import {
   bool,
   i16,
@@ -17,8 +17,8 @@ import {
   u512,
   u64,
   u8,
-} from '../src/beets/numbers'
-import { Beet, bignum } from '../src/types'
+} from '../../src/beets/numbers'
+import { Beet, bignum } from '../../src/types'
 
 test('toFixed: fixed primitives are already fixed', (t) => {
   const beets = <Beet<number | bignum>[]>[u8, u128, u256, u512, i16, i32, bool]
