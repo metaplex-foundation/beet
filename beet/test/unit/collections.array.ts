@@ -1,10 +1,11 @@
 import {
   bool,
   uniformFixedSizeArray,
-  fixedSizeUtf8String,
   FixedSizeBeet,
   u8,
+  fixedSizeUtf8String,
 } from '../../src/beet'
+
 import test from 'tape'
 
 function checkCases<T>(

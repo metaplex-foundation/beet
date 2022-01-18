@@ -6,8 +6,6 @@ import {
   BEET_TYPE_ARG_INNER,
   FixableBeet,
   FixedSizeBeet,
-  isFixableBeet,
-  isFixedSizeBeet,
   SupportedTypeDefinition,
 } from '../types'
 import { BEET_PACKAGE } from '../types'

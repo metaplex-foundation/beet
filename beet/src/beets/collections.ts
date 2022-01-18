@@ -14,62 +14,6 @@ import { logTrace } from '../utils'
 import { fixBeetFromData, fixBeetFromValue } from '../beet.dynamic'
 
 /**
- * De/Serializes a UTF8 string of a particular size.
- *
- * @param stringByteLength the number of bytes of the string
- *
- * @category beet/collection
- */
-export const fixedSizeUtf8String: (
-  stringByteLength: number
-) => FixedSizeBeet<string, string> = (stringByteLength: number) => {
-  return {
-    write: function (buf: Buffer, offset: number, value: string) {
-      const stringBuf = Buffer.from(value, 'utf8')
-      assert.equal(
-        stringBuf.byteLength,
-        stringByteLength,
-        `${value} has invalid byte size`
-      )
-      u32.write(buf, offset, stringByteLength)
-      stringBuf.copy(buf, offset + 4, 0, stringByteLength)
-    },
-
-    read: function (buf: Buffer, offset: number): string {
-      const size = u32.read(buf, offset)
-      assert.equal(size, stringByteLength, `invalid byte size`)
-      const stringSlice = buf.slice(offset + 4, offset + 4 + stringByteLength)
-      return stringSlice.toString('utf8')
-    },
-    elementByteSize: 1,
-    len: stringByteLength,
-    lenPrefixByteSize: 4,
-    byteSize: 4 + stringByteLength,
-    description: `Utf8String(4 + ${stringByteLength})`,
-  }
-}
-
-/**
- * De/Serializes a UTF8 string of any size.
- *
- * @category beet/collection
- */
-export const utf8String: FixableBeet<string, string> = {
-  toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<string, string> {
-    const len = u32.read(buf, offset)
-    logTrace(`${this.description}[${len}]`)
-    return fixedSizeUtf8String(len)
-  },
-
-  toFixedFromValue(val: string): FixedSizeBeet<string, string> {
-    const len = val.length
-    return fixedSizeUtf8String(len)
-  },
-
-  description: `Utf8String`,
-}
-
-/**
  * De/Serializes an array with a specific number of elements of type {@link T}
  * which all have the same size.
  *
@@ -281,7 +225,7 @@ export type CollectionsExports = keyof typeof import('./collections')
 /**
  * @category TypeDefinition
  */
-export type CollectionsTypeMapKey = 'string' | 'Array' | 'Buffer' | 'Uint8Array'
+export type CollectionsTypeMapKey = 'Array' | 'Buffer' | 'Uint8Array'
 /**
  * @category TypeDefinition
  */
@@ -299,7 +243,6 @@ export type CollectionsTypeMap = Record<
  */
 // prettier-ignore
 export const collectionsTypeMap: CollectionsTypeMap = {
-  string     : { beet: 'fixedSizeUtf8String', sourcePack: BEET_PACKAGE, ts: 'string',     arg: BEET_TYPE_ARG_LEN },
   Array      : { beet: 'fixedSizeArray',      sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
   Buffer     : { beet: 'fixedSizeBuffer',     sourcePack: BEET_PACKAGE, ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
   Uint8Array : { beet: 'fixedSizeUint8Array', sourcePack: BEET_PACKAGE, ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }

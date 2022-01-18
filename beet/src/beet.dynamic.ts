@@ -10,7 +10,8 @@ import {
   isFixableBeet,
   isFixedSizeBeet,
 } from './types'
-import { uniformFixedSizeArray, fixedSizeUtf8String } from './beets/collections'
+import { fixedSizeUtf8String } from './beets/string'
+import { uniformFixedSizeArray } from './beets/collections'
 import { strict as assert } from 'assert'
 
 /**
