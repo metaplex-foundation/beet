@@ -1,15 +1,19 @@
 import BN from 'bn.js'
 import test from 'tape'
-import { u128, u8 } from '../../src/beet'
-import { dynamicSizeUtf8String } from '../../src/beet.dynamic'
+import { u128, u8, utf8String } from '../../src/beet'
 import { checkFixedSerialization } from '../utils'
 import fixture from './fixtures/simple.json'
 
 test('compat simple: strings', (t) => {
-  const beet = dynamicSizeUtf8String
+  const beet = utf8String
   for (const { value, data } of fixture.strings) {
-    const fixedBeet = beet.toFixed(value.length)
-    checkFixedSerialization(t, fixedBeet, value, data)
+    checkFixedSerialization(t, beet.toFixedFromValue(value), value, data)
+    checkFixedSerialization(
+      t,
+      beet.toFixedFromData(Buffer.from(data), 0),
+      value,
+      data
+    )
   }
   t.end()
 })
