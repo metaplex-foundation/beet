@@ -250,7 +250,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   {
     t.comment('+++ with Some(args)')
     const args = { name: 'bob', age: 18 }
-    verify(t, beet, args, <Specifications<Beet<InnerArgs>>>{
+    verify(t, beet, args, <Specifications<typeof beet>>{
       description: 'COption<InnerStruct>[1 + 8]',
       byteSize: 9,
       inner: {

@@ -24,68 +24,6 @@ export type COption<T> = T | null
 const NONE = 0
 const SOME = 1
 
-/**
- * De/Serializes an _Option_ of type {@link T} represented by {@link COption}.
- *
- * The de/serialized type is prefixed with `1` if the inner value is
- * present and with `0` if not.
- * This matches the `COption` type borsh representation.
- *
- * @template T inner option type
- * @param inner the De/Serializer for the inner type
- *
- * @category beet/composite
- */
-export function fixedSizeOption<T>(inner: Beet<T>): FixedSizeBeet<COption<T>> {
-  return {
-    write: function (buf: Buffer, offset: number, value: COption<T>) {
-      assertFixedSizeBeet(
-        inner,
-        `coption inner type ${inner.description} needs to be fixed before calling write`
-      )
-      if (value == null) {
-        buf[offset] = NONE
-        // NOTE: here we leave the remaining part of the buffer unchanged
-        // as it won't be consumed on read either.
-        // Also it should be zero filled already.
-      } else {
-        buf[offset] = SOME
-        inner.write(buf, offset + 1, value)
-      }
-    },
-
-    read: function (buf: Buffer, offset: number): COption<T> {
-      assertFixedSizeBeet(
-        inner,
-        `coption inner type ${inner.description} needs to be fixed before calling read`
-      )
-      if (isNoneBuffer(buf, offset)) {
-        return null
-      }
-      assert(isSomeBuffer(buf, offset), 'should be valid COption buffer')
-      return inner.read(buf, offset + 1)
-    },
-
-    get byteSize() {
-      assertFixedSizeBeet(
-        inner,
-        `coption inner type ${inner.description} needs to be fixed before getting byte size`
-      )
-      return 1 + inner.byteSize
-    },
-    description: `COption<${inner.description}>`,
-
-    // @ts-ignore
-    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
-      return fixedSizeOption(fixedInner)
-    },
-
-    get inner() {
-      return inner
-    },
-  }
-}
-
 export function isSomeBuffer(buf: Buffer, offset: number) {
   return buf[offset] === SOME
 }
@@ -126,8 +64,12 @@ export function coptionNone<T>(description: string): FixedSizeBeet<COption<T>> {
     description: `COption<None(${description})>`,
 
     // @ts-ignore
-    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
-      return fixedSizeOption(fixedInner)
+    withFixedSizeInner(_fixedInner: FixedSizeBeet<T>) {
+      throw new Error('None withFixedSizeInner')
+    },
+
+    get inner() {
+      throw new Error('None inner')
     },
   }
 }
@@ -173,15 +115,15 @@ export function coptionSome<T>(
     },
 
     description: `COption<${inner.description}>[1 + ${inner.byteSize}]`,
+    byteSize,
 
     // @ts-ignore
-    withFixedSizeInner(fixedInner: FixedSizeBeet<T>) {
-      return fixedSizeOption(fixedInner)
+    withFixedSizeInner(_fixedInner: FixedSizeBeet<T>) {
+      throw new Error('withFixedSizeInner')
     },
 
-    byteSize,
     get inner() {
-      return inner
+      throw new Error('inner')
     },
   }
   logTrace(beet.description)
@@ -200,13 +142,9 @@ export function coptionSome<T>(
  *
  * @category beet/composite
  */
-export function coption<T, V = COption<T>>(
-  inner: Beet<T, V>
-): FixableBeet<COption<T>> {
+export function coption<T, V = T>(inner: Beet<T, V>): FixableBeet<COption<T>> {
   return {
-    toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<COption<T>, V> {
-      // TODO(thlorenz): all beets should just have this
-      // const [ innerFixed, innerByteSize ] = inner.toFixedFromData(buf, offset + byteSize)
+    toFixedFromData(buf: Buffer, offset: number) {
       if (isSomeBuffer(buf, offset)) {
         const innerFixed = fixBeetFromData(inner, buf, offset + 1)
         return coptionSome(innerFixed)
@@ -216,12 +154,10 @@ export function coption<T, V = COption<T>>(
       }
     },
 
-    // TODO(thlorenz): Fix type issue
-    // @ts-ignore
-    toFixedFromValue(val: V): FixedSizeBeet<COption<T>, V> {
+    toFixedFromValue(val: V | Partial<COption<T>>) {
       return val == null
         ? coptionNone(inner.description)
-        : coptionSome(fixBeetFromValue(inner, val))
+        : coptionSome(fixBeetFromValue(inner, val as V))
     },
 
     description: `COption<${inner.description}`,
@@ -291,6 +227,6 @@ export type CompositesTypeMap = Record<
  */
 // prettier-ignore
 export const compositesTypeMap: CompositesTypeMap = {
-  option: { beet: 'coption', sourcePack: BEET_PACKAGE, ts: 'COption<Inner>',        arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE },
+  option: { beet: 'coption', sourcePack: BEET_PACKAGE,  ts: 'COption<Inner>',        arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE },
   enum:   { beet: 'dataEnum', sourcePack: BEET_PACKAGE, ts: 'DataEnum<Kind, Inner>', arg: BEET_TYPE_ARG_INNER, pack: BEET_PACKAGE}
 }
