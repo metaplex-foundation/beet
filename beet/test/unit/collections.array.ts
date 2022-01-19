@@ -82,3 +82,17 @@ test('collections: non-uniform size array of option(string)', (t) => {
   checkCases(offsets, cases, beet, t)
   t.end()
 })
+
+test('collections: non-uniform size array of option(array(string))', (t) => {
+  const cases = [
+    [],
+    [null, null],
+    [['a '], ['abcdef', '😁']],
+    [['aa', 'bbb'], null, ['*&#@!!', 'abcdef', '😁', 'aa', 'bb', 'ccccc']],
+  ]
+  const offsets = [0, 3]
+  const beet = array(coption(array(utf8String)))
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
