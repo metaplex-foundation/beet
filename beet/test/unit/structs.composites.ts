@@ -4,7 +4,6 @@ import {
   Beet,
   BeetStruct,
   COption,
-  fixedSizeOption,
   dataEnum,
   DataEnum,
   uniformFixedSizeArray,
