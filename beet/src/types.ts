@@ -51,7 +51,7 @@ export type ElementCollectionBeet = {
   /**
    * For arrays and strings this indicates the amount of elements/chars.
    */
-  len: number
+  length: number
 
   /**
    * For arrays and strings this indicates the byte size of the number that
@@ -142,8 +142,12 @@ export type DynamicSizeBeetField<T> = [keyof T, DynamicSizeBeet<T[keyof T]>]
  * @category beet
  */
 export type BeetField<T, V = Partial<T>> = [
-  keyof T,
-  FixedSizeBeet<T[keyof T], V> | DynamicSizeBeet<T[keyof T], V>
+  keyof T & string,
+  (
+    | FixedSizeBeet<T[keyof T], V>
+    | FixableBeet<T[keyof T], V>
+    | DynamicSizeBeet<T[keyof T], V>
+  )
 ]
 
 // FixedBeetField<T> | DynamicSizeBeetField<T>

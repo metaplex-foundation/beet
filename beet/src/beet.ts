@@ -22,6 +22,7 @@ export * from './beets/composites'
 export * from './beets/numbers'
 export * from './read-write'
 export * from './struct'
+export * from './struct.fixable'
 export * from './types'
 
 /**

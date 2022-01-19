@@ -1,9 +1,27 @@
 import test from 'tape'
 import { inspect } from 'util'
-import { FixedSizeBeet } from '../../src/beet'
+import { Beet, FixedSizeBeet } from '../../src/beet'
 
 export function deepLog(obj: any) {
   console.log(inspect(obj, { depth: 15, colors: true, getters: true }))
+}
+
+export function deepLogBeet(struct: Beet<any, any>) {
+  // @ts-ignore accessing private fields
+  if (typeof struct.fields === 'undefined') {
+    deepLog(struct)
+    return
+  }
+  // @ts-ignore accessing private fields
+  for (const field of struct.fields) {
+    const [, beet] = field
+    const { write, read, ...rest } = beet
+    // @ts-ignore incomplete field on purpose
+    field[1] = rest
+  }
+  // @ts-ignore construct not always present
+  const { construct, ...rest } = struct
+  deepLog(rest)
 }
 
 function checkFixedSerialize<T>(

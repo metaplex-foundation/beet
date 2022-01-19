@@ -14,7 +14,7 @@ export function beetBytes<T, V = Partial<T>>(
 ) {
   let bytes: string
   if (isElementCollectionFixedSizeBeet(beet)) {
-    const len = isDynamic ? 'length' : beet.len
+    const len = isDynamic ? 'length' : beet.length
     const lenBytes = beet.lenPrefixByteSize
     bytes =
       lenBytes > 0

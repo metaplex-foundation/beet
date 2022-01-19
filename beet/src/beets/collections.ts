@@ -64,7 +64,7 @@ export function uniformFixedSizeArray<T, V = Partial<T>>(
       return arr
     },
     byteSize,
-    len,
+    length: len,
     elementByteSize: element.byteSize,
     lenPrefixByteSize: 4,
     description: `Array<${element.description}>(${len})`,
@@ -129,7 +129,7 @@ export function fixedSizeArray<T, V = Partial<T>>(
       return arr
     },
     byteSize: 4 + elementsByteSize,
-    len,
+    length: len,
     description: `Array<${firstElement}>(${len})[ 4 + ${elementsByteSize} ]`,
   }
 }
