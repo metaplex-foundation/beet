@@ -20,8 +20,9 @@ function verify<Args>(
   structOrBeet: FixableBeet<Args> | FixableBeetArgsStruct<Args>,
   args: Args,
   expected: Specifications<BeetArgsStruct<Args>>,
-  log = false
+  opts: { log?: boolean; skipRoundTrip?: boolean } = {}
 ) {
+  const { log = false, skipRoundTrip = false } = opts
   // 1. Derive fixed struct or beet from provided args and check it
   const fixedFromArgs = structOrBeet.toFixedFromValue(args)
   if (log) {
@@ -45,6 +46,8 @@ function verify<Args>(
   const fixedFromData = structOrBeet.toFixedFromData(data, 0)
   spok(t, fixedFromData, expected, 'fixedFromData: ')
 
+  if (skipRoundTrip) return
+
   // 4. Deserialize args from data via the beet or struct derived from data
   if (
     typeof (fixedFromData as BeetArgsStruct<Args>).deserialize === 'function'
@@ -53,11 +56,11 @@ function verify<Args>(
     const [deserializedArgs] = (
       fixedFromData as BeetArgsStruct<Args>
     ).deserialize(data)
-    spok(t, args, { ...deserializedArgs, $topic: 'round-tripped' })
+    spok(t, deserializedArgs, { ...args, $topic: 'round-tripped' })
   } else {
     // Beet
     const deserializedArgs = fixedFromData.read(data, 0)
-    spok(t, args, { ...deserializedArgs, $topic: 'round-tripped' })
+    spok(t, deserializedArgs, { ...args, $topic: 'round-tripped' })
   }
 }
 
@@ -105,7 +108,7 @@ test('structs: fixable struct with top level vec', (t) => {
   {
     t.comment('+++ providing value with more fields')
     const args = { ids: [1, 2, 3, 4], count: 1, name: 'bob' }
-    verify(t, struct, args, expected)
+    verify(t, struct, args, expected, { skipRoundTrip: true })
   }
 
   t.end()
@@ -233,7 +236,7 @@ test('struct: fixable struct with nested vec and string', (t) => {
 // Nested Fixable Struct
 // -----------------
 
-test('toFixed: struct with top level string nested inside other struct', (t) => {
+test('fixable: struct with top level string nested inside other struct', (t) => {
   type InnerArgs = {
     name: string
     age: number
@@ -290,7 +293,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   t.end()
 })
 
-test('toFixed: struct with top level string nested inside other struct', (t) => {
+test('fixable: struct with top level string nested inside other struct', (t) => {
   type InnerArgs = {
     name: string
     age: number

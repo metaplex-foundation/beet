@@ -62,15 +62,6 @@ export function coptionNone<T>(description: string): FixedSizeBeet<COption<T>> {
 
     byteSize: 1,
     description: `COption<None(${description})>`,
-
-    // @ts-ignore
-    withFixedSizeInner(_fixedInner: FixedSizeBeet<T>) {
-      throw new Error('None withFixedSizeInner')
-    },
-
-    get inner() {
-      throw new Error('None inner')
-    },
   }
 }
 
@@ -117,14 +108,7 @@ export function coptionSome<T>(
     description: `COption<${inner.description}>[1 + ${inner.byteSize}]`,
     byteSize,
 
-    // @ts-ignore
-    withFixedSizeInner(_fixedInner: FixedSizeBeet<T>) {
-      throw new Error('withFixedSizeInner')
-    },
-
-    get inner() {
-      throw new Error('inner')
-    },
+    inner,
   }
   logTrace(beet.description)
   return beet
