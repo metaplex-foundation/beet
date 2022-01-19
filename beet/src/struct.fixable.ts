@@ -1,4 +1,4 @@
-import { fixBeetFromData, fixBeetFromValue } from './beet.dynamic'
+import { fixBeetFromData, fixBeetFromValue } from './beet'
 import { BeetStruct } from './struct'
 import { BeetField, FixableBeet, FixedSizeBeet } from './types'
 import { strict as assert } from 'assert'

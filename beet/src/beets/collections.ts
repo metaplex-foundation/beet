@@ -2,7 +2,6 @@ import {
   BEET_TYPE_ARG_LEN,
   FixedSizeBeet,
   SupportedTypeDefinition,
-  Collection,
   ElementCollectionBeet,
   FixableBeet,
   Beet,
@@ -11,7 +10,7 @@ import { strict as assert } from 'assert'
 import { u32 } from './numbers'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
-import { fixBeetFromData, fixBeetFromValue } from '../beet.dynamic'
+import { fixBeetFromData, fixBeetFromValue } from '../beet'
 
 /**
  * De/Serializes an array with a specific number of elements of type {@link T}
@@ -30,7 +29,7 @@ export function uniformFixedSizeArray<T, V = Partial<T>>(
   element: FixedSizeBeet<T, V>,
   len: number,
   lenPrefix: boolean = false
-): Collection<T[], V[]> & ElementCollectionBeet & FixedSizeBeet<T[], V[]> {
+): ElementCollectionBeet & FixedSizeBeet<T[], V[]> {
   const arraySize = element.byteSize * len
   const byteSize = lenPrefix ? 4 + arraySize : arraySize
 
@@ -68,15 +67,6 @@ export function uniformFixedSizeArray<T, V = Partial<T>>(
     elementByteSize: element.byteSize,
     lenPrefixByteSize: 4,
     description: `Array<${element.description}>(${len})`,
-
-    // Composite
-    get inner(): FixedSizeBeet<T, Partial<T>> {
-      return element
-    },
-
-    withFixedSizeInner(inner: FixedSizeBeet<T>) {
-      return uniformFixedSizeArray(inner, len, lenPrefix)
-    },
   }
 }
 
@@ -134,6 +124,16 @@ export function fixedSizeArray<T, V = Partial<T>>(
   }
 }
 
+/**
+ * Wraps an array De/Serializer with with elements of type {@link T} which do
+ * not all have the same size.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param element the De/Serializer for the element types
+ *
+ * @category beet/collection
+ */
 export function array<T, V = Partial<T>>(
   element: Beet<T, V>
 ): FixableBeet<T[], V[]> {
@@ -223,7 +223,11 @@ export type CollectionsExports = keyof typeof import('./collections')
 /**
  * @category TypeDefinition
  */
-export type CollectionsTypeMapKey = 'Array' | 'Buffer' | 'Uint8Array'
+export type CollectionsTypeMapKey =
+  | 'Array'
+  | 'FixedSizeArray'
+  | 'Buffer'
+  | 'Uint8Array'
 /**
  * @category TypeDefinition
  */
@@ -241,7 +245,8 @@ export type CollectionsTypeMap = Record<
  */
 // prettier-ignore
 export const collectionsTypeMap: CollectionsTypeMap = {
-  Array      : { beet: 'fixedSizeArray',      sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
-  Buffer     : { beet: 'fixedSizeBuffer',     sourcePack: BEET_PACKAGE, ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
-  Uint8Array : { beet: 'fixedSizeUint8Array', sourcePack: BEET_PACKAGE, ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
+  Array          : { beet: 'array',               sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
+  FixedSizeArray : { beet: 'fixedSizeArray',      sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
+  Buffer         : { beet: 'fixedSizeBuffer',     sourcePack: BEET_PACKAGE, ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
+  Uint8Array     : { beet: 'fixedSizeUint8Array', sourcePack: BEET_PACKAGE, ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
 }

@@ -230,7 +230,7 @@ test('struct: fixable struct with nested vec and string', (t) => {
 })
 
 // -----------------
-// Nested Dynamic Struct
+// Nested Fixable Struct
 // -----------------
 
 test('toFixed: struct with top level string nested inside other struct', (t) => {
@@ -371,7 +371,7 @@ test('toFixed: struct with top level string nested inside other struct', (t) => 
   t.end()
 })
 
-test('toFixed: struct with nested struct and mixed nested dynamic and fixed beets ', (t) => {
+test('toFixed: struct with nested struct and mixed nested fixable and fixed beets ', (t) => {
   type InnerArgs = {
     housePrices: COption<number[]>
     age: number

@@ -10,11 +10,11 @@ export const logTrace = debug('beet:trace')
 
 export function beetBytes<T, V = Partial<T>>(
   beet: FixedSizeBeet<T, V>,
-  isDynamic = false
+  isFixable = false
 ) {
   let bytes: string
   if (isElementCollectionFixedSizeBeet(beet)) {
-    const len = isDynamic ? 'length' : beet.length
+    const len = isFixable ? 'length' : beet.length
     const lenBytes = beet.lenPrefixByteSize
     bytes =
       lenBytes > 0
@@ -29,8 +29,3 @@ export function beetBytes<T, V = Partial<T>>(
 export function bytes(n: number) {
   return brightBlack(`${n} B`)
 }
-
-/**
- * Use this to provide a map for structs which need no lengths
- */
-export const EMPTY_MAP = new Map()

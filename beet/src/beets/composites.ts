@@ -10,7 +10,7 @@ import {
 } from '../types'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
-import { fixBeetFromData, fixBeetFromValue } from '../beet.dynamic'
+import { fixBeetFromData, fixBeetFromValue } from '../beet'
 
 /**
  * Represents the Rust Option type {@link T}.

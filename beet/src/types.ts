@@ -1,6 +1,5 @@
 import BN from 'bn.js'
 import { strict as assert } from 'assert'
-import { DynamicSizeBeetStruct } from './struct.dynamic'
 
 /**
  * Matches name in package.json
@@ -82,39 +81,12 @@ export type FixedSizeBeet<T, V = Partial<T>> =
   | ScalarFixedSizeBeet<T, V>
   | ElementCollectionFixedSizeBeet<T, V>
 
-/**
- * Type that includes function that returns a {@link FixedSizeBeet} when the lens are
- * provided.
- *
- * @param len amount of elements
- * */
-export type DynamicSizeBeet<T, V = Partial<T>> = BeetBase & {
-  toFixed: (len: number) => FixedSizeBeet<T, V>
-}
-
 export type FixableBeet<T, V = Partial<T>> = BeetBase & {
   toFixedFromData: (buf: Buffer, offset: number) => FixedSizeBeet<T, V>
   toFixedFromValue: (val: V) => FixedSizeBeet<T, V>
 }
 
-export type Beet<T, V = Partial<T>> =
-  | FixedSizeBeet<T, V>
-  | DynamicSizeBeet<T, V>
-  | FixableBeet<T, V>
-
-export type Composite<T, V, InnerT, InnerV = Partial<InnerT>> = Beet<T, V> & {
-  inner: Beet<InnerT, InnerV>
-  withFixedSizeInner(
-    fixedInner: FixedSizeBeet<InnerT, InnerV>
-  ): Composite<T, V, InnerT, InnerV>
-}
-
-export type Collection<
-  T extends InnerT[],
-  V extends InnerV[],
-  InnerT = T[number],
-  InnerV = V[number]
-> = Beet<T, V> & Composite<T, V, InnerT, InnerV>
+export type Beet<T, V = Partial<T>> = FixedSizeBeet<T, V> | FixableBeet<T, V>
 
 /**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
@@ -132,25 +104,10 @@ export type FixedBeetField<T> = [keyof T, FixedSizeBeet<T[keyof T]>]
  *
  * @category beet
  */
-export type DynamicSizeBeetField<T> = [keyof T, DynamicSizeBeet<T[keyof T]>]
-
-/**
- * Specifies a field that is part of the type {@link T} along with its De/Serializer.
- *
- * @template T the type of which the field is a member
- *
- * @category beet
- */
 export type BeetField<T, V = Partial<T>> = [
   keyof T & string,
-  (
-    | FixedSizeBeet<T[keyof T], V>
-    | FixableBeet<T[keyof T], V>
-    | DynamicSizeBeet<T[keyof T], V>
-  )
+  FixedSizeBeet<T[keyof T], V> | FixableBeet<T[keyof T], V>
 ]
-
-// FixedBeetField<T> | DynamicSizeBeetField<T>
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
@@ -207,20 +164,14 @@ export function isFixedSizeBeet<T, V = Partial<T>>(
   return Object.keys(x).includes('byteSize')
 }
 
+/**
+ * @private
+ */
 export function assertFixedSizeBeet<T, V = Partial<T>>(
   x: Beet<T, V>,
   msg = `${x} should have been a fixed beet`
 ): asserts x is FixedSizeBeet<T, V> {
   assert(isFixedSizeBeet(x), msg)
-}
-
-/**
- * @private
- */
-export function isDynamicSizeBeet<T, V>(
-  x: Beet<T, V>
-): x is DynamicSizeBeet<T, V> {
-  return typeof (x as DynamicSizeBeet<T, V>).toFixed === 'function'
 }
 
 /**
@@ -236,30 +187,12 @@ export function isFixableBeet<T, V>(x: Beet<T, V>): x is FixableBeet<T, V> {
 /**
  * @private
  */
-export function isDynamicSizeBeetStruct<T, V>(
-  x: Beet<T, V>
-): x is DynamicSizeBeetStruct<T, V> {
-  return typeof (x as DynamicSizeBeetStruct<T, V>).toFixedFromMap === 'function'
-}
-
-/**
- * @private
- */
-export function isCompositeBeet<T, V = Partial<T>>(
-  x: Beet<T, V> | Composite<T, V, any, any>
-): x is Composite<T, V, any, any> {
-  return (x as Composite<T, V, any, any>).inner != null
-}
-
-/**
- * @private
- */
 export function isElementCollectionFixedSizeBeet<T, V = Partial<T>>(
   x: FixedSizeBeet<T, V>
 ): x is ElementCollectionFixedSizeBeet<T, V> {
   const keys = Object.keys(x)
   return (
-    keys.includes('len') &&
+    keys.includes('length') &&
     keys.includes('elementByteSize') &&
     keys.includes('lenPrefixByteSize')
   )
