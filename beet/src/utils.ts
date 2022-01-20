@@ -1,6 +1,11 @@
 import debug from 'debug'
 import colors from 'ansicolors'
-import { FixedSizeBeet, isElementCollectionFixedSizeBeet } from './types'
+import {
+  FixableBeet,
+  FixedSizeBeet,
+  isElementCollectionFixedSizeBeet,
+  isFixableBeet,
+} from './types'
 const { brightBlack } = colors
 
 export const logError = debug('beet:error')
@@ -9,11 +14,13 @@ export const logDebug = debug('beet:debug')
 export const logTrace = debug('beet:trace')
 
 export function beetBytes<T, V = Partial<T>>(
-  beet: FixedSizeBeet<T, V>,
+  beet: FixedSizeBeet<T, V> | FixableBeet<T, V>,
   isFixable = false
 ) {
   let bytes: string
-  if (isElementCollectionFixedSizeBeet(beet)) {
+  if (isFixableBeet(beet)) {
+    bytes = '? B'
+  } else if (isElementCollectionFixedSizeBeet(beet)) {
     const len = isFixable ? 'length' : beet.length
     const lenBytes = beet.lenPrefixByteSize
     bytes =

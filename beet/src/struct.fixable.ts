@@ -1,7 +1,10 @@
 import { fixBeetFromData, fixBeetFromValue } from './beet'
 import { BeetStruct } from './struct'
-import { BeetField, FixableBeet, FixedSizeBeet } from './types'
+import { BeetField, FixableBeet, FixedSizeBeet, isFixedSizeBeet } from './types'
 import { strict as assert } from 'assert'
+import { beetBytes, logDebug } from './utils'
+import colors from 'ansicolors'
+const { brightBlack } = colors
 
 export class FixableBeetStruct<Class, Args = Partial<Class>>
   implements FixableBeet<Class, Args>
@@ -20,25 +23,19 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
     private readonly construct: (args: Args) => Class,
     readonly description = FixableBeetStruct.description
   ) {
-    /*
+    let minByteSize = 0
     if (logDebug.enabled) {
-      let byteSize = 0
       const flds = fields
-        .map(([key, val]: BeetField<Args, any>) => {
-          if (isFixedRecursively(val)) {
-            byteSize += val.byteSize
-            return `${key}: ${val.description} ${beetBytes(val, true)}`
+        .map(([key, val]: BeetField<Args>) => {
+          if (isFixedSizeBeet(val)) {
+            minByteSize += val.byteSize
           }
-          val = toFixed(val, LOG_LENGTHS.slice(), LMAPS)
-          byteSize += val.byteSize
-          return `${key}: ${val.description} ${beetBytes(val, true)}`
+          return `${key}: ${val.description} ${beetBytes(val)}`
         })
         .join('\n  ')
-      logDebug(
-        `struct ${description} {\n  ${flds}\n} ${bytes(byteSize)} (minimum)`
-      )
+      const bytes = `> ${minByteSize} B`
+      logDebug(`struct ${description} {\n  ${flds}\n} ${brightBlack(bytes)}`)
     }
-    */
   }
   toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<Class, Args> {
     let cursor = offset

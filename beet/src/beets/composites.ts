@@ -144,7 +144,7 @@ export function coption<T, V = T>(inner: Beet<T, V>): FixableBeet<COption<T>> {
         : coptionSome(fixBeetFromValue(inner, val as V))
     },
 
-    description: `COption<${inner.description}`,
+    description: `COption<${inner.description}>`,
   }
 }
 
