@@ -1,6 +1,6 @@
 import { fixBeetFromData, fixBeetFromValue } from './beet'
 import { BeetStruct } from './struct'
-import { BeetField, FixableBeet, FixedSizeBeet, isFixedSizeBeet } from './types'
+import { BeetField, FixableBeet, isFixedSizeBeet } from './types'
 import { strict as assert } from 'assert'
 import { beetBytes, logDebug } from './utils'
 import colors from 'ansicolors'
@@ -37,7 +37,35 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
       logDebug(`struct ${description} {\n  ${flds}\n} ${brightBlack(bytes)}`)
     }
   }
-  toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<Class, Args> {
+
+  /**
+   * Deserializes an instance of the Class from the provided buffer starting to
+   * read at the provided offset.
+   *
+   * @returns `[instance of Class, offset into buffer after deserialization completed]`
+   */
+  deserialize(buffer: Buffer, offset: number = 0): [Class, number] {
+    return this.toFixedFromData(buffer, offset).deserialize(buffer, offset)
+  }
+
+  /**
+   * Serializes the provided instance into a new {@link Buffer}
+   *
+   * **NOTE:** that the `instance` is traversed and each of its fields accessed
+   * twice, once to derive a _fixed size_ {@link BeetStruct} and then use it to
+   * serialize the `instance`.
+   * Therefore ensure that none of the properties that are part of the struct
+   * have side effects, i.e. via `Getter`s.
+   *
+   * @param instance of the struct to serialize
+   * @param byteSize allows to override the size fo the created Buffer and
+   * defaults to the size of the struct to serialize
+   */
+  serialize(instance: Args, byteSize?: number): [Buffer, number] {
+    return this.toFixedFromValue(instance).serialize(instance, byteSize)
+  }
+
+  toFixedFromData(buf: Buffer, offset: number): BeetStruct<Class, Args> {
     let cursor = offset
     const fixedFields = new Array(this.fields.length)
 
@@ -53,7 +81,7 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
       : new BeetStruct(fixedFields, this.construct)
   }
 
-  toFixedFromValue(args: Args): FixedSizeBeet<Class, Args> {
+  toFixedFromValue(args: Args): BeetStruct<Class, Args> {
     const argsKeys = Object.keys(args)
     const fixedFields = new Array(this.fields.length)
 

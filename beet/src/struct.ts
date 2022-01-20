@@ -95,7 +95,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
       'serializing [%s] %o to %d bytes buffer',
       this.description,
       instance,
-      this.byteSize
+      byteSize
     )
     const writer = new BeetWriter(byteSize)
     writer.writeStruct(instance, this.fields)
