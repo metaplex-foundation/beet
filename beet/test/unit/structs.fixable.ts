@@ -20,9 +20,10 @@ function verify<Args>(
   structOrBeet: FixableBeet<Args> | FixableBeetArgsStruct<Args>,
   args: Args,
   expected: Specifications<BeetArgsStruct<Args>>,
-  opts: { log?: boolean; skipRoundTrip?: boolean } = {}
+  opts: { log?: boolean; argsForRoundTrip?: (args: Args) => Args } = {}
 ) {
-  const { log = false, skipRoundTrip = false } = opts
+  const { log = false, argsForRoundTrip: argsForRoundTrip = (args) => args } =
+    opts
   // 1. Derive fixed struct or beet from provided args and check it
   const fixedFromArgs = structOrBeet.toFixedFromValue(args)
   if (log) {
@@ -46,8 +47,6 @@ function verify<Args>(
   const fixedFromData = structOrBeet.toFixedFromData(data, 0)
   spok(t, fixedFromData, expected, 'fixedFromData: ')
 
-  if (skipRoundTrip) return
-
   // 4. Deserialize args from data via the beet or struct derived from data
   if (
     typeof (fixedFromData as BeetArgsStruct<Args>).deserialize === 'function'
@@ -56,11 +55,17 @@ function verify<Args>(
     const [deserializedArgs] = (
       fixedFromData as BeetArgsStruct<Args>
     ).deserialize(data)
-    spok(t, deserializedArgs, { ...args, $topic: 'round-tripped' })
+    spok(t, deserializedArgs, {
+      ...argsForRoundTrip(args),
+      $topic: 'round-tripped',
+    })
   } else {
     // Beet
     const deserializedArgs = fixedFromData.read(data, 0)
-    spok(t, deserializedArgs, { ...args, $topic: 'round-tripped' })
+    spok(t, deserializedArgs, {
+      ...argsForRoundTrip(args),
+      $topic: 'round-tripped',
+    })
   }
 }
 
@@ -108,7 +113,13 @@ test('structs: fixable struct with top level vec', (t) => {
   {
     t.comment('+++ providing value with more fields')
     const args = { ids: [1, 2, 3, 4], count: 1, name: 'bob' }
-    verify(t, struct, args, expected, { skipRoundTrip: true })
+    verify(t, struct, args, expected, {
+      argsForRoundTrip: (args) =>
+        <typeof args>{
+          ids: args.ids,
+          count: args.count,
+        },
+    })
   }
 
   t.end()
