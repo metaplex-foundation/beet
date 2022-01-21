@@ -1,6 +1,6 @@
 {
   "name": "@metaplex-foundation/beet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Strict borsh compatible de/serializer",
   "main": "dist/src/beet.js",
   "types": "dist/src/beet.d.ts",
