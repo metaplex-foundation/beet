@@ -1,6 +1,5 @@
 import BN from 'bn.js'
 import { strict as assert } from 'assert'
-import { DynamicSizeBeetStruct } from './struct.dynamic'
 
 /**
  * Matches name in package.json
@@ -9,6 +8,10 @@ import { DynamicSizeBeetStruct } from './struct.dynamic'
  */
 export const BEET_PACKAGE = '@metaplex-foundation/beet'
 
+/**
+ * Base Beet type.
+ * @category beet
+ */
 export type BeetBase = {
   /**
    * Describes the type of data that is de/serialized and serves for debugging
@@ -17,6 +20,10 @@ export type BeetBase = {
   description: string
 }
 
+/**
+ * Specifies the read/write methods that a beet may implement.
+ * @category beet
+ */
 export type BeetReadWrite<T, V = Partial<T>> = {
   /**
    * Writes the value of type {@link T} to the provided buffer.
@@ -51,7 +58,7 @@ export type ElementCollectionBeet = {
   /**
    * For arrays and strings this indicates the amount of elements/chars.
    */
-  len: number
+  length: number
 
   /**
    * For arrays and strings this indicates the byte size of the number that
@@ -70,7 +77,8 @@ export type ElementCollectionFixedSizeBeet<T, V = Partial<T>> = BeetBase &
   ElementCollectionBeet
 
 /**
- * Template for De/Serializer.
+ * Template for De/Serializer which is of fixed size, meaning its Buffer size
+ * when serialized doesn't change depending on the data it contains.
  *
  * @template T is the data type which is being de/serialized
  * @template V is the value type passed to the write which includes all
@@ -83,38 +91,44 @@ export type FixedSizeBeet<T, V = Partial<T>> =
   | ElementCollectionFixedSizeBeet<T, V>
 
 /**
- * Type that includes function that returns a {@link FixedSizeBeet} when the lens are
- * provided.
+ * Template for De/Serializer which has a dynamic size, meaning its Buffer size
+ * when serialized changes depending on the data it contains.
  *
- * @param len amount of elements
- * */
-export type DynamicSizeBeet<T, V = Partial<T>> = BeetBase & {
-  toFixed: (len: number) => FixedSizeBeet<T, V>
-}
-
+ * It is _fixable_ in the sense that a {@link FixedSizeBeet} can be derived
+ * from it by providing either the value or serialized data for the particular
+ * instance.
+ *
+ * @template T is the data type which is being de/serialized
+ * @template V is the value type passed to the write which includes all
+ * properties needed to produce {@link T}, defaults to `Partial<T>`
+ *
+ * @category beet
+ */
 export type FixableBeet<T, V = Partial<T>> = BeetBase & {
+  /**
+   * Provides a fixed size version of `this` by walking the provided data in
+   * order to discover the sizes of the root beet and all nested beets.
+   *
+   * @param buf the Buffer containing the data for which to adapt this beet to
+   * fixed size
+   * @param offset the offset at which the data starts
+   *
+   */
   toFixedFromData: (buf: Buffer, offset: number) => FixedSizeBeet<T, V>
+
+  /**
+   * Provides a fixed size version of `this` by walking the provided value in
+   * order to discover the sizes of the root beet and all nested beets.
+   *
+   * @param val the instance for which to adapt this beet to fixed size
+   */
   toFixedFromValue: (val: V) => FixedSizeBeet<T, V>
 }
 
-export type Beet<T, V = Partial<T>> =
-  | FixedSizeBeet<T, V>
-  | DynamicSizeBeet<T, V>
-  | FixableBeet<T, V>
-
-export type Composite<T, V, InnerT, InnerV = Partial<InnerT>> = Beet<T, V> & {
-  inner: Beet<InnerT, InnerV>
-  withFixedSizeInner(
-    fixedInner: FixedSizeBeet<InnerT, InnerV>
-  ): Composite<T, V, InnerT, InnerV>
-}
-
-export type Collection<
-  T extends InnerT[],
-  V extends InnerV[],
-  InnerT = T[number],
-  InnerV = V[number]
-> = Beet<T, V> & Composite<T, V, InnerT, InnerV>
+/**
+ * @category beet
+ */
+export type Beet<T, V = Partial<T>> = FixedSizeBeet<T, V> | FixableBeet<T, V>
 
 /**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
@@ -132,21 +146,10 @@ export type FixedBeetField<T> = [keyof T, FixedSizeBeet<T[keyof T]>]
  *
  * @category beet
  */
-export type DynamicSizeBeetField<T> = [keyof T, DynamicSizeBeet<T[keyof T]>]
-
-/**
- * Specifies a field that is part of the type {@link T} along with its De/Serializer.
- *
- * @template T the type of which the field is a member
- *
- * @category beet
- */
 export type BeetField<T, V = Partial<T>> = [
-  keyof T,
-  FixedSizeBeet<T[keyof T], V> | DynamicSizeBeet<T[keyof T], V>
+  keyof T & string,
+  FixedSizeBeet<T[keyof T], V> | FixableBeet<T[keyof T], V>
 ]
-
-// FixedBeetField<T> | DynamicSizeBeetField<T>
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
@@ -167,11 +170,16 @@ export const BEET_TYPE_ARG_LEN = 'len'
  * @category beet
  */
 export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'
+
 /**
  * Defines a type supported by beet.
  *
  * @property beet is the Beet reader/writer to use for serialization
  *  - this could also be a function that produces it (when arg is set)
+ * @property isFixable if `true` the size of structs of this type depends on
+ * the value/data they hold and needs to be _fixed_ with a value or data
+ * NOTE: that if this is `false`, the struct is considered _fixed_ size which
+ * means it has the same size no matter what value it holds
  * @property sourcPack the package where the definition is exported,
  * i.e. beet or beet-solana
  * @property ts is the TypeScript type representing the deserialized type
@@ -185,6 +193,7 @@ export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'
  */
 export type SupportedTypeDefinition = {
   beet: string
+  isFixable: boolean
   sourcePack: string
   ts: string
   arg?: typeof BEET_TYPE_ARG_LEN | typeof BEET_TYPE_ARG_INNER
@@ -203,20 +212,14 @@ export function isFixedSizeBeet<T, V = Partial<T>>(
   return Object.keys(x).includes('byteSize')
 }
 
+/**
+ * @private
+ */
 export function assertFixedSizeBeet<T, V = Partial<T>>(
   x: Beet<T, V>,
   msg = `${x} should have been a fixed beet`
 ): asserts x is FixedSizeBeet<T, V> {
   assert(isFixedSizeBeet(x), msg)
-}
-
-/**
- * @private
- */
-export function isDynamicSizeBeet<T, V>(
-  x: Beet<T, V>
-): x is DynamicSizeBeet<T, V> {
-  return typeof (x as DynamicSizeBeet<T, V>).toFixed === 'function'
 }
 
 /**
@@ -232,30 +235,12 @@ export function isFixableBeet<T, V>(x: Beet<T, V>): x is FixableBeet<T, V> {
 /**
  * @private
  */
-export function isDynamicSizeBeetStruct<T, V>(
-  x: Beet<T, V>
-): x is DynamicSizeBeetStruct<T, V> {
-  return typeof (x as DynamicSizeBeetStruct<T, V>).toFixedFromMap === 'function'
-}
-
-/**
- * @private
- */
-export function isCompositeBeet<T, V = Partial<T>>(
-  x: Beet<T, V> | Composite<T, V, any, any>
-): x is Composite<T, V, any, any> {
-  return (x as Composite<T, V, any, any>).inner != null
-}
-
-/**
- * @private
- */
 export function isElementCollectionFixedSizeBeet<T, V = Partial<T>>(
   x: FixedSizeBeet<T, V>
 ): x is ElementCollectionFixedSizeBeet<T, V> {
   const keys = Object.keys(x)
   return (
-    keys.includes('len') &&
+    keys.includes('length') &&
     keys.includes('elementByteSize') &&
     keys.includes('lenPrefixByteSize')
   )

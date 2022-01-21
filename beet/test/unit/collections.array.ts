@@ -1,100 +1,97 @@
 import {
-  bool,
-  fixedSizeArray,
-  fixedSizeUtf8String,
-  FixedSizeBeet,
+  array,
+  utf8String,
+  FixableBeet,
   u8,
+  COption,
+  coption,
 } from '../../src/beet'
+
 import test from 'tape'
 
-function checkCases<T>(
+function checkCases<T, V = Partial<T>>(
   offsets: number[],
-  cases: T[][],
-  beet: FixedSizeBeet<T[]>,
+  cases: V[][],
+  fixable: FixableBeet<T[], V[]>,
   t: test.Test
 ) {
   for (const offset of offsets) {
     for (const x of cases) {
       {
+        const beetFromVal = fixable.toFixedFromValue(x)
+
         // Larger buffer
-        const buf = Buffer.alloc(offset + beet.byteSize + offset)
-        beet.write(buf, offset, x)
-        const y = beet.read(buf, offset)
+        const buf = Buffer.alloc(offset + beetFromVal.byteSize + offset)
+        beetFromVal.write(buf, offset, x)
+
+        const beetFromData = fixable.toFixedFromData(buf, offset)
+        const y = beetFromData.read(buf, offset)
         t.deepEqual(x, y, `round trip ${x}, offset ${offset} larger buffer`)
       }
       {
+        const beetFromVal = fixable.toFixedFromValue(x)
+
         // Exact buffer
-        const buf = Buffer.alloc(offset + beet.byteSize)
-        beet.write(buf, offset, x)
-        const y = beet.read(buf, offset)
+        const buf = Buffer.alloc(offset + beetFromVal.byteSize)
+        beetFromVal.write(buf, offset, x)
+
+        const beetFromData = fixable.toFixedFromData(buf, offset)
+        const y = beetFromData.read(buf, offset)
         t.deepEqual(x, y, `round trip ${x}, offset ${offset} exact buffer`)
       }
     }
   }
 }
 
-test('collections: fixed size array of u8, include size', (t) => {
+test('collections: non-uniform size array of strings', (t) => {
   const cases = [
-    [1, 2, 0xff],
-    [0, 1, 2],
-  ]
-  const offsets = [0, 4]
-  const beet = fixedSizeArray(u8, 3, true)
-
-  checkCases(offsets, cases, beet, t)
-  t.end()
-})
-
-test('collections: fixed size array of u8, not including size', (t) => {
-  const cases = [
-    [1, 2, 0xff],
-    [0, 1, 2],
-  ]
-  const offsets = [0, 4]
-  const beet = fixedSizeArray(u8, 3)
-
-  checkCases(offsets, cases, beet, t)
-  t.end()
-})
-
-test('collections: fixed size array of bool, include size', (t) => {
-  const cases = [
-    [true, true, false, true],
-    [false, true, false, true],
-  ]
-  const offsets = [0, 4]
-  const beet: FixedSizeBeet<boolean[]> = fixedSizeArray(bool, 4, true)
-
-  checkCases(offsets, cases, beet, t)
-  t.end()
-})
-
-test('collections: fixed size array of string, include size', (t) => {
-  const cases = [
-    ['abc ', '*def', '😁'],
-    ['aaaa', 'bbbb', '*&#@'],
+    ['a ', 'abcdef', '😁'],
+    ['aa', 'bbb', '*&#@!!'],
   ]
   const offsets = [0, 3]
-  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
-    fixedSizeUtf8String(4),
-    3,
-    true
-  )
+  const beet = array(utf8String)
 
   checkCases(offsets, cases, beet, t)
   t.end()
 })
 
-test('collections: fixed size array of string, not including size', (t) => {
+test('collections: non-uniform size array of option(u8)', (t) => {
+  const cases: COption<number>[][] = [
+    [],
+    [1, 2, 3],
+    [null, null, null],
+    [1, null, 255],
+  ]
+
+  const offsets = [0, 3]
+  const beet = array(coption(u8))
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('collections: non-uniform size array of option(string)', (t) => {
   const cases = [
-    ['abc ', '*def', '😁'],
-    ['aaaa', 'bbbb', '*&#@'],
+    [],
+    [null, null],
+    ['a ', 'abcdef', '😁'],
+    ['aa', null, 'bbb', null, '*&#@!!'],
   ]
   const offsets = [0, 3]
-  const beet: FixedSizeBeet<string[]> = fixedSizeArray(
-    fixedSizeUtf8String(4),
-    3
-  )
+  const beet = array(coption(utf8String))
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('collections: non-uniform size array of option(array(string))', (t) => {
+  const cases = [
+    [],
+    [null, null],
+    [['a '], ['abcdef', '😁']],
+    [['aa', 'bbb'], null, ['*&#@!!', 'abcdef', '😁', 'aa', 'bb', 'ccccc']],
+  ]
+  const offsets = [0, 3]
+  const beet = array(coption(array(utf8String)))
 
   checkCases(offsets, cases, beet, t)
   t.end()

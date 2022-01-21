@@ -4,13 +4,14 @@ import {
   Beet,
   BeetStruct,
   COption,
-  fixedSizeOption,
   dataEnum,
   DataEnum,
-  fixedSizeArray,
+  uniformFixedSizeArray,
   i32,
   u16,
   u8,
+  coption,
+  FixableBeet,
 } from '../../src/beet'
 
 class Result {
@@ -35,21 +36,23 @@ const result2 = () => new Result(30, 100, -3)
 const result3 = () => new Result(3, 999, 0)
 
 test('struct: roundtrip COption<struct>', (t) => {
-  const beet: Beet<COption<Result>> = fixedSizeOption(Result.struct)
+  const fixableBeet: FixableBeet<COption<Result>> = coption(Result.struct)
   const offsets = [0, 8]
+  const arg = result1()
+  const beet = fixableBeet.toFixedFromValue(arg)
 
   for (const offset of offsets) {
     const buf = Buffer.alloc(offset + beet.byteSize + offset)
-    beet.write(buf, offset, result1())
+    beet.write(buf, offset, arg)
     const deserialized = beet.read(buf, offset)
 
-    spok(t, deserialized, result1())
+    spok(t, deserialized, arg)
   }
   t.end()
 })
 
 test('struct: roundtrip Array<struct>', (t) => {
-  const beet = fixedSizeArray(Result.struct, 3)
+  const beet = uniformFixedSizeArray(Result.struct, 3)
   const offsets = [0, 8]
 
   for (const offset of offsets) {

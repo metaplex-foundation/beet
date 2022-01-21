@@ -83,6 +83,7 @@ export type KeysTypeMap = Record<
 export const keysTypeMap: KeysTypeMap = {
   publicKey: {
     beet: 'publicKey',
+    isFixable: false,
     sourcePack: BEET_SOLANA_PACKAGE,
     ts: 'PublicKey',
     pack: SOLANA_WEB3_PACKAGE,
