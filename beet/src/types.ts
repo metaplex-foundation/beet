@@ -8,6 +8,10 @@ import { strict as assert } from 'assert'
  */
 export const BEET_PACKAGE = '@metaplex-foundation/beet'
 
+/**
+ * Base Beet type.
+ * @category beet
+ */
 export type BeetBase = {
   /**
    * Describes the type of data that is de/serialized and serves for debugging
@@ -16,6 +20,10 @@ export type BeetBase = {
   description: string
 }
 
+/**
+ * Specifies the read/write methods that a beet may implement.
+ * @category beet
+ */
 export type BeetReadWrite<T, V = Partial<T>> = {
   /**
    * Writes the value of type {@link T} to the provided buffer.
@@ -69,7 +77,8 @@ export type ElementCollectionFixedSizeBeet<T, V = Partial<T>> = BeetBase &
   ElementCollectionBeet
 
 /**
- * Template for De/Serializer.
+ * Template for De/Serializer which is of fixed size, meaning its Buffer size
+ * when serialized doesn't change depending on the data it contains.
  *
  * @template T is the data type which is being de/serialized
  * @template V is the value type passed to the write which includes all
@@ -81,11 +90,44 @@ export type FixedSizeBeet<T, V = Partial<T>> =
   | ScalarFixedSizeBeet<T, V>
   | ElementCollectionFixedSizeBeet<T, V>
 
+/**
+ * Template for De/Serializer which has a dynamic size, meaning its Buffer size
+ * when serialized changes depending on the data it contains.
+ *
+ * It is _fixable_ in the sense that a {@link FixedSizeBeet} can be derived
+ * from it by providing either the value or serialized data for the particular
+ * instance.
+ *
+ * @template T is the data type which is being de/serialized
+ * @template V is the value type passed to the write which includes all
+ * properties needed to produce {@link T}, defaults to `Partial<T>`
+ *
+ * @category beet
+ */
 export type FixableBeet<T, V = Partial<T>> = BeetBase & {
+  /**
+   * Provides a fixed size version of `this` by walking the provided data in
+   * order to discover the sizes of the root beet and all nested beets.
+   *
+   * @param buf the Buffer containing the data for which to adapt this beet to
+   * fixed size
+   * @param offset the offset at which the data starts
+   *
+   */
   toFixedFromData: (buf: Buffer, offset: number) => FixedSizeBeet<T, V>
+
+  /**
+   * Provides a fixed size version of `this` by walking the provided value in
+   * order to discover the sizes of the root beet and all nested beets.
+   *
+   * @param val the instance for which to adapt this beet to fixed size
+   */
   toFixedFromValue: (val: V) => FixedSizeBeet<T, V>
 }
 
+/**
+ * @category beet
+ */
 export type Beet<T, V = Partial<T>> = FixedSizeBeet<T, V> | FixableBeet<T, V>
 
 /**
@@ -128,6 +170,7 @@ export const BEET_TYPE_ARG_LEN = 'len'
  * @category beet
  */
 export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'
+
 /**
  * Defines a type supported by beet.
  *
