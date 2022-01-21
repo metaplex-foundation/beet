@@ -133,6 +133,10 @@ export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'
  *
  * @property beet is the Beet reader/writer to use for serialization
  *  - this could also be a function that produces it (when arg is set)
+ * @property isFixable if `true` the size of structs of this type depends on
+ * the value/data they hold and needs to be _fixed_ with a value or data
+ * NOTE: that if this is `false`, the struct is considered _fixed_ size which
+ * means it has the same size no matter what value it holds
  * @property sourcPack the package where the definition is exported,
  * i.e. beet or beet-solana
  * @property ts is the TypeScript type representing the deserialized type
@@ -146,6 +150,7 @@ export const BEET_TYPE_ARG_INNER = 'Beet<{innner}>'
  */
 export type SupportedTypeDefinition = {
   beet: string
+  isFixable: boolean
   sourcePack: string
   ts: string
   arg?: typeof BEET_TYPE_ARG_LEN | typeof BEET_TYPE_ARG_INNER

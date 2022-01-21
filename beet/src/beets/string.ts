@@ -91,12 +91,14 @@ export type StringTypeMap = Record<
 export const stringTypeMap: StringTypeMap = {
   fixedSizeString: {
     beet: 'fixedSizeUtf8String',
+    isFixable: false,
     sourcePack: BEET_PACKAGE,
     ts: 'string',
     arg: BEET_TYPE_ARG_LEN,
   },
   string: {
     beet: 'utf8String',
+    isFixable: true,
     sourcePack: BEET_PACKAGE,
     ts: 'string',
   },

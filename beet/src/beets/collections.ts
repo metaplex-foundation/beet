@@ -243,10 +243,33 @@ export type CollectionsTypeMap = Record<
  *
  * @category TypeDefinition
  */
-// prettier-ignore
 export const collectionsTypeMap: CollectionsTypeMap = {
-  Array          : { beet: 'array',               sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
-  FixedSizeArray : { beet: 'fixedSizeArray',      sourcePack: BEET_PACKAGE, ts: 'Array',      arg: BEET_TYPE_ARG_LEN },
-  Buffer         : { beet: 'fixedSizeBuffer',     sourcePack: BEET_PACKAGE, ts: 'Buffer',     arg: BEET_TYPE_ARG_LEN },
-  Uint8Array     : { beet: 'fixedSizeUint8Array', sourcePack: BEET_PACKAGE, ts: 'Uint8Array', arg: BEET_TYPE_ARG_LEN }
+  Array: {
+    beet: 'array',
+    isFixable: true,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Array',
+    arg: BEET_TYPE_ARG_LEN,
+  },
+  FixedSizeArray: {
+    beet: 'fixedSizeArray',
+    isFixable: false,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Array',
+    arg: BEET_TYPE_ARG_LEN,
+  },
+  Buffer: {
+    beet: 'fixedSizeBuffer',
+    isFixable: false,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Buffer',
+    arg: BEET_TYPE_ARG_LEN,
+  },
+  Uint8Array: {
+    beet: 'fixedSizeUint8Array',
+    isFixable: false,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Uint8Array',
+    arg: BEET_TYPE_ARG_LEN,
+  },
 }
