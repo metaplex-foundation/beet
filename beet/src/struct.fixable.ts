@@ -6,6 +6,17 @@ import { beetBytes, logDebug } from './utils'
 import colors from 'ansicolors'
 const { brightBlack } = colors
 
+/**
+ * Configures a class or any JavaScript object type for de/serialization aka
+ * read/write. Not all fields of that class have to be of fixed size.
+ * If none of the fields requires a {@link FixableBeet} use the {@link BeetStruct} instead.
+ *
+ * @template Class the type to produce when deserializing
+ * @template Args contains all fields, is typically a subset of Class and is
+ * used to construct an instance of it
+ *
+ * @category beet/struct
+ */
 export class FixableBeetStruct<Class, Args = Partial<Class>>
   implements FixableBeet<Class, Args>
 {

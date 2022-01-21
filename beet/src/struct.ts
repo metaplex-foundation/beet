@@ -4,7 +4,9 @@ import { beetBytes, logDebug, logTrace } from './utils'
 
 /**
  * Configures a class or any JavaScript object type for de/serialization aka
- * read/write.
+ * read/write. All fields of that class have to be of fixed size.
+ * If a field requires a {@link FixableBeet} use the {@link FixableBeetStruct}
+ * instead.
  *
  * @template Class the type to produce when deserializing
  * @template Args contains all fields, is typically a subset of Class and is
