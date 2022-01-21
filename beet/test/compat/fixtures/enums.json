@@ -1,0 +1,30 @@
+{
+  "directions": [
+    {
+      "value": "Up",
+      "data": [
+        0
+      ]
+    },
+    {
+      "value": "Down",
+      "data": [
+        2
+      ]
+    }
+  ],
+  "milligrams": [
+    {
+      "value": "Grams",
+      "data": [
+        0
+      ]
+    },
+    {
+      "value": "Kilograms",
+      "data": [
+        1
+      ]
+    }
+  ]
+}
