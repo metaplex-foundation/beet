@@ -16,17 +16,23 @@ import { fixBeetFromData, fixBeetFromValue } from '../beet'
  *
  * @template T inner option type
  *
- * @category beet/composite
+ * @category beet/option
  */
 export type COption<T> = T | null
 
 const NONE = 0
 const SOME = 1
 
+/**
+ * @private
+ */
 export function isSomeBuffer(buf: Buffer, offset: number) {
   return buf[offset] === SOME
 }
 
+/**
+ * @private
+ */
 export function isNoneBuffer(buf: Buffer, offset: number) {
   return buf[offset] === NONE
 }
@@ -41,7 +47,7 @@ export function isNoneBuffer(buf: Buffer, offset: number) {
  * @template T inner option type
  * @param inner the De/Serializer for the inner type
  *
- * @category beet/composite
+ * @category beet/option
  */
 export function coptionNone<T>(description: string): FixedSizeBeet<COption<T>> {
   logTrace(`coptionNone(${description})`)
