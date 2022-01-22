@@ -226,6 +226,7 @@ export type CollectionsExports = keyof typeof import('./collections')
 export type CollectionsTypeMapKey =
   | 'Array'
   | 'FixedSizeArray'
+  | 'UniformFixedSizeArray'
   | 'Buffer'
   | 'Uint8Array'
 /**
@@ -253,6 +254,13 @@ export const collectionsTypeMap: CollectionsTypeMap = {
   },
   FixedSizeArray: {
     beet: 'fixedSizeArray',
+    isFixable: false,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Array',
+    arg: BEET_TYPE_ARG_LEN,
+  },
+  UniformFixedSizeArray: {
+    beet: 'uniformFixedSizeArray',
     isFixable: false,
     sourcePack: BEET_PACKAGE,
     ts: 'Array',
