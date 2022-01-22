@@ -1,6 +1,6 @@
 {
   "name": "@metaplex-foundation/beet-solana",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Solana specific extension for beet, the borsh compatible de/serializer",
   "main": "dist/src/beet-solana.js",
   "types": "dist/src/beet-solana.d.ts",
