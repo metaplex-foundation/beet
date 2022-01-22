@@ -16,6 +16,8 @@ type Enum<T> = { [key: number | string]: string | number | T } | number | T
  * De/serializer for enums with up to 255 less variants which have no data.
  *
  * @param enumType type of enum to process, i.e. Color or Direction
+ *
+ * @category beet/enum
  */
 export function fixedScalarEnum<T>(
   enumType: Enum<T>
@@ -70,7 +72,7 @@ export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
  *
  * @param inner the De/Serializer for the data type
  *
- * @category beet/composite
+ * @category beet/enum
  */
 export function dataEnum<Kind, Data>(
   inner: FixedSizeBeet<Data>

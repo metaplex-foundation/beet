@@ -49,6 +49,11 @@ export type BeetReadWrite<T, V = Partial<T>> = {
   byteSize: number
 }
 
+/**
+ * Implemented by {@link ElementCollectionFixedSizeBeet}s to expose information
+ * about collection elements and collection size.
+ * @category beet
+ */
 export type ElementCollectionBeet = {
   /**
    * For arrays and strings this indicates the byte size of each element.
@@ -69,9 +74,17 @@ export type ElementCollectionBeet = {
   lenPrefixByteSize: number
 }
 
+/**
+ * Scalar Beet
+ * @category beet
+ */
 export type ScalarFixedSizeBeet<T, V = Partial<T>> = BeetBase &
   BeetReadWrite<T, V>
 
+/**
+ * Beet for Collections
+ * @category beet
+ */
 export type ElementCollectionFixedSizeBeet<T, V = Partial<T>> = BeetBase &
   BeetReadWrite<T, V> &
   ElementCollectionBeet
