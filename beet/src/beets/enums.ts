@@ -7,18 +7,21 @@ import {
 import { u8 } from './numbers'
 import { strict as assert } from 'assert'
 
-type Enum = { [key: number]: string | number } | string | number
+// TypeScript enum type support isn't that great since it really ends up being an Object hash
+// when transpiled.
+// Therefore we have to jump through some hoops to make all types check out
+type Enum<T> = { [key: number | string]: string | number | T } | number | T
 
 /**
  * De/serializer for enums with up to 255 less variants which have no data.
  *
  * @param enumType type of enum to process, i.e. Color or Direction
  */
-export function fixedScalarEnum<T extends Enum, V = T>(
-  enumType: T
-): FixedSizeBeet<T, V> {
+export function fixedScalarEnum<T>(
+  enumType: Enum<T>
+): FixedSizeBeet<Enum<T>, Enum<T>> {
   return {
-    write(buf: Buffer, offset: number, value: V) {
+    write(buf: Buffer, offset: number, value: T) {
       const idx = Object.values(enumType).indexOf(value)
       if (idx < 0) {
         assert.fail(
