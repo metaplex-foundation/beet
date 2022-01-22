@@ -3,11 +3,13 @@ use std::{fs::File, io::Write};
 use anyhow::Result;
 use borsh::BorshDeserialize;
 use composites::produce_composites;
+use enums::produce_enums;
 use options::produce_options;
 use simple::produce_simple;
 use vecs::produce_vecs;
 
 mod composites;
+mod enums;
 mod options;
 mod samples;
 mod simple;
@@ -31,6 +33,10 @@ fn main() -> Result<()> {
     let options_json = serde_json::to_string_pretty(&produce_options()?)?;
     let mut options_file = File::create(format!("{}/options.json", data_dir))?;
     options_file.write_all(options_json.as_bytes())?;
+
+    let enums_json = serde_json::to_string_pretty(&produce_enums()?)?;
+    let mut enums_file = File::create(format!("{}/enums.json", data_dir))?;
+    enums_file.write_all(enums_json.as_bytes())?;
 
     let vecs_json = serde_json::to_string_pretty(&produce_vecs()?)?;
     let mut vecs_file = File::create(format!("{}/vecs.json", data_dir))?;
