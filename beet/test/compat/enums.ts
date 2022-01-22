@@ -1,5 +1,5 @@
 import test from 'tape'
-import { simpleEnum } from '../../src/beet'
+import { fixedScalarEnum } from '../../src/beet'
 import { checkFixedSerialization } from '../utils'
 import fixture from './fixtures/enums.json'
 
@@ -21,7 +21,7 @@ function variantFromString<T>(enumType: T, variant: string): T {
 }
 
 test('compat enums: directions', (t) => {
-  const beet = simpleEnum(Directions)
+  const beet = fixedScalarEnum(Directions)
   for (const { value, data } of fixture.directions) {
     const direction = variantFromString(Directions, value)
     checkFixedSerialization(t, beet, direction, data)
@@ -30,7 +30,7 @@ test('compat enums: directions', (t) => {
 })
 
 test('compat enums: milligrams', (t) => {
-  const beet = simpleEnum(Milligrams)
+  const beet = fixedScalarEnum(Milligrams)
   for (const { value, data } of fixture.milligrams) {
     const milligram = variantFromString(Milligrams, value)
     checkFixedSerialization(t, beet, milligram, data)

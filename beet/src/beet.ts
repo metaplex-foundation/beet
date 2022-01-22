@@ -15,6 +15,7 @@ import {
   NumbersTypeMapKey,
 } from './beets/numbers'
 import { StringExports, stringTypeMap, StringTypeMapKey } from './beets/string'
+import { EnumsExports, enumsTypeMap, EnumsTypeMapKey } from './beets/enums'
 
 export * from './beets/collections'
 export * from './beets/string'
@@ -34,6 +35,7 @@ export type BeetTypeMapKey =
   | CollectionsTypeMapKey
   | StringTypeMapKey
   | CompositesTypeMapKey
+  | EnumsTypeMapKey
   | NumbersTypeMapKey
 
 /**
@@ -43,6 +45,7 @@ export type BeetExports =
   | CollectionsExports
   | StringExports
   | CompositesExports
+  | EnumsExports
   | NumbersExports
 
 /**
@@ -61,5 +64,6 @@ export const supportedTypeMap: Record<
   ...collectionsTypeMap,
   ...stringTypeMap,
   ...compositesTypeMap,
+  ...enumsTypeMap,
   ...numbersTypeMap,
 }
