@@ -24,7 +24,11 @@ export function fixedScalarEnum<T>(
 ): FixedSizeBeet<Enum<T>, Enum<T>> {
   return {
     write(buf: Buffer, offset: number, value: T) {
-      const idx = Object.values(enumType).indexOf(value)
+      const fullEnumObject = Object.values(enumType)
+      let idx = vals.indexOf(value);
+      if(typeof value == "number") {
+          idx -= vals.length/2;
+      }
       if (idx < 0) {
         assert.fail(
           `${value} should be a variant of the provided enum type, i.e. [ ${Object.values(
