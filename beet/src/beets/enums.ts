@@ -24,24 +24,29 @@ export function fixedScalarEnum<T>(
 ): FixedSizeBeet<Enum<T>, Enum<T>> {
   return {
     write(buf: Buffer, offset: number, value: T) {
-      const idx = Object.values(enumType).indexOf(value)
-      if (idx < 0) {
+      // @ts-ignore
+      if (enumType[value] === undefined) {
         assert.fail(
           `${value} should be a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
           ).join(', ')} ], but isn't`
         )
       }
-
-      u8.write(buf, offset, idx)
+      if (typeof value === 'number') {
+        u8.write(buf, offset, value)
+      } else {
+        // @ts-ignore
+        u8.write(buf, offset, enumType[value])
+      }
     },
 
     read(buf: Buffer, offset: number): T {
-      const idx = u8.read(buf, offset)
-      const item = Object.values(enumType)[idx]
+      const value = u8.read(buf, offset)
+      // @ts-ignore
+      const item = enumType[value] as T
       if (item == null) {
         assert.fail(
-          `${idx} should be a of a variant of the provided enum type, i.e. [ ${Object.values(
+          `${value} should be a of a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
           ).join(', ')} ], but isn't`
         )
