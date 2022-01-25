@@ -26,7 +26,7 @@ export function fixedScalarEnum<T>(
     write(buf: Buffer, offset: number, value: T) {
       const fullEnumObject = Object.values(enumType)
       let idx = fullEnumObject.indexOf(value)
-      if (typeof value == 'number') {
+      if (typeof value === 'number') {
         idx -= fullEnumObject.length / 2
       }
       if (idx < 0) {
