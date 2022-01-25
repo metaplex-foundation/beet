@@ -12,6 +12,10 @@ import { strict as assert } from 'assert'
 // Therefore we have to jump through some hoops to make all types check out
 type Enum<T> = { [key: number | string]: string | number | T } | number | T
 
+function resolveEnumVariant<T>(value: T, isNumVariant: boolean): keyof Enum<T> {
+  return (isNumVariant ? `${value}` : value) as keyof Enum<T>
+}
+
 /**
  * De/serializer for enums with up to 255 less variants which have no data.
  *
@@ -22,37 +26,41 @@ type Enum<T> = { [key: number | string]: string | number | T } | number | T
 export function fixedScalarEnum<T>(
   enumType: Enum<T>
 ): FixedSizeBeet<Enum<T>, Enum<T>> {
+  const keys = Object.keys(enumType)
   return {
     write(buf: Buffer, offset: number, value: T) {
-      // @ts-ignore - TS Enum issue: we know this is a number or string
-      let enumValue = enumType[value]
-      if (enumValue === undefined) {
+      const isNumVariant = typeof value === 'number'
+      const variantKey = resolveEnumVariant(value, isNumVariant)
+
+      if (!keys.includes(variantKey)) {
         assert.fail(
           `${value} should be a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
           ).join(', ')} ], but isn't`
         )
       }
-      if (typeof value === 'number') {
+
+      if (isNumVariant) {
         u8.write(buf, offset, value)
       } else {
-        // @ts-ignore
+        const enumValue = enumType[variantKey] as number
         u8.write(buf, offset, enumValue)
       }
     },
 
     read(buf: Buffer, offset: number): T {
-      const value = u8.read(buf, offset) as number
-      // @ts-ignore - TS Enum issue: we know that value is a number and the result is a string
-      let enumValue = enumType[value]
-      if (enumValue == null) {
+      const value = u8.read(buf, offset) as T | number
+      const isNumVariant = typeof value === 'number'
+      const variantKey = resolveEnumVariant(value, isNumVariant)
+
+      if (!keys.includes(variantKey)) {
         assert.fail(
           `${value} should be a of a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
           ).join(', ')} ], but isn't`
         )
       }
-      return enumValue
+      return enumType[variantKey] as T
     },
 
     byteSize: u8.byteSize,
