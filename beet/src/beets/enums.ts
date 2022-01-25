@@ -24,8 +24,9 @@ export function fixedScalarEnum<T>(
 ): FixedSizeBeet<Enum<T>, Enum<T>> {
   return {
     write(buf: Buffer, offset: number, value: T) {
-      // @ts-ignore
-      if (enumType[value] === undefined) {
+      // @ts-ignore - TS Enum issue: we know this is a number or string
+      let enumValue = enumType[value]
+      if (enumValue === undefined) {
         assert.fail(
           `${value} should be a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
@@ -36,22 +37,22 @@ export function fixedScalarEnum<T>(
         u8.write(buf, offset, value)
       } else {
         // @ts-ignore
-        u8.write(buf, offset, enumType[value])
+        u8.write(buf, offset, enumValue)
       }
     },
 
     read(buf: Buffer, offset: number): T {
-      const value = u8.read(buf, offset)
-      // @ts-ignore
-      const item = enumType[value] as T
-      if (item == null) {
+      const value = u8.read(buf, offset) as number
+      // @ts-ignore - TS Enum issue: we know that value is a number and the result is a string
+      let enumValue = enumType[value]
+      if (enumValue == null) {
         assert.fail(
           `${value} should be a of a variant of the provided enum type, i.e. [ ${Object.values(
             enumType
           ).join(', ')} ], but isn't`
         )
       }
-      return item
+      return enumValue
     },
 
     byteSize: u8.byteSize,
