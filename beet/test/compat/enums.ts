@@ -1,6 +1,10 @@
 import test from 'tape'
 import { fixedScalarEnum } from '../../src/beet'
-import { checkFixedSerialization } from '../utils'
+import {
+  checkFixedDeserialize,
+  checkFixedSerialization,
+  checkFixedSerialize,
+} from '../utils'
 import fixture from './fixtures/enums.json'
 
 enum Directions {
@@ -35,5 +39,27 @@ test('compat enums: milligrams', (t) => {
     const milligram = variantFromString(Milligrams, value)
     checkFixedSerialization(t, beet, milligram, data)
   }
+  t.end()
+})
+
+test('compat enums: directions using int', (t) => {
+  const beet = fixedScalarEnum(Directions)
+  const buf = Buffer.alloc(beet.byteSize)
+  beet.write(buf, 0, Directions.Down)
+  // Clearer test to show expected values
+  checkFixedSerialize(
+    t,
+    beet,
+    Directions.Down,
+    [0x02],
+    'Directions.Down Serialize'
+  )
+  checkFixedDeserialize(
+    t,
+    beet,
+    Directions[2] as unknown as Directions,
+    [0x02],
+    'Directions.Down Deserialize'
+  )
   t.end()
 })

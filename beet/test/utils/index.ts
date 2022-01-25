@@ -24,7 +24,7 @@ export function deepLogBeet(struct: Beet<any, any>) {
   deepLog(rest)
 }
 
-function checkFixedSerialize<T>(
+export function checkFixedSerialize<T>(
   t: test.Test,
   fixedBeet: FixedSizeBeet<T>,
   value: T,
@@ -37,7 +37,7 @@ function checkFixedSerialize<T>(
   t.deepEqual(buf.toJSON().data, data, `serialize: '${description}'`)
 }
 
-function checkFixedDeserialize<T>(
+export function checkFixedDeserialize<T>(
   t: test.Test,
   fixedBeet: FixedSizeBeet<T>,
   value: T,
