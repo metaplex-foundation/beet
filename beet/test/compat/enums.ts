@@ -20,7 +20,7 @@ enum Milligrams {
 }
 
 function variantFromString<T>(enumType: T, variant: string): T {
-  const idx = Object.values(enumType).indexOf(variant)
+  const idx = Object.keys(enumType).indexOf(variant)
   return Object.values(enumType)[idx] as T
 }
 
@@ -57,7 +57,7 @@ test('compat enums: directions using int', (t) => {
   checkFixedDeserialize(
     t,
     beet,
-    Directions[2] as unknown as Directions,
+    Directions.Down,
     [0x02],
     'Directions.Down Deserialize'
   )

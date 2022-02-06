@@ -10,7 +10,10 @@ import { strict as assert } from 'assert'
 // TypeScript enum type support isn't that great since it really ends up being an Object hash
 // when transpiled.
 // Therefore we have to jump through some hoops to make all types check out
-type Enum<T> = { [key: number | string]: string | number | T } | number | T
+export type Enum<T> =
+  | { [key: number | string]: string | number | T }
+  | number
+  | T
 
 function resolveEnumVariant<T>(value: T, isNumVariant: boolean): keyof Enum<T> {
   return (isNumVariant ? `${value}` : value) as keyof Enum<T>
@@ -60,7 +63,7 @@ export function fixedScalarEnum<T>(
           ).join(', ')} ], but isn't`
         )
       }
-      return enumType[variantKey] as T
+      return (isNumVariant ? value : enumType[variantKey]) as T
     },
 
     byteSize: u8.byteSize,
