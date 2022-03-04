@@ -8,8 +8,8 @@
   "module": "dist/esm/src/beet.js",
   "types": "dist/types/src/beet.d.ts",
   "exports": {
-      "import": "./dist/esm/src/beet.js",
-      "require": "./dist/cjs/src/beet.js"
+    "import": "./dist/esm/src/beet.js",
+    "require": "./dist/cjs/src/beet.js"
   },
   "scripts": {
     "check:publish-ready": "yarn build && yarn test",
