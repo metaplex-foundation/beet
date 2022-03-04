@@ -20,7 +20,7 @@
     "build": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
     "pretest": "yarn build",
     "test": "tape dist/cjs/test/{unit,compat}/*.js",
-    "test:browser": "airtap ./test/{unit,compat}/*.ts",
+    "test:browser": "airtap test/{unit,compat}/*.ts",
     "bsamples": "cd ../tools/bsamples && cargo run",
     "lint": "prettier -c ./src/",
     "lint:fix": "prettier --write ./src",
