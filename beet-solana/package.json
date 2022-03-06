@@ -35,7 +35,7 @@
     "dist/types/src/*"
   ],
   "dependencies": {
-    "@metaplex-foundation/beet": ">0.0.5",
+    "@metaplex-foundation/beet": ">0.1.0",
     "@solana/web3.js": "^1.31.0"
   },
   "devDependencies": {
