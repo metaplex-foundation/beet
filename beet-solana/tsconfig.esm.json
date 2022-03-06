@@ -2,10 +2,10 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist/cjs",
-    "module": "commonjs",
-    "declarationDir": null,
-    "declaration": false
+    "outDir": "./dist/esm",
+    "module": "esnext",
+    "declarationDir": "./dist/types",
+    "declaration": true
   },
   "include": ["src", "test"]
 }

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declarationMap": false,
+    "noEmit": false,
+    "preserveWatchOutput": true,
+    "emitDeclarationOnly": false,
+    "importHelpers": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "incremental": false,
+    "resolveJsonModule": true
+  }
+}
