@@ -9,7 +9,7 @@ import {
 } from '../types'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
-import { fixBeetFromData, fixBeetFromValue } from '../beet'
+import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
 
 /**
  * Represents the Rust Option type {@link T}.

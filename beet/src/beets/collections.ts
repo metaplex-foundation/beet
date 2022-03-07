@@ -10,7 +10,7 @@ import { strict as assert } from 'assert'
 import { u32 } from './numbers'
 import { BEET_PACKAGE } from '../types'
 import { logTrace } from '../utils'
-import { fixBeetFromData, fixBeetFromValue } from '../beet'
+import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
 
 /**
  * De/Serializes an array with a specific number of elements of type {@link T}
