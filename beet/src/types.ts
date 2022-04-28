@@ -78,7 +78,8 @@ export type ElementCollectionBeet = {
  * Scalar Beet
  * @category beet
  */
-export type ScalarFixedSizeBeet<T, V = T> = BeetBase & BeetReadWrite<T, V>
+export type ScalarFixedSizeBeet<T, V = Partial<T>> = BeetBase &
+  BeetReadWrite<T, V>
 
 /**
  * Beet for Collections
