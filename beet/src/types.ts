@@ -32,7 +32,7 @@ export type BeetReadWrite<T, V = Partial<T>> = {
    * @param offset at which to start writing into the buffer
    * @param value to write
    */
-  write(buf: Buffer, offset: number, value: V): void
+  write(buf: Buffer, offset: number, value: T | V): void
   /**
    * Reads the data in the provided buffer and deserializes it into a value of
    * type {@link T}.
