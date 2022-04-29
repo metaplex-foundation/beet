@@ -4,6 +4,7 @@ import {
   array,
   Beet,
   BeetArgsStruct,
+  bytes,
   coption,
   COption,
   FixableBeet,
@@ -68,7 +69,6 @@ function verify<Args>(
     })
   }
 }
-
 test('structs: fixable struct with top level vec', (t) => {
   type Args = {
     ids: number[]
@@ -125,6 +125,68 @@ test('structs: fixable struct with top level vec', (t) => {
   t.end()
 })
 
+test('structs: fixable struct with top level vec and bytes', (t) => {
+  type Args = {
+    ids: number[]
+    data: Uint8Array
+    count: number
+  }
+  const struct = new FixableBeetArgsStruct<Args>(
+    [
+      ['ids', array(u32)],
+      ['data', bytes],
+      ['count', u32],
+    ],
+    'VecStruct'
+  )
+  const expected = <Specifications<BeetArgsStruct<Args>>>{
+    fields: [
+      [
+        'ids',
+        { byteSize: 20, length: 4, description: 'Array<u32>(4)[ 4 + 16 ]' },
+      ],
+      ['data', { byteSize: 4 + 11, description: 'Uint8Array(11)' }],
+      ['count', { byteSize: 4, description: 'u32' }],
+    ],
+    description: 'VecStruct',
+    byteSize: 39,
+  }
+
+  const data = Buffer.from('hello world', 'utf8')
+  {
+    t.comment('+++ providing value with all fields')
+
+    const args = {
+      ids: [1, 2, 3, 4],
+      data,
+      count: 1,
+    }
+    console.log(args)
+    const fixed = struct.toFixedFromValue(args)
+    console.log({ fixed })
+    const [serialized] = struct.serialize(args)
+    console.log(serialized.toJSON().data)
+    verify(t, struct, args, expected)
+  }
+
+  {
+    t.comment('+++ providing value with more fields')
+    const args = {
+      ids: [1, 2, 3, 4],
+      data,
+      count: 1,
+    }
+    verify(t, struct, args, expected, {
+      argsForRoundTrip: (args) =>
+        <typeof args>{
+          ids: args.ids,
+          count: args.count,
+        },
+    })
+  }
+
+  t.end()
+})
 test('struct: fixable struct with top level string', (t) => {
   type Args = {
     name: string

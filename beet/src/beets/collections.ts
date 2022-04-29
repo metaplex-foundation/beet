@@ -189,7 +189,48 @@ export function fixedSizeBuffer(bytes: number): FixedSizeBeet<Buffer> {
     },
 
     byteSize: bytes,
-    description: `Buffer(len)`,
+    description: `Buffer(${bytes})`,
+  }
+}
+
+/**
+ * A De/Serializer for {@link Uint8Array}s of known size that just copies/reads
+ * the array bytes to/from the provided buffer.
+ *
+ * @category beet/collection
+ */
+export function fixedSizeUint8Array(
+  len: number,
+  lenPrefix: boolean = false
+): FixedSizeBeet<Uint8Array> {
+  const arrayBufferBeet = fixedSizeBuffer(len)
+  const byteSize = lenPrefix ? len + 4 : len
+  return {
+    write: function (buf: Buffer, offset: number, value: Uint8Array): void {
+      assert.equal(
+        value.byteLength,
+        len,
+        `Uint8Array length ${value.byteLength} should match len ${len}`
+      )
+      if (lenPrefix) {
+        u32.write(buf, offset, len)
+        offset += 4
+      }
+      const valueBuf = Buffer.from(value)
+      arrayBufferBeet.write(buf, offset, valueBuf)
+    },
+    read: function (buf: Buffer, offset: number): Uint8Array {
+      if (lenPrefix) {
+        const size = u32.read(buf, offset)
+        assert.equal(size, len, 'invalid byte size')
+        offset += 4
+      }
+      const arrayBuffer = arrayBufferBeet.read(buf, offset)
+      return Uint8Array.from(arrayBuffer)
+    },
+
+    byteSize,
+    description: `Uint8Array(${len})`,
   }
 }
 
@@ -199,21 +240,23 @@ export function fixedSizeBuffer(bytes: number): FixedSizeBeet<Buffer> {
  *
  * @category beet/collection
  */
-export function fixedSizeUint8Array(len: number): FixedSizeBeet<Uint8Array> {
-  const arrayBufferBeet = fixedSizeBuffer(len)
-  return {
-    write: function (buf: Buffer, offset: number, value: Uint8Array): void {
-      const valueBuf = Buffer.from(value)
-      arrayBufferBeet.write(buf, offset, valueBuf)
-    },
-    read: function (buf: Buffer, offset: number): Uint8Array {
-      const arrayBuffer = arrayBufferBeet.read(buf, offset)
-      return Uint8Array.from(arrayBuffer)
-    },
+export const uint8Array: FixableBeet<Uint8Array, Uint8Array> = {
+  toFixedFromData(
+    buf: Buffer,
+    offset: number
+  ): FixedSizeBeet<Uint8Array, Uint8Array> {
+    const len = u32.read(buf, offset)
+    logTrace(`${this.description}[${len}]`)
 
-    byteSize: len,
-    description: `Uint8Array(len)`,
-  }
+    return fixedSizeUint8Array(len, true)
+  },
+
+  toFixedFromValue(val: Uint8Array): FixedSizeBeet<Uint8Array, Uint8Array> {
+    const len = val.byteLength
+    return fixedSizeUint8Array(len, true)
+  },
+
+  description: `Uint8Array`,
 }
 
 /**
@@ -228,6 +271,7 @@ export type CollectionsTypeMapKey =
   | 'FixedSizeArray'
   | 'UniformFixedSizeArray'
   | 'Buffer'
+  | 'FixedSizeUint8Array'
   | 'Uint8Array'
 /**
  * @category TypeDefinition
@@ -273,9 +317,16 @@ export const collectionsTypeMap: CollectionsTypeMap = {
     ts: 'Buffer',
     arg: BEET_TYPE_ARG_LEN,
   },
-  Uint8Array: {
+  FixedSizeUint8Array: {
     beet: 'fixedSizeUint8Array',
     isFixable: false,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Uint8Array',
+    arg: BEET_TYPE_ARG_LEN,
+  },
+  Uint8Array: {
+    beet: 'uint8Array',
+    isFixable: true,
     sourcePack: BEET_PACKAGE,
     ts: 'Uint8Array',
     arg: BEET_TYPE_ARG_LEN,
