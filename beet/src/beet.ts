@@ -16,7 +16,13 @@ import {
 } from './beets/numbers'
 import { StringExports, stringTypeMap, StringTypeMapKey } from './beets/string'
 import { EnumsExports, enumsTypeMap, EnumsTypeMapKey } from './beets/enums'
+import {
+  AliasesExports,
+  aliasesTypeMap,
+  AliasesTypeMapKey,
+} from './beets/aliases'
 
+export * from './beets/aliases'
 export * from './beets/collections'
 export * from './beets/string'
 export * from './beets/composites'
@@ -37,6 +43,7 @@ export type BeetTypeMapKey =
   | CompositesTypeMapKey
   | EnumsTypeMapKey
   | NumbersTypeMapKey
+  | AliasesTypeMapKey
 
 /**
  * @category TypeDefinition
@@ -47,6 +54,7 @@ export type BeetExports =
   | CompositesExports
   | EnumsExports
   | NumbersExports
+  | AliasesExports
 
 /**
  * Maps all {@link Beet} de/serializers to metadata which describes in which
@@ -66,4 +74,5 @@ export const supportedTypeMap: Record<
   ...compositesTypeMap,
   ...enumsTypeMap,
   ...numbersTypeMap,
+  ...aliasesTypeMap,
 }
