@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::samples::{produce_samples, Sample};
 
 #[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
-enum Direction {
+pub enum Direction {
     Up,
     Right,
     Down,
