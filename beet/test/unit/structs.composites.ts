@@ -4,8 +4,8 @@ import {
   Beet,
   BeetStruct,
   COption,
-  dataEnum,
-  DataEnum,
+  uniformDataEnum,
+  UniformDataEnum,
   uniformFixedSizeArray,
   i32,
   u16,
@@ -71,15 +71,17 @@ enum ResultKind {
 }
 
 test('struct: roundtrip enum<struct>', (t) => {
-  const goodResult: DataEnum<ResultKind, Result> = {
+  const goodResult: UniformDataEnum<ResultKind, Result> = {
     kind: ResultKind.Good,
     data: result3(),
   }
-  const badResult: DataEnum<ResultKind, Result> = {
+  const badResult: UniformDataEnum<ResultKind, Result> = {
     kind: ResultKind.Bad,
     data: result2(),
   }
-  const beet: Beet<DataEnum<ResultKind, Result>> = dataEnum(Result.struct)
+  const beet: Beet<UniformDataEnum<ResultKind, Result>> = uniformDataEnum(
+    Result.struct
+  )
 
   const offsets = [0, 8]
 

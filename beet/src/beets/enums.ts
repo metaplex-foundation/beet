@@ -72,14 +72,15 @@ export function fixedScalarEnum<T>(
 }
 
 /**
- * Represents an {@link Enum} type which contains fixed size data.
+ * Represents an {@link Enum} type which contains fixed size data and whose
+ * data is uniform across all variants.
  *
  * @template Kind the enum variant, i.e. `Color.Red`
  * @template Data the data value, i.e. '#f00'
  *
  * @category beet/composite
  */
-export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
+export type UniformDataEnum<Kind, Data> = { kind: Kind & number; data: Data }
 /**
  * De/Serializes an {@link Enum} that contains a type of data, i.e. a {@link Struct}.
  * The main difference to a Rust enum is that the type of data has to be the
@@ -91,22 +92,26 @@ export type DataEnum<Kind, Data> = { kind: Kind & number; data: Data }
  *
  * @category beet/enum
  */
-export function dataEnum<Kind, Data>(
+export function uniformDataEnum<Kind, Data>(
   inner: FixedSizeBeet<Data>
-): FixedSizeBeet<DataEnum<Kind, Data>> {
+): FixedSizeBeet<UniformDataEnum<Kind, Data>> {
   return {
-    write: function (buf: Buffer, offset: number, value: DataEnum<Kind, Data>) {
+    write: function (
+      buf: Buffer,
+      offset: number,
+      value: UniformDataEnum<Kind, Data>
+    ) {
       u8.write(buf, offset, value.kind)
       inner.write(buf, offset + 1, value.data)
     },
 
-    read: function (buf: Buffer, offset: number): DataEnum<Kind, Data> {
-      const kind = u8.read(buf, offset) as DataEnum<Kind, Data>['kind']
+    read: function (buf: Buffer, offset: number): UniformDataEnum<Kind, Data> {
+      const kind = u8.read(buf, offset) as UniformDataEnum<Kind, Data>['kind']
       const data = inner.read(buf, offset + 1)
       return { kind, data }
     },
     byteSize: 1 + inner.byteSize,
-    description: `DataEnum<${inner.description}>`,
+    description: `UniformDataEnum<${inner.description}>`,
   }
 }
 
