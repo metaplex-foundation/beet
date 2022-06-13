@@ -155,36 +155,41 @@ export function dataEnum<T>(variants: DataEnumBeet<T>[]) {
         variant != null,
         `Discriminant ${discriminant} out of range for ${variants.length} variants`
       )
-      const fixed = isFixedSizeBeet(variant.dataBeet)
-        ? variant.dataBeet
-        : variant.dataBeet.toFixedFromData(buf, offset + 1)
+      const [__kind, dataBeet] = variant
+      const fixed = isFixedSizeBeet(dataBeet)
+        ? dataBeet
+        : dataBeet.toFixedFromData(buf, offset + 1)
 
-      return enumDataVariantBeet(fixed, discriminant, variant.__kind)
+      return enumDataVariantBeet(fixed, discriminant, __kind)
     },
 
     toFixedFromValue(val: any) {
       if (val.__kind == null) {
         const keys = Object.keys(val).join(', ')
-        const validKinds = variants.map((v) => v.__kind).join(', ')
+        const validKinds = variants.map(([__kind]) => __kind).join(', ')
         assert.fail(
           `Value with fields [ ${keys} ] is missing __kind, ` +
             `which needs to be set to one of [ ${validKinds} ]`
         )
       }
 
-      const discriminant = variants.findIndex((v) => v.__kind === val.__kind)
+      const discriminant = variants.findIndex(
+        ([__kind]) => __kind === val.__kind
+      )
       if (discriminant < 0) {
-        const validKinds = variants.map((v) => v.__kind).join(', ')
+        const validKinds = variants.map(([__kind]) => __kind).join(', ')
         assert.fail(
           `${val.__kind} is not a valid kind, needs to be one of [ ${validKinds} ]`
         )
       }
-      const { __kind, ...withoutKind } = val
       const variant = variants[discriminant]
-      const fixed = isFixedSizeBeet(variant.dataBeet)
-        ? variant.dataBeet
-        : variant.dataBeet.toFixedFromValue(withoutKind)
-      return enumDataVariantBeet(fixed, discriminant, variant.__kind)
+
+      const { __kind, ...dataValue } = val
+      const [__variantKind, dataBeet] = variant
+      const fixed = isFixedSizeBeet(dataBeet)
+        ? dataBeet
+        : dataBeet.toFixedFromValue(dataValue)
+      return enumDataVariantBeet(fixed, discriminant, __variantKind)
     },
 
     description: `DataEnum<${variants.length} variants>`,

@@ -26,14 +26,8 @@ function convertToKindData(value: any) {
 test('compat data enums: simples', (t) => {
   type Simples = typeof fixture.simples[number]['value']
   const beet = dataEnum<Simples>([
-    {
-      __kind: 'First',
-      dataBeet: new BeetArgsStruct([['first_field', u32]]),
-    },
-    {
-      __kind: 'Second',
-      dataBeet: new BeetArgsStruct([['second_field', u32]]),
-    },
+    ['First', new BeetArgsStruct([['first_field', u32]])],
+    ['Second', new BeetArgsStruct([['second_field', u32]])],
   ])
 
   for (const { value, data } of fixture.simples) {
@@ -60,18 +54,15 @@ test('compat data enums: simples', (t) => {
 test('compat data enums: CollectionInfo', (t) => {
   type Collections = typeof fixture.collections[number]['value']
   const beet = dataEnum<Collections>([
-    {
-      __kind: 'V1',
-      dataBeet: new FixableBeetArgsStruct([
+    [
+      'V1',
+      new FixableBeetArgsStruct([
         ['symbol', utf8String],
         ['verified_creators', array(u8)],
         ['whitelist_root', uniformFixedSizeArray(u8, 32)],
       ]),
-    },
-    {
-      __kind: 'V2',
-      dataBeet: new FixableBeetArgsStruct([['collection_mint', u8]]),
-    },
+    ],
+    ['V2', new FixableBeetArgsStruct([['collection_mint', u8]])],
   ])
 
   for (const { value, data } of fixture.collections) {

@@ -279,9 +279,10 @@ export type DataEnumKind<T> = keyof T
 /**
  * Turns a `Record<K, Beet<V>>` into a discriminated union `{ __kind: K, dataBeet: Beet<V> }`.
  */
-export type DataEnumBeet<T> = { __kind: DataEnumKind<T> } & {
-  dataBeet: FixableBeet<T[keyof T], any> | FixedSizeBeet<T[keyof T], any>
-}
+export type DataEnumBeet<T> = [
+  DataEnumKind<T>,
+  FixableBeet<T[keyof T], any> | FixedSizeBeet<T[keyof T], any>
+]
 /**
  * Turns a `Record<K, V>` into a discriminated union `{ __kind: K, ...V }`.
  */
