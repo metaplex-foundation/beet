@@ -80,5 +80,5 @@ export function checkFixableFromValueSerialization<T>(
 ) {
   const fixedBeet = fixabledBeet.toFixedFromValue(value)
   checkFixedSerialize(t, fixedBeet, value, data, description)
-  // checkFixedDeserialize(t, fixedBeet, value, data, description)
+  checkFixedDeserialize(t, fixedBeet, value, data, description)
 }

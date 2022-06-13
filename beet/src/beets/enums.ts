@@ -179,11 +179,11 @@ export function dataEnum<T>(variants: DataEnumBeet<T>[]) {
           `${val.__kind} is not a valid kind, needs to be one of [ ${validKinds} ]`
         )
       }
-      const { dataBeet } = val
+      const { __kind, ...withoutKind } = val
       const variant = variants[discriminant]
-      const fixed = isFixedSizeBeet(dataBeet)
-        ? dataBeet
-        : dataBeet.toFixedFromValue(dataBeet)
+      const fixed = isFixedSizeBeet(variant.dataBeet)
+        ? variant.dataBeet
+        : variant.dataBeet.toFixedFromValue(withoutKind)
       return enumDataVariantBeet(fixed, discriminant, variant.__kind)
     },
 
