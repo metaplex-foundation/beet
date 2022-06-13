@@ -1,8 +1,8 @@
 import {
   BEET_PACKAGE,
   BEET_TYPE_ARG_INNER,
-  DataEnumKeyAsKind,
-  FixableBeet,
+  DataEnumBeet,
+  Enum,
   FixedSizeBeet,
   isFixedSizeBeet,
   SupportedTypeDefinition,
@@ -13,14 +13,6 @@ import { strict as assert } from 'assert'
 // -----------------
 // Fixed Scalar Enum
 // -----------------
-
-// TypeScript enum type support isn't that great since it really ends up being an Object hash
-// when transpiled.
-// Therefore we have to jump through some hoops to make all types check out
-export type Enum<T> =
-  | { [key: number | string]: string | number | T }
-  | number
-  | T
 
 function resolveEnumVariant<T>(value: T, isNumVariant: boolean): keyof Enum<T> {
   return (isNumVariant ? `${value}` : value) as keyof Enum<T>
@@ -129,8 +121,7 @@ export function uniformDataEnum<Kind, Data>(
 // -----------------
 // Data Enum
 // -----------------
-
-export type EnumDataVariant<Kind, Data> = {
+type EnumDataVariant<Kind, Data> = {
   __kind: Kind
 } & Data
 
@@ -155,11 +146,7 @@ function enumDataVariantBeet<Kind, T>(
   }
 }
 
-export type BeetDataEnum<T> = { __kind: keyof T } & {
-  dataBeet: FixableBeet<T[keyof T]> | FixedSizeBeet<T[keyof T]>
-}
-
-export function dataEnum<T>(variants: BeetDataEnum<T>[]) {
+export function dataEnum<T>(variants: DataEnumBeet<T>[]) {
   return {
     toFixedFromData(buf: Buffer, offset: number) {
       const discriminant = u8.read(buf, offset)
