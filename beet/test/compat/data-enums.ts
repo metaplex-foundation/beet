@@ -8,6 +8,7 @@ import {
 import {
   array,
   BeetArgsStruct,
+  EnumDataVariant,
   dataEnum,
   FixableBeetArgsStruct,
   u32,
@@ -24,7 +25,22 @@ function convertToKindData(value: any) {
 }
 
 test('compat data enums: simples', (t) => {
-  const beet = dataEnum([
+  type SimpleKind = 'First' | 'Second'
+  type Simples =
+    | EnumDataVariant<
+        'First',
+        {
+          first_field: number
+        }
+      >
+    | EnumDataVariant<
+        'Second',
+        {
+          second_field: number
+        }
+      >
+
+  const beet = dataEnum<SimpleKind, Simples>([
     {
       kind: 'First',
       dataBeet: new BeetArgsStruct([['first_field', u32]]),
@@ -36,7 +52,12 @@ test('compat data enums: simples', (t) => {
   ])
 
   for (const { value, data } of fixture.simples) {
-    const val = convertToKindData(value)
+    const val = convertToKindData(value) as Simples
+
+    // TODO(thlorenz): work out types to not need 'as Simples' ideally
+    const fixedBeet = beet.toFixedFromData(Buffer.from(data), 0)
+    const res = fixedBeet.read(Buffer.from(data), 0)
+
     checkFixableFromDataSerialization(
       t,
       beet,
@@ -56,6 +77,8 @@ test('compat data enums: simples', (t) => {
 })
 
 test('compat data enums: CollectionInfo', (t) => {
+  // type CollectionInfoKind = 'V1' | 'V2'
+
   const beet = dataEnum([
     {
       kind: 'V1',

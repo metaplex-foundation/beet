@@ -128,19 +128,24 @@ export function uniformDataEnum<Kind, Data>(
 // -----------------
 // Data Enum
 // -----------------
-function enumDataBeet<T>(
+
+export type EnumDataVariant<Kind, Data> = {
+  __kind: Kind
+} & Data
+
+function enumDataVariantBeet<Kind, T>(
   inner: FixedSizeBeet<T>,
   discriminant: number,
-  kind: string
-): FixedSizeBeet<T> {
+  kind: Kind
+): FixedSizeBeet<EnumDataVariant<Kind, T>> {
   return {
-    write(buf: Buffer, offset: number, value: any) {
+    write(buf: Buffer, offset: number, value: T) {
       u8.write(buf, offset, discriminant)
       inner.write(buf, offset + u8.byteSize, value)
     },
 
     read(buf: Buffer, offset: number) {
-      const val = inner.read(buf, offset + u8.byteSize)
+      const val: T = inner.read(buf, offset + u8.byteSize)
       return { __kind: kind, ...val }
     },
 
@@ -149,8 +154,10 @@ function enumDataBeet<T>(
   }
 }
 
-export function dataEnum(
-  variants: { kind: string; dataBeet: FixableBeet<any> | FixedSizeBeet<any> }[]
+export type DataEnumKind<T> = keyof T
+
+export function dataEnum<Kind, T>(
+  variants: { kind: Kind; dataBeet: FixableBeet<T> | FixedSizeBeet<T> }[]
 ) {
   return {
     toFixedFromData(buf: Buffer, offset: number) {
@@ -164,7 +171,7 @@ export function dataEnum(
         ? variant.dataBeet
         : variant.dataBeet.toFixedFromData(buf, offset + 1)
 
-      return enumDataBeet(fixed, discriminant, variant.kind)
+      return enumDataVariantBeet(fixed, discriminant, variant.kind)
     },
 
     toFixedFromValue(val: any) {
@@ -189,7 +196,7 @@ export function dataEnum(
       const fixed = isFixedSizeBeet(variant.dataBeet)
         ? variant.dataBeet
         : variant.dataBeet.toFixedFromValue(withoutKind)
-      return enumDataBeet(fixed, discriminant, variant.kind)
+      return enumDataVariantBeet(fixed, discriminant, variant.kind)
     },
 
     description: `DataEnum<${variants.length} variants>`,
