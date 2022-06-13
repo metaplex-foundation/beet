@@ -25,8 +25,13 @@ function convertToKindData(value: any) {
 }
 
 test('compat data enums: simples', (t) => {
-  type SimpleKind = 'First' | 'Second'
-  type Simples =
+  type DataEnumKind<T> = keyof T
+  type DataEnumKeyAsKind<T> = {
+    [K in keyof T]: { __kind: K } & T[K]
+  }[keyof T]
+
+  // type SimpleKind = 'First' | 'Second'
+  type SimpleVariants =
     | EnumDataVariant<
         'First',
         {
@@ -40,19 +45,28 @@ test('compat data enums: simples', (t) => {
         }
       >
 
-  const beet = dataEnum<SimpleKind, Simples>([
+  type Simples = {
+    First: { first_field: number }
+    Second: { second_field: number }
+  }
+  const SimplesBeet = {
+    First: new BeetArgsStruct([['first_field', u32]]),
+    Second: new BeetArgsStruct([['second_field', u32]]),
+  }
+
+  const beet = dataEnum<Simples, DataEnumKind<Simples>>([
     {
-      kind: 'First',
-      dataBeet: new BeetArgsStruct([['first_field', u32]]),
+      __kind: 'First',
+      dataBeet: SimplesBeet.First,
     },
     {
-      kind: 'Second',
-      dataBeet: new BeetArgsStruct([['second_field', u32]]),
+      __kind: 'Second',
+      dataBeet: SimplesBeet.Second,
     },
   ])
 
   for (const { value, data } of fixture.simples) {
-    const val = convertToKindData(value) as Simples
+    const val = convertToKindData(value) as SimpleVariants
 
     // TODO(thlorenz): work out types to not need 'as Simples' ideally
     const fixedBeet = beet.toFixedFromData(Buffer.from(data), 0)
@@ -81,7 +95,7 @@ test('compat data enums: CollectionInfo', (t) => {
 
   const beet = dataEnum([
     {
-      kind: 'V1',
+      __kind: 'V1',
       dataBeet: new FixableBeetArgsStruct([
         ['symbol', utf8String],
         ['verified_creators', array(u8)],
@@ -89,7 +103,7 @@ test('compat data enums: CollectionInfo', (t) => {
       ]),
     },
     {
-      kind: 'V2',
+      __kind: 'V2',
       dataBeet: new FixableBeetArgsStruct([['collection_mint', u8]]),
     },
   ])

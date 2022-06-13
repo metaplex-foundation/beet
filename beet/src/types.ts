@@ -258,3 +258,12 @@ export function isElementCollectionFixedSizeBeet<T, V = Partial<T>>(
     keys.includes('lenPrefixByteSize')
   )
 }
+
+export type DataEnumKind<T> = keyof T
+
+/**
+ * Turns a `Record<K, V>` into a discriminated union `{ __kind: K, ...V }`.
+ */
+export type DataEnumKeyAsKind<T> = {
+  [K in keyof T]: { __kind: K } & T[K]
+}[keyof T]

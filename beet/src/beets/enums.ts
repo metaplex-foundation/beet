@@ -1,6 +1,7 @@
 import {
   BEET_PACKAGE,
   BEET_TYPE_ARG_INNER,
+  DataEnumKeyAsKind,
   FixableBeet,
   FixedSizeBeet,
   isFixedSizeBeet,
@@ -154,11 +155,11 @@ function enumDataVariantBeet<Kind, T>(
   }
 }
 
-export type DataEnumKind<T> = keyof T
+export type BeetDataEnum<T> = { __kind: keyof T } & {
+  dataBeet: FixableBeet<T[keyof T]> | FixedSizeBeet<T[keyof T]>
+}
 
-export function dataEnum<Kind, T>(
-  variants: { kind: Kind; dataBeet: FixableBeet<T> | FixedSizeBeet<T> }[]
-) {
+export function dataEnum<T>(variants: BeetDataEnum<T>[]) {
   return {
     toFixedFromData(buf: Buffer, offset: number) {
       const discriminant = u8.read(buf, offset)
@@ -171,32 +172,32 @@ export function dataEnum<Kind, T>(
         ? variant.dataBeet
         : variant.dataBeet.toFixedFromData(buf, offset + 1)
 
-      return enumDataVariantBeet(fixed, discriminant, variant.kind)
+      return enumDataVariantBeet(fixed, discriminant, variant.__kind)
     },
 
     toFixedFromValue(val: any) {
       if (val.__kind == null) {
         const keys = Object.keys(val).join(', ')
-        const validKinds = variants.map((v) => v.kind).join(', ')
+        const validKinds = variants.map((v) => v.__kind).join(', ')
         assert.fail(
           `Value with fields [ ${keys} ] is missing __kind, ` +
             `which needs to be set to one of [ ${validKinds} ]`
         )
       }
 
-      const discriminant = variants.findIndex((v) => v.kind === val.__kind)
+      const discriminant = variants.findIndex((v) => v.__kind === val.__kind)
       if (discriminant < 0) {
-        const validKinds = variants.map((v) => v.kind).join(', ')
+        const validKinds = variants.map((v) => v.__kind).join(', ')
         assert.fail(
           `${val.__kind} is not a valid kind, needs to be one of [ ${validKinds} ]`
         )
       }
-      const { __kind, ...withoutKind } = val
+      const { dataBeet } = val
       const variant = variants[discriminant]
-      const fixed = isFixedSizeBeet(variant.dataBeet)
-        ? variant.dataBeet
-        : variant.dataBeet.toFixedFromValue(withoutKind)
-      return enumDataVariantBeet(fixed, discriminant, variant.kind)
+      const fixed = isFixedSizeBeet(dataBeet)
+        ? dataBeet
+        : dataBeet.toFixedFromValue(dataBeet)
+      return enumDataVariantBeet(fixed, discriminant, variant.__kind)
     },
 
     description: `DataEnum<${variants.length} variants>`,
