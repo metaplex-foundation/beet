@@ -146,6 +146,27 @@ function enumDataVariantBeet<Kind, T>(
   }
 }
 
+/**
+ * De/serializes Data Enums.
+ * They are represented as a discriminated unions in TypeScript.
+ *
+ * ## Example
+ *
+ * ```ts
+ * type Simple = {
+ *   First: { n1: number }
+ *   Second: { n2: number }
+ * }
+ *
+ * const beet = dataEnum<Simple>([
+ *   ['First', new BeetArgsStruct([['n1', u32]])],
+ *   ['Second', new BeetArgsStruct([['n2', u32]])],
+ * ])
+ * ```
+ *
+ * @category beet/enum
+ * @param variants an array of {@link DataEnumBeet}s each a tuple of `[ kind, data ]`
+ */
 export function dataEnum<T>(variants: DataEnumBeet<T>[]) {
   return {
     toFixedFromData(buf: Buffer, offset: number) {
