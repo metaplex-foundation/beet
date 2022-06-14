@@ -30,7 +30,7 @@ function checkCases<Kind>(
         t.deepEqual(
           actual,
           expected,
-          `round trip dataEnum(${
+          `round trip Enum(${
             resolve[expected as number]
           }, ${expected}), offset ${offset} larger buffer`
         )
@@ -43,7 +43,7 @@ function checkCases<Kind>(
         t.deepEqual(
           actual,
           expected,
-          `round trip dataEnum(${
+          `round trip Enum(${
             resolve[expected as number]
           }, ${expected}), offset ${offset} exact buffer`
         )

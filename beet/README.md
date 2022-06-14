@@ -252,21 +252,63 @@ fixedBeet.read(buf, 0) // same  as results
 
 #### Enum with Data Variants
 
+NOTE: this sample is what [solita](https://github.com/metaplex-foundation/solita) will generate from a provided IDL. solita is the
+recommended way to create TypeScript that uses beet for de/serialization.
+
 ```ts
-enum ResultKind {
-  Good,
-  Bad,
+// -----------------
+// Setup
+// -----------------
+type CollectionInfoRecord = {
+  V1: {
+    symbol: string
+    verifiedCreators: web3.PublicKey[]
+    whitelistRoot: number[] /* size: 32 */
+  }
+  V2: { collectionMint: web3.PublicKey }
 }
+type CollectionInfo = beet.DataEnumKeyAsKind<CollectionInfoRecord>
 
-const goodResult: DataEnum<ResultKind, Result> = {
-  kind: ResultKind.Good,
-  data: new Result(20, 1200, -455),
+const collectionInfoBeet = beet.dataEnum<CollectionInfoRecord>([
+  [
+    'V1',
+    new beet.FixableBeetArgsStruct<CollectionInfoRecord['V1']>(
+      [
+        ['symbol', beet.utf8String],
+        ['verifiedCreators', beet.array(beetSolana.publicKey)],
+        ['whitelistRoot', beet.uniformFixedSizeArray(beet.u8, 32)],
+      ],
+      'CollectionInfoRecord["V1"]'
+    ),
+  ],
+
+  [
+    'V2',
+    new beet.BeetArgsStruct<CollectionInfoRecord['V2']>(
+      [['collectionMint', beetSolana.publicKey]],
+      'CollectionInfoRecord["V2"]'
+    ),
+  ],
+]) as beet.FixableBeet<CollectionInfo>
+
+// -----------------
+// Usage
+// -----------------
+const collectionV1: CollectionInfo & { __kind: 'V1' } = {
+  __kind: 'V1',
+  symbol: 'SYM',
+  verifiedCreators: [new web3.PublicKey(1), new web3.PublicKey(2)],
+  whitelistRoot: new Array(32).fill(33),
 }
-const resultEnum: Beet<DataEnum<ResultKind, Result>> = dataEnum(Result.struct)
+const fixedBeet = collectionInfoBeet.toFixedFromValue(collectionV1)
 
-const buf = Buffer.alloc(resultEnum.byteSize)
-beet.write(buf, 0, goodResult)
-beet.read(buf, 0) // same as goodResult
+// Serialize
+const buf = Buffer.alloc(fixedBeet.byteSize)
+fixedBeet.write(buf, 0, collectionV1)
+
+// Deserialize
+const val = fixedBeet.read(buf, 0)
+console.log(val)
 ```
 
 ## LICENSE

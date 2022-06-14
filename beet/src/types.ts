@@ -258,3 +258,34 @@ export function isElementCollectionFixedSizeBeet<T, V = Partial<T>>(
     keys.includes('lenPrefixByteSize')
   )
 }
+
+// -----------------
+// Enums
+// -----------------
+
+// TypeScript enum type support isn't that great since it really ends up being an Object hash
+// when transpiled.
+// Therefore we have to jump through some hoops to make all types check out
+export type Enum<T> =
+  | { [key: number | string]: string | number | T }
+  | number
+  | T
+
+/**
+ * Enum Variant Kinds
+ */
+export type DataEnumKind<T> = keyof T
+
+/**
+ * Turns a `Record<K, Beet<V>>` into a discriminated union `{ __kind: K, dataBeet: Beet<V> }`.
+ */
+export type DataEnumBeet<T, Kind extends DataEnumKind<T> = DataEnumKind<T>> = [
+  Kind,
+  FixableBeet<T[Kind], any> | FixedSizeBeet<T[Kind], any>
+]
+/**
+ * Turns a `Record<K, V>` into a discriminated union `{ __kind: K, ...V }`.
+ */
+export type DataEnumKeyAsKind<T> = {
+  [K in DataEnumKind<T>]: { __kind: K } & T[K]
+}[keyof T]

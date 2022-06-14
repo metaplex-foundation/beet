@@ -37,7 +37,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
       const flds = fields
         .map(
           ([key, val]: FixedBeetField<Args>) =>
-            `${key}: ${val.description} ${beetBytes(val)}`
+            `${String(key)}: ${val.description} ${beetBytes(val)}`
         )
         .join('\n  ')
       logDebug(`struct ${description} {\n  ${flds}\n} ${beetBytes(this)}`)
@@ -109,6 +109,16 @@ export class BeetStruct<Class, Args = Partial<Class>>
   }
 
   static description = 'BeetStruct'
+
+  static TYPE = 'BeetStruct'
+
+  get type() {
+    return BeetStruct.TYPE
+  }
+}
+
+export function isBeetStruct(beet: any): beet is BeetStruct<any, any> {
+  return beet.type === BeetStruct.TYPE
 }
 
 /**

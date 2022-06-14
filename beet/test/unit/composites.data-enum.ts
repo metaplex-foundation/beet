@@ -1,7 +1,7 @@
 import {
   Beet,
-  dataEnum,
-  DataEnum,
+  uniformDataEnum,
+  UniformDataEnum,
   uniformFixedSizeArray,
   fixedSizeUtf8String,
   FixedSizeBeet,
@@ -23,8 +23,8 @@ enum Seats {
 
 function checkCases<Kind, Data>(
   offsets: number[],
-  cases: DataEnum<Kind, Data>[],
-  beet: FixedSizeBeet<DataEnum<Kind, Data>>,
+  cases: UniformDataEnum<Kind, Data>[],
+  beet: FixedSizeBeet<UniformDataEnum<Kind, Data>>,
   resolve: Record<number, string>,
   t: test.Test
 ) {
@@ -68,7 +68,7 @@ test('composites: DataEnum<Color, string>', (t) => {
   ]
 
   const offsets = [0, 4]
-  const beet: FixedSizeBeet<DataEnum<Color, string>> = dataEnum(
+  const beet: FixedSizeBeet<UniformDataEnum<Color, string>> = uniformDataEnum(
     fixedSizeUtf8String(5)
   )
 
@@ -84,7 +84,7 @@ test('composites: DataEnum<Seats, u8>', (t) => {
   ]
 
   const offsets = [0, 4]
-  const beet: Beet<DataEnum<Seats, number>> = dataEnum(u8)
+  const beet: Beet<UniformDataEnum<Seats, number>> = uniformDataEnum(u8)
 
   checkCases(offsets, cases, beet, Seats, t)
   t.end()
@@ -98,7 +98,7 @@ test('composites: DataEnum<Seats, u8[]>', (t) => {
   ]
 
   const offsets = [0, 4]
-  const beet: Beet<DataEnum<Seats, number[]>> = dataEnum(
+  const beet: Beet<UniformDataEnum<Seats, number[]>> = uniformDataEnum(
     uniformFixedSizeArray(u8, 9)
   )
 
