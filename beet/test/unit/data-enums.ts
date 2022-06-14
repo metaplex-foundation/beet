@@ -64,7 +64,7 @@ test('data-enums: fixable + fixed data structs', (t) => {
     Fixed: { n: number }
   }
   const beet = dataEnum<Ty>([
-    ['Fixable', new FixableBeetArgsStruct([['s', utf8String]])],
+    ['Fixable', new FixableBeetArgsStruct<Ty['Fixable']>([['s', utf8String]])],
     ['Fixed', new BeetArgsStruct([['n', u8]])],
   ])
   checkCase(t, beet, { Fixable: { s: 'hello' } })
@@ -78,10 +78,10 @@ test('data-enums: fixed only data structs', (t) => {
     FixedTwo: { n2: number; array: number[] /* 2 */ }
   }
   const beet = dataEnum<Ty>([
-    ['FixedOne', new BeetArgsStruct([['n1', u8]])],
+    ['FixedOne', new BeetArgsStruct<Ty['FixedOne']>([['n1', u8]])],
     [
       'FixedTwo',
-      new BeetArgsStruct([
+      new BeetArgsStruct<Ty['FixedTwo']>([
         ['n2', u8],
         ['array', uniformFixedSizeArray(u8, 2)],
       ]),
@@ -112,11 +112,28 @@ test('data-enums: fixable only data structs', (t) => {
   t.end()
 })
 
-test('data-enums: direct data', (t) => {
+test('data-enums: direct fixed data', (t) => {
   type Ty = {
     Data: number
   }
-  const beet = dataEnum<Ty>([['Data', u8]])
-  checkCase(t, beet, { Data: 1 })
+  try {
+    dataEnum<Ty>([['Data', u8]])
+    t.fail('should throw')
+  } catch (err: any) {
+    t.match(err.toString(), /beet must be a struct/)
+  }
+  t.end()
+})
+
+test('data-enums: direct fixable data', (t) => {
+  type Ty = {
+    Data: string
+  }
+  try {
+    dataEnum<Ty>([['Data', utf8String]])
+    t.fail('should throw')
+  } catch (err: any) {
+    t.match(err.toString(), /beet must be a struct/)
+  }
   t.end()
 })

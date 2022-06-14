@@ -9,6 +9,8 @@ import {
 } from '../types'
 import { u8 } from './numbers'
 import { strict as assert } from 'assert'
+import { isBeetStruct } from '../struct'
+import { isFixableBeetStruct } from '../struct.fixable'
 
 // -----------------
 // Fixed Scalar Enum
@@ -150,6 +152,9 @@ function enumDataVariantBeet<Kind, T>(
  * De/serializes Data Enums.
  * They are represented as a discriminated unions in TypeScript.
  *
+ * NOTE: only structs, i.e. {@link BeetArgsStruct} and
+ * {@link FixableBeetArgsStruct} are supported as the data of each enum variant.
+ *
  * ## Example
  *
  * ```ts
@@ -159,15 +164,25 @@ function enumDataVariantBeet<Kind, T>(
  * }
  *
  * const beet = dataEnum<Simple>([
- *   ['First', new BeetArgsStruct([['n1', u32]])],
- *   ['Second', new BeetArgsStruct([['n2', u32]])],
+ *   ['First', new BeetArgsStruct<Simple['First']>([['n1', u32]])],
+ *   ['Second', new BeetArgsStruct<Simple['Second']>([['n2', u32]])],
  * ])
  * ```
  *
  * @category beet/enum
  * @param variants an array of {@link DataEnumBeet}s each a tuple of `[ kind, data ]`
  */
-export function dataEnum<T>(variants: DataEnumBeet<T>[]) {
+export function dataEnum<T, Key extends keyof T = keyof T>(
+  variants: DataEnumBeet<T, Key>[]
+) {
+  for (const [_, beet] of variants) {
+    // NOTE: tried to enforce this with types but failed to do so for now
+    assert(
+      isBeetStruct(beet) || isFixableBeetStruct(beet),
+      'dataEnum: data beet must be a struct'
+    )
+  }
+
   return {
     toFixedFromData(buf: Buffer, offset: number) {
       const discriminant = u8.read(buf, offset)

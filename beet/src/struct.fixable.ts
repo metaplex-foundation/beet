@@ -113,6 +113,18 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
   }
 
   static description = 'FixableBeetStruct'
+
+  static TYPE = 'FixableBeetStruct'
+
+  get type() {
+    return FixableBeetStruct.TYPE
+  }
+}
+
+export function isFixableBeetStruct(
+  beet: any
+): beet is FixableBeetStruct<any, any> {
+  return beet.type === FixableBeetStruct.TYPE
 }
 
 /**
