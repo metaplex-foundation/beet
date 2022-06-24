@@ -2,6 +2,7 @@ import { SupportedTypeDefinition } from '@metaplex-foundation/beet'
 import { KeysExports, keysTypeMap, KeysTypeMapKey } from './keys'
 
 export * from './keys'
+export * from './gpa'
 
 /**
  * @category TypeDefinition
