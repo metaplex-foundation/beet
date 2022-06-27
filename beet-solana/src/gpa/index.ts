@@ -51,7 +51,7 @@ export class GpaBuilder<T> {
     return this._addFilter({ dataSize: size })
   }
 
-  addFilter(key: keyof T & string, val: any) {
+  addFilter(key: keyof T & string, val: T[keyof T]) {
     const beetInfo = this.beets.get(key)
     assert(beetInfo != null, 'Filter key needs to be an existing field name')
 
@@ -83,7 +83,10 @@ export class GpaBuilder<T> {
    * @param programId the id of the program that owns the accounts we are querying
    * @param beetFields the beet fields that make up the structure of the account data
    */
-  static fromBeetFields<T>(programId: PublicKey, beetFields: BeetField<T>[]) {
+  static fromBeetFields<T>(
+    programId: PublicKey,
+    beetFields: BeetField<T, T[keyof T]>[]
+  ) {
     const map = new Map<
       keyof T & string,
       {
@@ -112,7 +115,7 @@ export class GpaBuilder<T> {
    */
   static fromStruct<T>(
     programId: PublicKey,
-    struct: { fields: BeetField<T>[] }
+    struct: { fields: BeetField<T, T[keyof T]>[] }
   ) {
     return GpaBuilder.fromBeetFields(programId, struct.fields)
   }
