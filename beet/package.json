@@ -52,6 +52,7 @@
     "airtap-system": "^0.1.0",
     "browserify": "^17.0.0",
     "doctoc": "^2.1.0",
+    "minipass": "3.0.0",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
     "spok": "^1.4.3",
