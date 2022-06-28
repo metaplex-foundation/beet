@@ -45,15 +45,6 @@ export class GpaBuilder<T> {
     return this
   }
 
-  dataSize(size?: number) {
-    size = size ?? this.accountSize
-    assert(
-      size != null,
-      'for accounts of dynamic size the dataSize arg needs to be provided'
-    )
-    return this._addFilter({ dataSize: size })
-  }
-
   private _addInnerFilter(
     key: keyof T & string,
     innerKey: string,
@@ -149,6 +140,22 @@ export class GpaBuilder<T> {
   }
 
   /**
+   * Adds a `dataSize` filter which will match on account's sizes.
+   * You have to provide that {@link size} for accounts that don't have a fixed size.
+   * For _fixed_ size accounts that size is determined for you.
+   *
+   * @param size - the account size to match for
+   */
+  dataSize(size?: number) {
+    size = size ?? this.accountSize
+    assert(
+      size != null,
+      'for accounts of dynamic size the dataSize arg needs to be provided'
+    )
+    return this._addFilter({ dataSize: size })
+  }
+
+  /**
    * Attempts to find the accounts matching the configured filters.
    *
    * @param connection used to query the program accounts on the cluster
@@ -164,8 +171,8 @@ export class GpaBuilder<T> {
    * will not be included as a filter option since it their position in the
    * bytes array will change depending on the content of the non-fixed field.
    *
-   * @param programId the id of the program that owns the accounts we are querying
-   * @param beetFields the beet fields that make up the structure of the account data
+   * @param programId - the id of the program that owns the accounts we are querying
+   * @param beetFields - the beet fields that make up the structure of the account data
    */
   static fromBeetFields<T>(
     programId: PublicKey,
@@ -196,6 +203,9 @@ export class GpaBuilder<T> {
   /**
    * Convenience wrapper around {@link GpaBuilder.fromBeetFields} that allows
    * providing a struct which contains the beet fields.
+   *
+   * @param - programId the id of the program that owns the accounts we are querying
+   * @param struct - containing the beet `fields` specifying the layout of the account
    */
   static fromStruct<T>(
     programId: PublicKey,
