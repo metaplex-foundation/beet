@@ -29,10 +29,6 @@ test('gpa: fixed struct with one u8', (t) => {
 })
 
 test('gpa: fixed struct with two u8s', (t) => {
-  type Args = {
-    n: number
-    nn: number
-  }
   const struct = new BeetStruct(
     [
       ['n', u8],
@@ -41,7 +37,7 @@ test('gpa: fixed struct with two u8s', (t) => {
     (args) => args
   )
 
-  let gpaBuilder: GpaBuilder<Args> = GpaBuilder.fromStruct(PROGRAM_ID, struct)
+  let gpaBuilder = GpaBuilder.fromStruct(PROGRAM_ID, struct)
   function prepCase(comment: string) {
     t.comment(comment)
     gpaBuilder = GpaBuilder.fromStruct(PROGRAM_ID, struct)
@@ -91,10 +87,7 @@ test('gpa: fixed struct with two u8s', (t) => {
 })
 
 test('gpa: fixed struct with three ints', (t) => {
-  let gpaBuilder: GpaBuilder<Results> = GpaBuilder.fromStruct<Results>(
-    PROGRAM_ID,
-    Results.struct
-  )
+  let gpaBuilder = GpaBuilder.fromStruct<Results>(PROGRAM_ID, Results.struct)
   function prepCase(comment: string) {
     t.comment(comment)
     gpaBuilder = GpaBuilder.fromStruct<Results>(PROGRAM_ID, Results.struct)
