@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "(cd ./beet && yarn build) && (cd ./beet-solana && yarn build)",
+    "postinstall": "patch-package",
     "test:beet": "cd ./beet && yarn test && yarn test:browser",
     "test:beet-solana": "cd ./beet-solana && yarn test",
     "doc": "(cd ./beet && yarn doc); (cd ./beet-solana && yarn doc)",
@@ -18,5 +19,8 @@
     "url": "https://github.com/metaplex/beet.git"
   },
   "private": true,
-  "packageManager": "yarn@3.1.1"
+  "packageManager": "yarn@3.1.1",
+  "devDependencies": {
+    "patch-package": "^6.4.7"
+  }
 }
