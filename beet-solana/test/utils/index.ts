@@ -90,3 +90,27 @@ export class Trader {
     'Trader'
   )
 }
+
+// Expected Filters
+export const nameFilter = (name: string) => ({
+  memcmp: {
+    offset: 0,
+    bytes: Buffer.concat([
+      Buffer.from([4, 0, 0, 0]), // length
+      Buffer.from(name),
+    ]),
+  },
+})
+export const ageFilter = (age: number) => ({
+  memcmp: { offset: 15, bytes: Buffer.from([age]) },
+})
+
+export const resultsFilter = (results: Results) => {
+  const bytes = Results.struct.serialize(results)[0]
+  return {
+    memcmp: {
+      offset: 8,
+      bytes,
+    },
+  }
+}

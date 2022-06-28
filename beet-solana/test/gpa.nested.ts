@@ -1,34 +1,16 @@
 import test from 'tape'
 import spok from 'spok'
-import { PROGRAM_ID, Results, Trader, withDecodedBytes } from './utils'
-import { GpaBuilder } from 'src/beet-solana'
+import {
+  ageFilter,
+  nameFilter,
+  resultsFilter,
+  PROGRAM_ID,
+  Trader,
+  withDecodedBytes,
+} from './utils'
+import { GpaBuilder } from '../src/beet-solana'
 
 test('gpa: fixed struct nested inside fixed struct', (t) => {
-  // Expected Filters
-  const nameFilter = (name: string) => ({
-    memcmp: {
-      offset: 0,
-      bytes: Buffer.concat([
-        Buffer.from([4, 0, 0, 0]), // length
-        Buffer.from(name),
-      ]),
-    },
-  })
-  const ageFilter = (age: number) => ({
-    memcmp: { offset: 15, bytes: Buffer.from([age]) },
-  })
-
-  const resultsFilter = (results: Results) => {
-    const bytes = Results.struct.serialize(results)[0]
-    return {
-      memcmp: {
-        offset: 8,
-        bytes,
-      },
-    }
-  }
-
-  // Prep
   let gpaBuilder: GpaBuilder<Trader> = GpaBuilder.fromStruct<Trader>(
     PROGRAM_ID,
     Trader.struct
@@ -38,9 +20,8 @@ test('gpa: fixed struct nested inside fixed struct', (t) => {
     gpaBuilder = GpaBuilder.fromStruct<Trader>(PROGRAM_ID, Trader.struct)
   }
 
-  // Tests
   prepCase(
-    `name whic is before results struct - gpaBuilder.addFilter('name', 'trad')`
+    `name which is before results struct - gpaBuilder.addFilter('name', 'trad')`
   )
   gpaBuilder.addFilter('name', 'trad')
   spok(t, withDecodedBytes(gpaBuilder.config), {
@@ -72,5 +53,71 @@ test('gpa: fixed struct nested inside fixed struct', (t) => {
     filters: [resultsFilter(results)],
   })
 
+  t.end()
+})
+
+test('gpa: fixed struct nested inside fixed struct - filter inner struct', (t) => {
+  let gpaBuilder: GpaBuilder<Trader> = GpaBuilder.fromStruct<Trader>(
+    PROGRAM_ID,
+    Trader.struct
+  )
+  function prepCase(comment: string) {
+    t.comment(comment)
+    gpaBuilder = GpaBuilder.fromStruct<Trader>(PROGRAM_ID, Trader.struct)
+  }
+
+  // -----------------
+  // Success Cases
+  // -----------------
+  prepCase(`gpaBuilder.addInnerFilter('results.win', 2)`)
+  gpaBuilder.addInnerFilter('results.win', 2)
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [{ memcmp: { offset: 8, bytes: Buffer.from([2]) } }],
+  })
+
+  prepCase(`gpaBuilder.addInnerFilter('results.totalWin', 8)`)
+  gpaBuilder.addInnerFilter('results.totalWin', 8)
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [{ memcmp: { offset: 9, bytes: Buffer.from([8]) } }],
+  })
+
+  prepCase(`gpaBuilder.addInnerFilter('results.losses', -678)`)
+  gpaBuilder.addInnerFilter('results.losses', -678)
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [{ memcmp: { offset: 11, bytes: Buffer.from([-678]) } }],
+  })
+
+  prepCase(
+    `gpaBuilder.addInnerFilter('results.totalWin', 8).addInnerFilter('results.win', 2)`
+  )
+  gpaBuilder
+    .addInnerFilter('results.totalWin', 8)
+    .addInnerFilter('results.win', 2)
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [
+      { memcmp: { offset: 9, bytes: Buffer.from([8]) } },
+      { memcmp: { offset: 8, bytes: Buffer.from([2]) } },
+    ],
+  })
+
+  // -----------------
+  // Failure Cases
+  // -----------------
+
+  t.throws(
+    () => gpaBuilder.addInnerFilter('result.win', 2),
+    /Outer filter key needs to be an existing field/i,
+    'invalid outer field'
+  )
+  t.throws(
+    () => gpaBuilder.addInnerFilter('results.wiin', 2),
+    /wiin is not a field of the results struct/i,
+    'invalid inner field'
+  )
+  t.throws(
+    () => gpaBuilder.addInnerFilter('results.win.nested', 2),
+    /inner filters can go only one level deep/i,
+    'invalid three level nesting'
+  )
   t.end()
 })

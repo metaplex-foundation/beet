@@ -1,6 +1,8 @@
 import {
   BeetField,
+  BeetStruct,
   FixableBeet,
+  FixableBeetStruct,
   FixedSizeBeet,
   isFixedSizeBeet,
 } from '@metaplex-foundation/beet'
@@ -11,6 +13,7 @@ import {
   PublicKey,
 } from '@solana/web3.js'
 import { strict as assert } from 'assert'
+import { logTrace } from '../utils'
 import { encodeFixedBeet } from './util'
 
 type FieldBeetType<T> =
@@ -51,6 +54,87 @@ export class GpaBuilder<T> {
     return this._addFilter({ dataSize: size })
   }
 
+  private _addInnerFilter(
+    key: keyof T & string,
+    innerKey: string,
+    val: T[keyof T]
+  ) {
+    logTrace(`gpa.addInnerFilter: ${key}.${innerKey}`)
+    const outerBeetInfo = this.beets.get(key)
+    assert(
+      outerBeetInfo != null,
+      'Outer filter key needs to be an existing field name'
+    )
+
+    const beetInfo = outerBeetInfo.beet as
+      | BeetStruct<any>
+      | FixableBeetStruct<any>
+
+    let offset = outerBeetInfo.offset
+    const outerBeet = isFixedSizeBeet(beetInfo)
+      ? beetInfo
+      : beetInfo.toFixedFromValue(val)
+
+    let beet
+    for (const [k, v] of outerBeet.fields) {
+      if (k === innerKey) {
+        beet = v
+        break
+      }
+      offset += v.byteSize
+    }
+    assert(beet != null, `${innerKey} is not a field of the ${key} struct`)
+    const bytes = encodeFixedBeet(beet, val)
+    this._addFilter({ memcmp: { offset, bytes } })
+    return this
+  }
+
+  /**
+   * Adds a _memcmp_ filter for a field inside a field which is a struct value.
+   * The provided keys need to be separated by a `.` and only one level of
+   * nesting is supported at this point.
+   *
+   * The filter is applied to the inner value.
+   *
+   * ## Example
+   *
+   * ### Given:
+   *
+   * ```typescript
+   * type Inner = {
+   *   a: number
+   * }
+   * type Outer = {
+   *   idx: number
+   *   inner: Inner
+   * }
+   * ```
+   * ### Apply a filter on `a` of the `Inner` type:
+   *
+   * ```typescript
+   * gpaBuilder.addInnerFilter('inner.a', 2)
+   * ```
+   *
+   * @param keys - the names of the fields by which to filter, i.e. `'outer.inner'`
+   * @param val - the field value that the filter should match
+   */
+  addInnerFilter(keys: string, val: T[keyof T]) {
+    const parts = keys.split('.')
+    assert.equal(
+      parts.length,
+      2,
+      `inner filters can go only one level deep, i.e. 'outer.inner' is ok, but 'outer.inner.deep' is not`
+    )
+    const [ka, kb] = parts as [keyof T & string, string]
+    return this._addInnerFilter(ka, kb, val)
+  }
+
+  /**
+   * Adds a _memcmp_ filter for the provided {@link key} of the struct.
+   *
+   * @param key - the name of the field by which to filter
+   * @param val - the field value that the filter should match
+   */
   addFilter(key: keyof T & string, val: T[keyof T]) {
     const beetInfo = this.beets.get(key)
     assert(beetInfo != null, 'Filter key needs to be an existing field name')

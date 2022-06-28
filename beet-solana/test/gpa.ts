@@ -3,7 +3,7 @@ import spok from 'spok'
 import { BeetStruct } from '@metaplex-foundation/beet'
 import { u8 } from '@metaplex-foundation/beet'
 import { PROGRAM_ID, Results, withDecodedBytes } from './utils'
-import { GpaBuilder } from 'src/beet-solana'
+import { GpaBuilder } from '../src/beet-solana'
 
 test('gpa: fixed struct with one u8', (t) => {
   type Args = {
