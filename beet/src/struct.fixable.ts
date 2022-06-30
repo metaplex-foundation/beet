@@ -30,14 +30,14 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
    * purposes
    */
   constructor(
-    private readonly fields: BeetField<Args, any>[],
+    readonly fields: BeetField<Args, any>[],
     private readonly construct: (args: Args) => Class,
     readonly description = FixableBeetStruct.description
   ) {
     let minByteSize = 0
     if (logDebug.enabled) {
       const flds = fields
-        .map(([key, val]: BeetField<Args>) => {
+        .map(([key, val]: BeetField<Args, any>) => {
           if (isFixedSizeBeet(val)) {
             minByteSize += val.byteSize
           }

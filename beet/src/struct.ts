@@ -28,7 +28,7 @@ export class BeetStruct<Class, Args = Partial<Class>>
    * purposes
    */
   constructor(
-    private readonly fields: FixedBeetField<Args>[],
+    readonly fields: FixedBeetField<Args>[],
     private readonly construct: (args: Args) => Class,
     readonly description = BeetStruct.description
   ) {
