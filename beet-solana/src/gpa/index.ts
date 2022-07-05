@@ -20,7 +20,15 @@ type FieldBeetType<T> =
   | FixedSizeBeet<T[keyof T]>
   | FixableBeet<T[keyof T], T[keyof T]>
 
+/**
+ * Provides an Account specific GPA builder.
+ *
+ * @template T - the type of the account for which the GpaBuilder is used
+ */
 export class GpaBuilder<T> {
+  /**
+   * web3.js {@link GetProgramAccountsConfig} configured via filter GpaBuilder filter methods.
+   */
   readonly config: GetProgramAccountsConfig = {}
 
   private constructor(
@@ -167,8 +175,9 @@ export class GpaBuilder<T> {
   /**
    * Creates a GPA builder that supports adding up to four filters for
    * fixed size fields.
+   *
    * Once a non-fixed field is encountered, the remaining fields following it
-   * will not be included as a filter option since it their position in the
+   * will not be included as a filter option since their position in the
    * bytes array will change depending on the content of the non-fixed field.
    *
    * @param programId - the id of the program that owns the accounts we are querying
@@ -204,7 +213,7 @@ export class GpaBuilder<T> {
    * Convenience wrapper around {@link GpaBuilder.fromBeetFields} that allows
    * providing a struct which contains the beet fields.
    *
-   * @param - programId the id of the program that owns the accounts we are querying
+   * @param programId - the id of the program that owns the accounts we are querying
    * @param struct - containing the beet `fields` specifying the layout of the account
    */
   static fromStruct<T>(
