@@ -2,7 +2,13 @@ import test from 'tape'
 import spok from 'spok'
 import { BeetStruct } from '@metaplex-foundation/beet'
 import { u8 } from '@metaplex-foundation/beet'
-import { PROGRAM_ID, Results, withDecodedBytes } from './utils'
+import {
+  IntAndString,
+  PROGRAM_ID,
+  Results,
+  stringFilter,
+  withDecodedBytes,
+} from './utils'
 import { GpaBuilder } from '../src/beet-solana'
 
 test('gpa: fixed struct with one u8', (t) => {
@@ -117,6 +123,45 @@ test('gpa: fixed struct with three ints', (t) => {
     filters: [
       { memcmp: { offset: 1, bytes: Buffer.from([8]) } },
       { memcmp: { offset: 3, bytes: Buffer.from([-7]) } },
+    ],
+  })
+
+  t.end()
+})
+
+test('gpa: fixable struct with one int and a string', (t) => {
+  let gpaBuilder = GpaBuilder.fromStruct<IntAndString>(
+    PROGRAM_ID,
+    IntAndString.struct
+  )
+  function prepCase(comment: string) {
+    t.comment(comment)
+    gpaBuilder = GpaBuilder.fromStruct<IntAndString>(
+      PROGRAM_ID,
+      IntAndString.struct
+    )
+  }
+
+  prepCase(`gpaBuilder.addFilter('theInt', 2)`)
+  gpaBuilder.addFilter('theInt', 2)
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [{ memcmp: { offset: 0, bytes: Buffer.from([2]) } }],
+  })
+
+  prepCase(`gpaBuilder.addFilter('theString', 'hello world')`)
+  gpaBuilder.addFilter('theString', 'hello world')
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [stringFilter(1, 'hello world')],
+  })
+
+  prepCase(
+    `gpaBuilder.addFilter('theInt', 2).addFilter('theString', 'hello world')`
+  )
+  gpaBuilder.addFilter('theInt', 2).addFilter('theString', 'hello world')
+  spok(t, withDecodedBytes(gpaBuilder.config), {
+    filters: [
+      { memcmp: { offset: 0, bytes: Buffer.from([2]) } },
+      stringFilter(1, 'hello world'),
     ],
   })
 
