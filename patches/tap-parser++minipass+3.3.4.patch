@@ -1,7 +1,7 @@
-diff --git a/node_modules/minipass/index.js b/node_modules/minipass/index.js
+diff --git a/node_modules/tap-parser/node_modules/minipass/index.js b/node_modules/tap-parser/node_modules/minipass/index.js
 index e8797aa..822f1a4 100644
---- a/node_modules/minipass/index.js
-+++ b/node_modules/minipass/index.js
+--- a/node_modules/tap-parser/node_modules/minipass/index.js
++++ b/node_modules/tap-parser/node_modules/minipass/index.js
 @@ -625,7 +625,7 @@ module.exports = class Minipass extends Stream {
      this[DESTROYED] = true
  
