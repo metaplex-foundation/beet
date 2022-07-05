@@ -1,9 +1,11 @@
 import {
   BeetStruct,
+  FixableBeetStruct,
   fixedSizeUtf8String,
   i32,
   u16,
   u8,
+  utf8String,
 } from '@metaplex-foundation/beet'
 import {
   GetProgramAccountsConfig,
@@ -91,16 +93,36 @@ export class Trader {
   )
 }
 
+export type IntAndStringArgs = Pick<IntAndString, 'theInt' | 'theString'>
+export class IntAndString {
+  constructor(readonly theInt: number, readonly theString: string) {}
+
+  static readonly struct = new FixableBeetStruct<
+    IntAndString,
+    IntAndStringArgs
+  >(
+    [
+      ['theInt', u8],
+      ['theString', utf8String],
+    ],
+    (args) => new IntAndString(args.theInt!, args.theString!),
+    'Trader'
+  )
+}
+
 // Expected Filters
-export const nameFilter = (name: string) => ({
+export const stringFilter = (offset: number, s: string) => ({
   memcmp: {
-    offset: 0,
+    offset,
     bytes: Buffer.concat([
-      Buffer.from([4, 0, 0, 0]), // length
-      Buffer.from(name),
+      Buffer.from([s.length, 0, 0, 0]), // length
+      Buffer.from(s),
     ]),
   },
 })
+
+export const nameFilter = (name: string) => stringFilter(0, name)
+
 export const ageFilter = (age: number) => ({
   memcmp: { offset: 15, bytes: Buffer.from([age]) },
 })
