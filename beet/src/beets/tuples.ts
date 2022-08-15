@@ -7,7 +7,15 @@ import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
 // Since the Tuple type itself dictates the length, and buffer layout, no extra
 // information is included in the serialized data.
 
-// If all inner tuple types are fixed size so is the tuple itself, otherwise it is fixable
+/**
+ * De/Serializes a tuple with all fixed size tuple elements .
+ * Since each tuple element can be of a different type not much type safety can
+ * be provided here.
+ *
+ * @param elements the De/Serializer for each tuple element type
+ *
+ * @category beet/collection
+ */
 export function fixedSizeTuple<T extends any[]>(
   elements: FixedSizeBeet<any>[]
 ): FixedSizeBeet<any> {
@@ -52,8 +60,12 @@ export function fixedSizeTuple<T extends any[]>(
 }
 
 /**
- * De/Serializes a tuple which contains some non-fixed size elements.
+ * De/Serializes a tuple which contains some non-fixed size tuple elements.
  *
+ * Since each tuple element can be of a different type not much type safety can
+ * be provided here.
+ *
+ * @param elements the De/Serializer for each tuple element type
  * @category beet/collection
  */
 export function tuple<T extends any[]>(
