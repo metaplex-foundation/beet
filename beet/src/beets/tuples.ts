@@ -1,10 +1,11 @@
+import { FixableBeet, FixedSizeBeet } from 'src/types'
+import { strict as assert } from 'assert'
+import { fixBeetFromData, fixBeetFromValue } from 'src/beet.fixable'
+
 // Tuples are a special kind of composite which can be understood as
-// fixed length arrays where each data type can have a different data type
+// fixed length arrays where each tuple element can have a different data type.
 // Since the Tuple type itself dictates the length, and buffer layout, no extra
 // information is included in the serialized data.
-
-import { FixedSizeBeet } from 'src/types'
-import { strict as assert } from 'assert'
 
 // If all inner tuple types are fixed size so is the tuple itself, otherwise it is fixable
 export function fixedSizeTuple<T extends any[]>(
@@ -44,6 +45,51 @@ export function fixedSizeTuple<T extends any[]>(
 
     byteSize,
     length: len,
-    description: `Tuple<${elDescs.join(',')}>[ ${byteSizes.join(', ')} ]`,
+    description: `FixedSizeTuple<${elDescs.join(',')}>[ ${byteSizes.join(
+      ', '
+    )} ]`,
+  }
+}
+
+/**
+ * De/Serializes a tuple which contains some non-fixed size elements.
+ *
+ * @category beet/collection
+ */
+export function tuple<T extends any[]>(
+  elements: (FixedSizeBeet<any, any> | FixableBeet<any, any>)[]
+): FixableBeet<T> {
+  const len = elements.length
+  const elDescs = elements.map((x) => x.description)
+
+  return {
+    toFixedFromData(buf: Buffer, offset: number): FixedSizeBeet<any> {
+      let cursor = offset
+      const fixedElements: FixedSizeBeet<T>[] = new Array(len)
+      for (let i = 0; i < len; i++) {
+        const fixedElement = fixBeetFromData(elements[i], buf, cursor)
+        fixedElements[i] = fixedElement
+        cursor += fixedElement.byteSize
+      }
+      return fixedSizeTuple(fixedElements)
+    },
+
+    toFixedFromValue(vals: any[]): FixedSizeBeet<any> {
+      assert(Array.isArray(vals), `${vals} should be an array of tuple values`)
+      assert.equal(
+        vals.length,
+        len,
+        `There should be ${len} tuple values, but there are ${vals.length}`
+      )
+
+      const fixedElements: FixedSizeBeet<T>[] = new Array(len)
+      for (let i = 0; i < vals.length; i++) {
+        const fixedElement = fixBeetFromValue(elements[i], vals[i])
+        fixedElements[i] = fixedElement
+      }
+      return fixedSizeTuple(fixedElements)
+    },
+
+    description: `Tuple<${elDescs.join(',')}>`,
   }
 }
