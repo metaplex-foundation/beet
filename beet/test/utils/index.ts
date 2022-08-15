@@ -81,3 +81,63 @@ export function checkFixableFromValueSerialization<T>(
   checkFixedSerialize(t, fixedBeet, value, data, description)
   checkFixedDeserialize(t, fixedBeet, value, data, description)
 }
+
+export function checkFixedCases<T>(
+  offsets: number[],
+  cases: T[][],
+  beet: FixedSizeBeet<T[]>,
+  t: test.Test
+) {
+  for (const offset of offsets) {
+    for (const x of cases) {
+      {
+        // Larger buffer
+        const buf = Buffer.alloc(offset + beet.byteSize + offset)
+        beet.write(buf, offset, x)
+        const y = beet.read(buf, offset)
+        t.deepEqual(x, y, `round trip ${x}, offset ${offset} larger buffer`)
+      }
+      {
+        // Exact buffer
+        const buf = Buffer.alloc(offset + beet.byteSize)
+        beet.write(buf, offset, x)
+        const y = beet.read(buf, offset)
+        t.deepEqual(x, y, `round trip ${x}, offset ${offset} exact buffer`)
+      }
+    }
+  }
+}
+
+export function checkFixableCases<T, V = Partial<T>>(
+  offsets: number[],
+  cases: V[][],
+  fixable: FixableBeet<T[], V[]>,
+  t: test.Test
+) {
+  for (const offset of offsets) {
+    for (const x of cases) {
+      {
+        const beetFromVal = fixable.toFixedFromValue(x)
+
+        // Larger buffer
+        const buf = Buffer.alloc(offset + beetFromVal.byteSize + offset)
+        beetFromVal.write(buf, offset, x)
+
+        const beetFromData = fixable.toFixedFromData(buf, offset)
+        const y = beetFromData.read(buf, offset)
+        t.deepEqual(x, y, `round trip ${x}, offset ${offset} larger buffer`)
+      }
+      {
+        const beetFromVal = fixable.toFixedFromValue(x)
+
+        // Exact buffer
+        const buf = Buffer.alloc(offset + beetFromVal.byteSize)
+        beetFromVal.write(buf, offset, x)
+
+        const beetFromData = fixable.toFixedFromData(buf, offset)
+        const y = beetFromData.read(buf, offset)
+        t.deepEqual(x, y, `round trip ${x}, offset ${offset} exact buffer`)
+      }
+    }
+  }
+}

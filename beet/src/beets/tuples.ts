@@ -1,6 +1,6 @@
-import { FixableBeet, FixedSizeBeet } from 'src/types'
+import { FixableBeet, FixedSizeBeet } from '../types'
 import { strict as assert } from 'assert'
-import { fixBeetFromData, fixBeetFromValue } from 'src/beet.fixable'
+import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
 
 // Tuples are a special kind of composite which can be understood as
 // fixed length arrays where each tuple element can have a different data type.
