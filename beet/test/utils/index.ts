@@ -29,7 +29,6 @@ export function checkFixedSerialize<T>(
   fixedBeet: FixedSizeBeet<T>,
   value: T,
   data: number[],
-
   description: string
 ) {
   const buf = Buffer.alloc(fixedBeet.byteSize)

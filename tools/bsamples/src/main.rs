@@ -7,7 +7,7 @@ use data_enums::produce_data_enums;
 use enums::produce_enums;
 use options::produce_options;
 use simple::produce_simple;
-use tuples::produce_top_level_tuples;
+use tuples::produce_fixed_size_top_level_tuples;
 use vecs::produce_vecs;
 
 mod composites;
@@ -67,9 +67,9 @@ fn main() -> Result<()> {
     }
 
     {
-        let top_level_tuples_json = serde_json::to_string_pretty(&produce_top_level_tuples()?)?;
-        let mut top_level_tuples_file =
-            File::create(format!("{}/top_level_tuples.json", data_dir))?;
+        let top_level_tuples_json =
+            serde_json::to_string_pretty(&produce_fixed_size_top_level_tuples()?)?;
+        let mut top_level_tuples_file = File::create(format!("{}/tuples.json", data_dir))?;
         top_level_tuples_file.write_all(top_level_tuples_json.as_bytes())?;
     }
 
