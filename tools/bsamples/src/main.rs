@@ -7,6 +7,7 @@ use data_enums::produce_data_enums;
 use enums::produce_enums;
 use options::produce_options;
 use simple::produce_simple;
+use tuples::produce_tuples;
 use vecs::produce_vecs;
 
 mod composites;
@@ -15,6 +16,7 @@ mod enums;
 mod options;
 mod samples;
 mod simple;
+mod tuples;
 mod vecs;
 
 #[allow(unused)]
@@ -62,6 +64,13 @@ fn main() -> Result<()> {
         let composites_json = serde_json::to_string_pretty(&produce_composites()?)?;
         let mut composites_file = File::create(format!("{}/composites.json", data_dir))?;
         composites_file.write_all(composites_json.as_bytes())?;
+    }
+
+    {
+        let top_level_tuples_json =
+            serde_json::to_string_pretty(&produce_tuples()?)?;
+        let mut top_level_tuples_file = File::create(format!("{}/tuples.json", data_dir))?;
+        top_level_tuples_file.write_all(top_level_tuples_json.as_bytes())?;
     }
 
     Ok(())

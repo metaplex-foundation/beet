@@ -24,10 +24,11 @@ import {
 
 export * from './beets/aliases'
 export * from './beets/collections'
-export * from './beets/string'
 export * from './beets/composites'
 export * from './beets/enums'
 export * from './beets/numbers'
+export * from './beets/string'
+export * from './beets/tuples'
 export * from './beet.fixable'
 export * from './read-write'
 export * from './struct'
