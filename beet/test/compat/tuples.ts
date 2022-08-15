@@ -71,3 +71,30 @@ test('compat fixable tuples top level: (u8, i32[] ,i8)', (t) => {
   }
   t.end()
 })
+
+// -----------------
+// Nested
+// -----------------
+test('compat nested tuples: Vec<(u8, u8)>', (t) => {
+  const beet = array(fixedSizeTuple([u8, u8]))
+  for (const { value, data } of fixture.vec_u8_u8s) {
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+    checkFixedSerialization(t, fixedBeetFromData, value, data)
+
+    const fixedBeetFromValue = beet.toFixedFromValue(value)
+    checkFixedSerialization(t, fixedBeetFromValue, value, data)
+  }
+  t.end()
+})
+
+test('compat nested tuples: Vec<(u8, string)>', (t) => {
+  const beet = array(tuple([u8, utf8String]))
+  for (const { value, data } of fixture.vec_u8_strings) {
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+    checkFixedSerialization(t, fixedBeetFromData, value, data)
+
+    const fixedBeetFromValue = beet.toFixedFromValue(value)
+    checkFixedSerialization(t, fixedBeetFromValue, value, data)
+  }
+  t.end()
+})
