@@ -173,7 +173,7 @@ export function map<K extends keyof any, V>(
       offset: number
     ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
       const len = u32.read(buf, offset)
-      let cursor = offset
+      let cursor = offset + 4
 
       // Shortcut for the case that both key and value are fixed size beets
       if (keyIsFixed && valIsFixed) {

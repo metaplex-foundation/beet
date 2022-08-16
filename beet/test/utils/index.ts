@@ -79,7 +79,7 @@ export function checkFixableFromValueSerialization<T>(
   fixabledBeet: FixableBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   const fixedBeet = fixabledBeet.toFixedFromValue(value)
   checkFixedSerialize(t, fixedBeet, value, data, description)

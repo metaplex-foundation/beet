@@ -33,7 +33,7 @@ test('compat maps top level: HashMap<u8, u8>', (t) => {
 test('compat maps top level: BTreeMap<u8, u8>', (t) => {
   const beet = map(u8, u8)
   for (const { value, data } of fixture.btree_map_u8_u8s) {
-    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), -1)
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
     const m: Map<number, number> = hashToMap(value, parseInt)
     checkFixedSerialization(t, fixedBeetFromData, m, data)
 
@@ -43,7 +43,7 @@ test('compat maps top level: BTreeMap<u8, u8>', (t) => {
   t.end()
 })
 
-test.only('compat maps top level: HashMap<string, i32>', (t) => {
+test('compat maps top level: HashMap<string, i32>', (t) => {
   const beet = map(utf8String, i32)
   for (const { value, data } of fixture.hash_map_string_i32s) {
     const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
