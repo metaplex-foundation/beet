@@ -1,4 +1,10 @@
-import { ElementCollectionBeet, FixableBeet, FixedSizeBeet } from '../types'
+import {
+  Beet,
+  ElementCollectionBeet,
+  FixableBeet,
+  FixedSizeBeet,
+  isFixedSizeBeet,
+} from '../types'
 import { u32 } from './numbers'
 import { strict as assert } from 'assert'
 
@@ -19,13 +25,58 @@ import { strict as assert } from 'assert'
  * @private
  */
 function fixedSizeMap<K extends keyof any, V>(
-  keyElement: FixedSizeBeet<K>,
-  valElement: FixedSizeBeet<V>,
+  keyElement: Beet<K>,
+  valElement: Beet<V>,
+  fixedElements: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]>,
   len: number
 ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
-  const elementByteSize = keyElement.byteSize + valElement.byteSize
-  const mapSize = elementByteSize * len
-  const byteSize = 4 + mapSize
+  const keyElementFixed = isFixedSizeBeet(keyElement)
+  const valElementFixed = isFixedSizeBeet(valElement)
+
+  function determineSizes() {
+    if (keyElementFixed && valElementFixed) {
+      const elementByteSize = keyElement.byteSize + valElement.byteSize
+      return {
+        elementByteSize,
+        byteSize: 4 + len * elementByteSize,
+      }
+    } else if (keyElementFixed) {
+      let valsByteSize = 0
+      for (const [_, v] of fixedElements.values()) {
+        valsByteSize += v.byteSize
+      }
+      // Once each element has a different size all we can do here is take an average
+      const elementByteSize = keyElement.byteSize + valsByteSize / len
+      return {
+        elementByteSize,
+        byteSize: 4 + keyElement.byteSize * len + valsByteSize,
+      }
+    } else if (valElementFixed) {
+      let keysByteSize = 0
+      for (const [k, _] of fixedElements.values()) {
+        keysByteSize += k.byteSize
+      }
+      const elementByteSize = keysByteSize / len + valElement.byteSize
+      return {
+        elementByteSize,
+        byteSize: 4 + keysByteSize + valElement.byteSize * len,
+      }
+    } else {
+      let keysByteSize = 0
+      let valsByteSize = 0
+      for (const [k, v] of fixedElements.values()) {
+        keysByteSize += k.byteSize
+        valsByteSize += v.byteSize
+      }
+      const elementByteSize = keysByteSize / len + valsByteSize / len
+      return {
+        elementByteSize,
+        byteSize: 4 + keysByteSize + valsByteSize,
+      }
+    }
+  }
+
+  const { elementByteSize, byteSize } = determineSizes()
 
   return {
     write: function (buf: Buffer, offset: number, map: Map<K, V>): void {
@@ -34,12 +85,29 @@ function fixedSizeMap<K extends keyof any, V>(
 
       let size = 0
       for (const [k, v] of map.entries()) {
-        size++
-        keyElement.write(buf, cursor, k)
-        cursor += keyElement.byteSize
+        let fixedKey = keyElementFixed ? keyElement : null
+        let fixedVal = valElementFixed ? valElement : null
 
-        valElement.write(buf, cursor, v)
-        cursor += valElement.byteSize
+        if (fixedKey == null || fixedVal == null) {
+          // When we write the value we know the key and an just pull the
+          // matching fixed beet for key/val from the provided map which is
+          // faster than fixing it by value
+          const els = fixedElements.get(k)
+          assert(
+            els != null,
+            `Should be able to find beet els for ${k.toString()}, but could not`
+          )
+          fixedKey ??= els[0]
+          fixedVal ??= els[1]
+        }
+
+        fixedKey.write(buf, cursor, k)
+        cursor += fixedKey.byteSize
+
+        fixedVal.write(buf, cursor, v)
+        cursor += fixedVal.byteSize
+
+        size++
       }
       u32.write(buf, offset, size)
 
@@ -63,11 +131,21 @@ function fixedSizeMap<K extends keyof any, V>(
       const map: Map<K, V> = new Map()
 
       for (let i = 0; i < size; i++) {
-        const k = keyElement.read(buf, cursor)
-        cursor += keyElement.byteSize
+        // When we read the value from a buffer we don't know the key we're
+        // reading yet and thus cannot use the provided map of fixed
+        // de/serializers.
+        // Therefore we obtain it by fixing it by data instead.
+        const fixedKey = keyElementFixed
+          ? keyElement
+          : keyElement.toFixedFromData(buf, cursor)
+        const k = fixedKey.read(buf, cursor)
+        cursor += fixedKey.byteSize
 
-        const v = valElement.read(buf, cursor)
-        cursor += valElement.byteSize
+        const fixedVal = valElementFixed
+          ? valElement
+          : valElement.toFixedFromData(buf, cursor)
+        const v = fixedVal.read(buf, cursor)
+        cursor += fixedVal.byteSize
 
         map.set(k, v)
       }
@@ -84,23 +162,65 @@ function fixedSizeMap<K extends keyof any, V>(
 }
 
 export function map<K extends keyof any, V>(
-  keyElement: FixedSizeBeet<K>,
-  valElement: FixedSizeBeet<V>
+  keyElement: Beet<K>,
+  valElement: Beet<V>
 ): FixableBeet<Map<K, V>, Map<K, V>> {
+  const keyIsFixed = isFixedSizeBeet(keyElement)
+  const valIsFixed = isFixedSizeBeet(valElement)
   return {
     toFixedFromData(
       buf: Buffer,
       offset: number
     ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
       const len = u32.read(buf, offset)
-      return fixedSizeMap(keyElement, valElement, len)
+      let cursor = offset
+
+      // Shortcut for the case that both key and value are fixed size beets
+      if (keyIsFixed && valIsFixed) {
+        return fixedSizeMap(keyElement, valElement, new Map(), len)
+      }
+
+      // If either key or val are not fixed size beets we need to determine the
+      // fixed versions and add them to a map by key
+      const fixedBeets: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]> = new Map()
+      for (let i = 0; i < len; i++) {
+        const keyFixed = keyIsFixed
+          ? keyElement
+          : keyElement.toFixedFromData(buf, cursor)
+        const key = keyFixed.read(buf, cursor)
+        cursor += keyFixed.byteSize
+
+        const valFixed = valIsFixed
+          ? valElement
+          : valElement.toFixedFromData(buf, cursor)
+        cursor += valFixed.byteSize
+
+        fixedBeets.set(key, [keyFixed, valFixed])
+      }
+      return fixedSizeMap(keyElement, valElement, fixedBeets, len)
     },
+
     toFixedFromValue(
-      val: Map<K, V>
+      mapVal: Map<K, V>
     ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
-      const len = val.size
-      return fixedSizeMap(keyElement, valElement, len)
+      const len = mapVal.size
+      // As above shortcut for the optimal case and build a map for all others
+      if (keyIsFixed && valIsFixed) {
+        return fixedSizeMap(keyElement, valElement, new Map(), len)
+      }
+      const fixedBeets: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]> = new Map()
+      for (const [k, v] of mapVal) {
+        const keyFixed = keyIsFixed
+          ? keyElement
+          : keyElement.toFixedFromValue(k)
+        const valFixed = valIsFixed
+          ? valElement
+          : valElement.toFixedFromValue(v)
+        fixedBeets.set(k, [keyFixed, valFixed])
+      }
+      return fixedSizeMap(keyElement, valElement, fixedBeets, len)
     },
+
     description: `FixableMap<${keyElement.description}, ${valElement.description}>`,
   }
 }
