@@ -1,18 +1,34 @@
-import { ElementCollectionBeet, FixedSizeBeet } from '../types'
+import { ElementCollectionBeet, FixableBeet, FixedSizeBeet } from '../types'
 import { u32 } from './numbers'
 import { strict as assert } from 'assert'
 
-export function fixedSizeMap<T extends keyof any, V>(
-  keyElement: FixedSizeBeet<T>,
+/**
+ * De/Serializes a map with a specific number of key/values of type {@link K}
+ * and {@link V} respectively.
+ *
+ * NOTE: that it is not exported as no fixed size map exists but will have to
+ * be derived from data or value instead.
+ *
+ * @template K type of elements held in the array
+ *
+ * @param keyElement the De/Serializers for the key element types
+ * @param valElement the De/Serializers for the value element types
+ * @param len amount of entries in the map
+ *
+ * @category beet/collection
+ * @private
+ */
+function fixedSizeMap<K extends keyof any, V>(
+  keyElement: FixedSizeBeet<K>,
   valElement: FixedSizeBeet<V>,
   len: number
-): ElementCollectionBeet & FixedSizeBeet<Map<T, V>, Map<T, V>> {
-  const mapSize = (keyElement.byteSize + valElement.byteSize) * len
+): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
+  const elementByteSize = keyElement.byteSize + valElement.byteSize
+  const mapSize = elementByteSize * len
   const byteSize = 4 + mapSize
 
-  // @ts-ignore types are tricky here
   return {
-    write: function (buf: Buffer, offset: number, map: Map<T, V>): void {
+    write: function (buf: Buffer, offset: number, map: Map<K, V>): void {
       // Write the values first and then the size as it comes clear while we do the former
       let cursor = offset + 4
 
@@ -34,7 +50,7 @@ export function fixedSizeMap<T extends keyof any, V>(
       )
     },
 
-    read: function (buf: Buffer, offset: number): Map<T, V> {
+    read: function (buf: Buffer, offset: number): Map<K, V> {
       const size = u32.read(buf, offset)
       assert.equal(
         size,
@@ -44,7 +60,7 @@ export function fixedSizeMap<T extends keyof any, V>(
 
       let cursor = offset + 4
 
-      const map: Map<T, V> = new Map()
+      const map: Map<K, V> = new Map()
 
       for (let i = 0; i < size; i++) {
         const k = keyElement.read(buf, cursor)
@@ -59,9 +75,32 @@ export function fixedSizeMap<T extends keyof any, V>(
       return map
     },
 
+    elementByteSize,
     byteSize,
     length: len,
     lenPrefixByteSize: 4,
     description: `Map<${keyElement.description}, ${valElement.description}>`,
+  }
+}
+
+export function map<K extends keyof any, V>(
+  keyElement: FixedSizeBeet<K>,
+  valElement: FixedSizeBeet<V>
+): FixableBeet<Map<K, V>, Map<K, V>> {
+  return {
+    toFixedFromData(
+      buf: Buffer,
+      offset: number
+    ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
+      const len = u32.read(buf, offset)
+      return fixedSizeMap(keyElement, valElement, len)
+    },
+    toFixedFromValue(
+      val: Map<K, V>
+    ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {
+      const len = val.size
+      return fixedSizeMap(keyElement, valElement, len)
+    },
+    description: `FixableMap<${keyElement.description}, ${valElement.description}>`,
   }
 }

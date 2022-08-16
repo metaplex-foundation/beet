@@ -2,8 +2,12 @@ import test from 'tape'
 import { inspect } from 'util'
 import { Beet, FixableBeet, FixedSizeBeet } from '../../src/beet'
 
+export function deepInspect(obj: any) {
+  return inspect(obj, { depth: 15, colors: true, getters: true })
+}
+
 export function deepLog(obj: any) {
-  console.log(inspect(obj, { depth: 15, colors: true, getters: true }))
+  console.log(deepInspect(obj))
 }
 
 export function deepLogBeet(struct: Beet<any, any>) {
@@ -52,7 +56,7 @@ export function checkFixedSerialization<T>(
   fixedBeet: FixedSizeBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   checkFixedSerialize(t, fixedBeet, value, data, description)
   checkFixedDeserialize(t, fixedBeet, value, data, description)
@@ -63,7 +67,7 @@ export function checkFixableFromDataSerialization<T>(
   fixabledBeet: FixableBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   const fixedBeet = fixabledBeet.toFixedFromData(Buffer.from(data), 0)
   checkFixedSerialize(t, fixedBeet, value, data, description)
