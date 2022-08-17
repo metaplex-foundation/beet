@@ -162,8 +162,8 @@ function fixedSizeMap<K extends keyof any, V>(
 }
 
 export function map<K extends keyof any, V>(
-  keyElement: Beet<K>,
-  valElement: Beet<V>
+  keyElement: Beet<K, K>,
+  valElement: Beet<V, V>
 ): FixableBeet<Map<K, V>, Map<K, V>> {
   const keyIsFixed = isFixedSizeBeet(keyElement)
   const valIsFixed = isFixedSizeBeet(valElement)

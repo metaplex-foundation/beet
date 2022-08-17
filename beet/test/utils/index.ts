@@ -154,8 +154,8 @@ export function checkMapSerialize<K extends keyof any, V>(
   t: test.Test,
   m: Map<K, V>,
   mapBeet: FixedSizeBeet<Map<K, V>>,
-  keyBeet: Beet<K>,
-  valBeet: Beet<V>
+  keyBeet: Beet<K, K>,
+  valBeet: Beet<V, V>
 ) {
   const serializedMap = Buffer.alloc(mapBeet.byteSize)
   mapBeet.write(serializedMap, 0, m)
