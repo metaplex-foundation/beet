@@ -64,17 +64,17 @@ test('compat maps top level: HashMap<string, i32>', (t) => {
   t.end()
 })
 
-/*
 test('compat maps top level: HashMap<string, i8[]>', (t) => {
   const beet = map(utf8String, array(i8))
   for (const { value, data } of fixture.hash_map_string_vec_i8s) {
     const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
     const m: Map<string, number[]> = hashToMap(value)
-    checkFixedSerialization(t, fixedBeetFromData, m, data)
+    checkFixedDeserialize(t, fixedBeetFromData, m, data)
+    checkMapSerialize(t, m, fixedBeetFromData, utf8String, array(i8))
 
     const fixedBeetFromValue = beet.toFixedFromValue(m)
-    checkFixedSerialization(t, fixedBeetFromValue, m, data)
+    checkFixedDeserialize(t, fixedBeetFromValue, m, data)
+    checkMapSerialize(t, m, fixedBeetFromValue, utf8String, array(i8))
   }
   t.end()
 })
-*/
