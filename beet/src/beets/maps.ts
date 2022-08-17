@@ -45,8 +45,10 @@ function fixedSizeMap<K extends keyof any, V>(
       for (const [_, v] of fixedElements.values()) {
         valsByteSize += v.byteSize
       }
-      // Once each element has a different size all we can do here is take an average
-      const elementByteSize = keyElement.byteSize + valsByteSize / len
+      // If any element has a dynamic size all we can do here is take an average
+      const elementByteSize =
+        keyElement.byteSize + Math.ceil(valsByteSize / len)
+
       return {
         elementByteSize,
         byteSize: 4 + keyElement.byteSize * len + valsByteSize,
@@ -56,7 +58,9 @@ function fixedSizeMap<K extends keyof any, V>(
       for (const [k, _] of fixedElements.values()) {
         keysByteSize += k.byteSize
       }
-      const elementByteSize = keysByteSize / len + valElement.byteSize
+      const elementByteSize =
+        Math.ceil(keysByteSize / len) + valElement.byteSize
+
       return {
         elementByteSize,
         byteSize: 4 + keysByteSize + valElement.byteSize * len,
@@ -68,7 +72,7 @@ function fixedSizeMap<K extends keyof any, V>(
         keysByteSize += k.byteSize
         valsByteSize += v.byteSize
       }
-      const elementByteSize = keysByteSize / len + valsByteSize / len
+      const elementByteSize = Math.ceil(keysByteSize / len + valsByteSize / len)
       return {
         elementByteSize,
         byteSize: 4 + keysByteSize + valsByteSize,
