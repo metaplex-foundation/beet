@@ -19,7 +19,7 @@ import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
  *
  * @param elements the De/Serializer for each tuple element type
  *
- * @category beet/collection
+ * @category beet/composite
  */
 export function fixedSizeTuple<T extends any[]>(
   elements: FixedSizeBeet<any>[]
@@ -71,7 +71,7 @@ export function fixedSizeTuple<T extends any[]>(
  * be provided here.
  *
  * @param elements the De/Serializer for each tuple element type
- * @category beet/collection
+ * @category beet/composite
  */
 export function tuple<T extends any[]>(
   elements: (FixedSizeBeet<any, any> | FixableBeet<any, any>)[]
@@ -114,7 +114,10 @@ export function tuple<T extends any[]>(
 /**
  * @category TypeDefinition
  */
-export type TuplesExports = keyof typeof import('./tuples')
+export type TuplesExports = keyof Omit<
+  typeof import('./tuples'),
+  'tuplesTypeMap'
+>
 
 /**
  * @category TypeDefinition
@@ -130,7 +133,7 @@ export type TuplesTypeMap = Record<
 >
 
 /**
- * Maps collections beet exports to metadata which describes in which package it
+ * Maps tuples beet exports to metadata which describes in which package it
  * is defined as well as which TypeScript type is used to represent the
  * deserialized value in JavaScript.
  *

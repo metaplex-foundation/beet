@@ -5,6 +5,7 @@ use borsh::BorshDeserialize;
 use composites::produce_composites;
 use data_enums::produce_data_enums;
 use enums::produce_enums;
+use maps::produce_maps;
 use options::produce_options;
 use simple::produce_simple;
 use tuples::produce_tuples;
@@ -13,6 +14,7 @@ use vecs::produce_vecs;
 mod composites;
 mod data_enums;
 mod enums;
+mod maps;
 mod options;
 mod samples;
 mod simple;
@@ -67,11 +69,15 @@ fn main() -> Result<()> {
     }
 
     {
-        let top_level_tuples_json =
-            serde_json::to_string_pretty(&produce_tuples()?)?;
+        let tuples_json = serde_json::to_string_pretty(&produce_tuples()?)?;
         let mut top_level_tuples_file = File::create(format!("{}/tuples.json", data_dir))?;
-        top_level_tuples_file.write_all(top_level_tuples_json.as_bytes())?;
+        top_level_tuples_file.write_all(tuples_json.as_bytes())?;
     }
 
+    {
+        let maps_json = serde_json::to_string_pretty(&produce_maps()?)?;
+        let mut top_level_maps_file = File::create(format!("{}/maps.json", data_dir))?;
+        top_level_maps_file.write_all(maps_json.as_bytes())?;
+    }
     Ok(())
 }

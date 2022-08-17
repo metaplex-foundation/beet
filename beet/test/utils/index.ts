@@ -1,9 +1,18 @@
 import test from 'tape'
 import { inspect } from 'util'
-import { Beet, FixableBeet, FixedSizeBeet } from '../../src/beet'
+import {
+  Beet,
+  FixableBeet,
+  FixedSizeBeet,
+  isFixedSizeBeet,
+} from '../../src/beet'
+
+export function deepInspect(obj: any) {
+  return inspect(obj, { depth: 15, colors: true, getters: true })
+}
 
 export function deepLog(obj: any) {
-  console.log(inspect(obj, { depth: 15, colors: true, getters: true }))
+  console.log(deepInspect(obj))
 }
 
 export function deepLogBeet(struct: Beet<any, any>) {
@@ -41,7 +50,7 @@ export function checkFixedDeserialize<T>(
   fixedBeet: FixedSizeBeet<T>,
   value: T,
   data: number[],
-  description: string
+  description = `${deepInspect(value)}`
 ) {
   const actual = fixedBeet.read(Buffer.from(data), 0)
   t.deepEqual(actual, value, `deserialize: '${description}'`)
@@ -52,7 +61,7 @@ export function checkFixedSerialization<T>(
   fixedBeet: FixedSizeBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   checkFixedSerialize(t, fixedBeet, value, data, description)
   checkFixedDeserialize(t, fixedBeet, value, data, description)
@@ -63,7 +72,7 @@ export function checkFixableFromDataSerialization<T>(
   fixabledBeet: FixableBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   const fixedBeet = fixabledBeet.toFixedFromData(Buffer.from(data), 0)
   checkFixedSerialize(t, fixedBeet, value, data, description)
@@ -75,7 +84,7 @@ export function checkFixableFromValueSerialization<T>(
   fixabledBeet: FixableBeet<T>,
   value: T,
   data: number[],
-  description = `${value}`
+  description = `${deepInspect(value)}`
 ) {
   const fixedBeet = fixabledBeet.toFixedFromValue(value)
   checkFixedSerialize(t, fixedBeet, value, data, description)
@@ -140,4 +149,59 @@ export function checkFixableCases<T, V = Partial<T>>(
       }
     }
   }
+}
+export function checkMapSerialize<K extends keyof any, V>(
+  t: test.Test,
+  m: Map<K, V>,
+  mapBeet: FixedSizeBeet<Map<K, V>>,
+  keyBeet: Beet<K, K>,
+  valBeet: Beet<V, V>
+) {
+  const serializedMap = Buffer.alloc(mapBeet.byteSize)
+  mapBeet.write(serializedMap, 0, m)
+
+  serializedMapIncludesKeyVals(t, serializedMap, m, keyBeet, valBeet)
+}
+
+/**
+ * Verifies that each keyval of the provided map value {@link m} is contained in
+ * the {@link serializedMap}.
+ * Map key/vals aren't ordered and thus it is unknown how they are written to
+ * the buffer when serialized.
+ * Therefore we cannot compare the serialized buffers directly but have to look
+ * each key/val up one by one.
+ */
+function serializedMapIncludesKeyVals<K extends keyof any, V>(
+  t: test.Test,
+  serializedMap: Buffer,
+  m: Map<K, V>,
+  keyBeet: Beet<K, K>,
+  valBeet: Beet<V, V>
+) {
+  for (const [k, v] of m) {
+    const fixedKey = fixFromValIfNeeded(keyBeet, k)
+    const fixedVal = fixFromValIfNeeded(valBeet, v)
+
+    const keyBuf = Buffer.alloc(fixedKey.byteSize)
+    const valBuf = Buffer.alloc(fixedVal.byteSize)
+
+    fixedKey.write(keyBuf, 0, k)
+    fixedVal.write(valBuf, 0, v)
+
+    const keyVal = deepInspect({ [k]: v })
+    t.assert(
+      bufferIncludes(serializedMap, Buffer.concat([keyBuf, valBuf])),
+      `serialized map includes ${keyVal}`
+    )
+  }
+}
+
+function fixFromValIfNeeded<T, V>(beet: Beet<T, V>, v: V): FixedSizeBeet<T, V> {
+  return isFixedSizeBeet(beet)
+    ? beet
+    : (beet as FixableBeet<T, V>).toFixedFromValue(v)
+}
+
+export function bufferIncludes(buf: Buffer, snippet: Buffer) {
+  return buf.toString('hex').includes(snippet.toString('hex'))
 }
