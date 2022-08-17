@@ -25,8 +25,8 @@ import { strict as assert } from 'assert'
  * @private
  */
 function fixedSizeMap<K extends keyof any, V>(
-  keyElement: Beet<K>,
-  valElement: Beet<V>,
+  keyElement: Beet<K, K>,
+  valElement: Beet<V, V>,
   fixedElements: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]>,
   len: number
 ): ElementCollectionBeet & FixedSizeBeet<Map<K, V>, Map<K, V>> {

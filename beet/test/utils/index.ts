@@ -175,8 +175,8 @@ function serializedMapIncludesKeyVals<K extends keyof any, V>(
   t: test.Test,
   serializedMap: Buffer,
   m: Map<K, V>,
-  keyBeet: Beet<K>,
-  valBeet: Beet<V>
+  keyBeet: Beet<K, K>,
+  valBeet: Beet<V, V>
 ) {
   for (const [k, v] of m) {
     const fixedKey = fixFromValIfNeeded(keyBeet, k)
