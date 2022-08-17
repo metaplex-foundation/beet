@@ -1,6 +1,6 @@
 import test from 'tape'
 import { u8, map, utf8String, i8, array, i32 } from '../../src/beet'
-import { checkFixedSerialization } from '../utils'
+import { checkFixedDeserialize, checkMapSerialize } from '../utils'
 import fixture from './fixtures/maps.json'
 
 function hashToMap<K extends keyof any, V>(
@@ -19,26 +19,32 @@ function hashToMap<K extends keyof any, V>(
 test('compat maps top level: HashMap<u8, u8>', (t) => {
   const beet = map(u8, u8)
   for (const { value, data } of fixture.hash_map_u8_u8s) {
-    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
     const m: Map<number, number> = hashToMap(value, parseInt)
-    checkFixedSerialization(t, fixedBeetFromData, m, data)
+
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+    checkFixedDeserialize(t, fixedBeetFromData, m, data)
+    checkMapSerialize(t, m, fixedBeetFromData, u8, u8)
 
     const fixedBeetFromValue = beet.toFixedFromValue(m)
-    checkFixedSerialization(t, fixedBeetFromValue, m, data)
+    checkFixedDeserialize(t, fixedBeetFromValue, m, data)
+    checkMapSerialize(t, m, fixedBeetFromValue, u8, u8)
   }
   t.end()
 })
 
-// NOTE: this merly confirms that HashMap and BTreeMap data is layed out the same way when serialized
+// NOTE: this merely confirms that HashMap and BTreeMap data is layed out the same way when serialized
 test('compat maps top level: BTreeMap<u8, u8>', (t) => {
   const beet = map(u8, u8)
   for (const { value, data } of fixture.btree_map_u8_u8s) {
-    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
     const m: Map<number, number> = hashToMap(value, parseInt)
-    checkFixedSerialization(t, fixedBeetFromData, m, data)
+
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+    checkFixedDeserialize(t, fixedBeetFromData, m, data)
+    checkMapSerialize(t, m, fixedBeetFromData, u8, u8)
 
     const fixedBeetFromValue = beet.toFixedFromValue(m)
-    checkFixedSerialization(t, fixedBeetFromValue, m, data)
+    checkFixedDeserialize(t, fixedBeetFromValue, m, data)
+    checkMapSerialize(t, m, fixedBeetFromValue, u8, u8)
   }
   t.end()
 })
@@ -46,12 +52,14 @@ test('compat maps top level: BTreeMap<u8, u8>', (t) => {
 test('compat maps top level: HashMap<string, i32>', (t) => {
   const beet = map(utf8String, i32)
   for (const { value, data } of fixture.hash_map_string_i32s) {
-    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
     const m: Map<string, number> = hashToMap(value)
-    checkFixedSerialization(t, fixedBeetFromData, m, data)
+    const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+    checkFixedDeserialize(t, fixedBeetFromData, m, data)
+    checkMapSerialize(t, m, fixedBeetFromData, utf8String, i32)
 
     const fixedBeetFromValue = beet.toFixedFromValue(m)
-    checkFixedSerialization(t, fixedBeetFromValue, m, data)
+    checkFixedDeserialize(t, fixedBeetFromValue, m, data)
+    checkMapSerialize(t, m, fixedBeetFromValue, utf8String, i32)
   }
   t.end()
 })
