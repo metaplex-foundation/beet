@@ -1,9 +1,11 @@
 import {
   Beet,
+  BEET_PACKAGE,
   ElementCollectionBeet,
   FixableBeet,
   FixedSizeBeet,
   isFixedSizeBeet,
+  SupportedTypeDefinition,
 } from '../types'
 import { u32 } from './numbers'
 import { strict as assert } from 'assert'
@@ -240,4 +242,38 @@ export function map<K extends keyof any, V>(
 
     description: `FixableMap<${keyElement.description}, ${valElement.description}>`,
   }
+}
+
+/**
+ * @category TypeDefinition
+ */
+export type MapsExports = keyof Omit<typeof import('./maps'), 'mapsTypeMap'>
+
+/**
+ * @category TypeDefinition
+ */
+export type MapsTypeMapKey = 'Map'
+
+/**
+ * @category TypeDefinition
+ */
+export type MapsTypeMap = Record<
+  MapsTypeMapKey,
+  SupportedTypeDefinition & { beet: MapsExports }
+>
+
+/**
+ * Maps maps beet exports to metadata which describes in which package it
+ * is defined as well as which TypeScript type is used to represent the
+ * deserialized value in JavaScript.
+ *
+ * @category TypeDefinition
+ */
+export const mapsTypeMap: MapsTypeMap = {
+  Map: {
+    beet: 'map',
+    isFixable: true,
+    sourcePack: BEET_PACKAGE,
+    ts: 'Map',
+  },
 }
