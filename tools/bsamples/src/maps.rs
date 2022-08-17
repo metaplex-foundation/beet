@@ -12,6 +12,7 @@ pub struct Maps {
     btree_map_u8_u8s: Vec<Sample<BTreeMap<u8, u8>>>,
     hash_map_string_i32s: Vec<Sample<HashMap<String, i32>>>,
     hash_map_string_vec_i8s: Vec<Sample<HashMap<String, Vec<i8>>>>,
+    vec_hash_map_string_i64s: Vec<Sample<Vec<HashMap<String, i64>>>>,
 }
 
 pub fn produce_maps() -> Result<Maps> {
@@ -63,10 +64,26 @@ pub fn produce_maps() -> Result<Maps> {
         produce_samples(vec![hm1, hm2])?
     };
 
+    let vec_hash_map_string_i64s = {
+        let hm1 = HashMap::from([
+            ("Uno".to_string(), -3),
+            ("Dos".to_string(), -1),
+            ("Tres".to_string(), 2),
+        ]);
+        let hm2 = HashMap::from([
+            ("Eins".to_string(), 3),
+            ("Zwei".to_string(), 1),
+            ("Drei".to_string(), -3),
+            ("Vier".to_string(), 0),
+        ]);
+        produce_samples(vec![vec![hm1.clone(), hm2.clone()], vec![hm2, hm1]])?
+    };
+
     Ok(Maps {
         hash_map_u8_u8s,
         btree_map_u8_u8s,
         hash_map_string_i32s,
         hash_map_string_vec_i8s,
+        vec_hash_map_string_i64s,
     })
 }

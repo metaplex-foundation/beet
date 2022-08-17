@@ -1,6 +1,16 @@
+import BN from 'bn.js'
 import test from 'tape'
-import { u8, map, utf8String, i8, array, i32 } from '../../src/beet'
-import { checkFixedDeserialize, checkMapSerialize } from '../utils'
+import {
+  u8,
+  map,
+  utf8String,
+  i8,
+  array,
+  i32,
+  i64,
+  bignum,
+} from '../../src/beet'
+import { checkFixedDeserialize, checkMapSerialize, deepInspect } from '../utils'
 import fixture from './fixtures/maps.json'
 
 function hashToMap<K extends keyof any, V>(
@@ -75,6 +85,80 @@ test('compat maps top level: HashMap<string, i8[]>', (t) => {
     const fixedBeetFromValue = beet.toFixedFromValue(m)
     checkFixedDeserialize(t, fixedBeetFromValue, m, data)
     checkMapSerialize(t, m, fixedBeetFromValue, utf8String, array(i8))
+  }
+  t.end()
+})
+
+test('compat maps top level: Vec<HashMap<string, i64>>', (t) => {
+  // To properly compare we need to convert the map into a hash + convert the
+  // BNs to numbers since that is how they are presented in the JSON fixture
+  function unmapped(actual: Map<string, Partial<bignum>>[]) {
+    return actual.map((x) => {
+      const hash: Record<string, number> = {}
+      for (const [k, v] of x) {
+        hash[k] = new BN(v as bignum).toNumber()
+      }
+      return hash
+    })
+  }
+
+  // In order to create a beet from value we need to first convert the hash
+  // objects from the JSON fixture into proper maps
+  function mapped(vals: Record<string, number | undefined>[]) {
+    return vals.map((x) => {
+      const map = new Map()
+      for (const [k, v] of Object.entries(x)) {
+        map.set(k, new BN(v as bignum))
+      }
+      return map
+    })
+  }
+
+  // NOTE: this checks deserialization only as it turned out complex enough
+  // already to set up this test
+  const beet = array(map(utf8String, i64))
+  for (const { value, data } of fixture.vec_hash_map_string_i64s) {
+    {
+      const fixedBeetFromData = beet.toFixedFromData(Buffer.from(data), 0)
+
+      // Serialization
+      const actual = fixedBeetFromData.read(Buffer.from(data), 0)
+      t.deepEqual(
+        unmapped(actual),
+        value,
+        `deserialize: '${deepInspect(value)}'`
+      )
+
+      // Deserialization
+      const serialized = Buffer.alloc(fixedBeetFromData.byteSize)
+      fixedBeetFromData.write(serialized, 0, actual)
+      t.deepEqual(
+        serialized.toJSON().data,
+        data,
+        `serialize: '${deepInspect(value)}'`
+      )
+    }
+
+    {
+      const fixedBeetFromValue = beet.toFixedFromValue(mapped(value))
+
+      // Serialization
+      const actual = fixedBeetFromValue.read(Buffer.from(data), 0)
+      t.deepEqual(
+        unmapped(actual),
+        value,
+        `deserialize: '${deepInspect(value)}'`
+      )
+
+      // Deserialization
+      const serialized = Buffer.alloc(fixedBeetFromValue.byteSize)
+      fixedBeetFromValue.write(serialized, 0, actual)
+      t.deepEqual(
+        serialized.toJSON().data,
+        data,
+        `serialize: '${deepInspect(value)}'`
+      )
+    }
   }
   t.end()
 })
