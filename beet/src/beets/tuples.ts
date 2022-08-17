@@ -19,7 +19,7 @@ import { fixBeetFromData, fixBeetFromValue } from '../beet.fixable'
  *
  * @param elements the De/Serializer for each tuple element type
  *
- * @category beet/collection
+ * @category beet/composite
  */
 export function fixedSizeTuple<T extends any[]>(
   elements: FixedSizeBeet<any>[]
@@ -71,7 +71,7 @@ export function fixedSizeTuple<T extends any[]>(
  * be provided here.
  *
  * @param elements the De/Serializer for each tuple element type
- * @category beet/collection
+ * @category beet/composite
  */
 export function tuple<T extends any[]>(
   elements: (FixedSizeBeet<any, any> | FixableBeet<any, any>)[]

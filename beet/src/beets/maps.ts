@@ -15,13 +15,14 @@ import { strict as assert } from 'assert'
  * NOTE: that it is not exported as no fixed size map exists but will have to
  * be derived from data or value instead.
  *
- * @template K type of elements held in the array
+ * @template K type of key elements held in the map
+ * @template V type of value elements held in the map
  *
  * @param keyElement the De/Serializers for the key element types
  * @param valElement the De/Serializers for the value element types
  * @param len amount of entries in the map
  *
- * @category beet/collection
+ * @category beet/composite
  * @private
  */
 function fixedSizeMap<K extends keyof any, V>(
@@ -165,6 +166,18 @@ function fixedSizeMap<K extends keyof any, V>(
   }
 }
 
+/**
+ * De/Serializes a map with a specific number of key/values of type {@link K}
+ * and {@link V} respectively.
+ *
+ * @template K type of key elements held in the map
+ * @template V type of value elements held in the map
+ *
+ * @param keyElement the _fixable_ or _fixed_ de/serializers for the key element types
+ * @param valElement the _fixable_ or _fixed_ de/serializers for the value element types
+ *
+ * @category beet/composite
+ */
 export function map<K extends keyof any, V>(
   keyElement: Beet<K, K>,
   valElement: Beet<V, V>
