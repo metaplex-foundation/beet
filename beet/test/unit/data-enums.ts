@@ -9,6 +9,7 @@ import {
   isFixableBeet,
   u8,
   uniformFixedSizeArray,
+  unit,
   utf8String,
 } from '../../src/beet'
 
@@ -120,7 +121,10 @@ test('data-enums: direct fixed data', (t) => {
     dataEnum<Ty>([['Data', u8]])
     t.fail('should throw')
   } catch (err: any) {
-    t.match(err.toString(), /beet must be a struct/)
+    t.match(
+      err.toString(),
+      /variants must be a data beet struct or a scalar unit/
+    )
   }
   t.end()
 })
@@ -133,7 +137,25 @@ test('data-enums: direct fixable data', (t) => {
     dataEnum<Ty>([['Data', utf8String]])
     t.fail('should throw')
   } catch (err: any) {
-    t.match(err.toString(), /beet must be a struct/)
+    t.match(
+      err.toString(),
+      /variants must be a data beet struct or a scalar unit/
+    )
   }
+  t.end()
+})
+
+test('data-enums: mixed variants', (t) => {
+  type Ty = {
+    Data: { s: string }
+    Scalar: void
+  }
+  const beet = dataEnum<Ty>([
+    ['Data', new FixableBeetArgsStruct([['s', utf8String]])],
+    ['Scalar', unit],
+  ])
+  checkCase(t, beet, { Data: { s: 'hello' } })
+  checkCase(t, beet, { Scalar: void 0 })
+  checkCase(t, beet, { Scalar: undefined })
   t.end()
 })

@@ -137,5 +137,33 @@
         0
       ]
     }
+  ],
+  "data_scalar_mix": [
+    {
+      "value": {
+        "Data": {
+          "data_field": 333
+        }
+      },
+      "data": [
+        0,
+        77,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "value": "Up",
+      "data": [
+        1
+      ]
+    },
+    {
+      "value": "Down",
+      "data": [
+        2
+      ]
+    }
   ]
 }

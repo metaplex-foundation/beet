@@ -11,6 +11,7 @@ import { u8 } from './numbers'
 import { strict as assert } from 'assert'
 import { isBeetStruct } from '../struct'
 import { isFixableBeetStruct } from '../struct.fixable'
+import { unit } from './unit'
 
 // -----------------
 // Fixed Scalar Enum
@@ -176,10 +177,12 @@ export function dataEnum<T, Key extends keyof T = keyof T>(
   variants: DataEnumBeet<T, Key>[]
 ) {
   for (const [_, beet] of variants) {
-    // NOTE: tried to enforce this with types but failed to do so for now
     assert(
-      isBeetStruct(beet) || isFixableBeetStruct(beet),
-      'dataEnum: data beet must be a struct'
+      isBeetStruct(beet) ||
+        isFixableBeetStruct(beet) ||
+        // scalar variant
+        beet === unit,
+      'dataEnum: variants must be a data beet struct or a scalar unit'
     )
   }
 
