@@ -287,5 +287,7 @@ export type DataEnumBeet<T, Kind extends DataEnumKind<T> = DataEnumKind<T>> = [
  * Turns a `Record<K, V>` into a discriminated union `{ __kind: K, ...V }`.
  */
 export type DataEnumKeyAsKind<T> = {
-  [K in DataEnumKind<T>]: { __kind: K } & T[K]
+  [K in DataEnumKind<T>]: {
+    __kind: K
+  } & Omit<T[K], 'void'>
 }[keyof T]
