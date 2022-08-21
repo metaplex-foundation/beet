@@ -23,6 +23,7 @@ import {
 } from './beets/aliases'
 import { TuplesExports, tuplesTypeMap, TuplesTypeMapKey } from './beets/tuples'
 import { MapsExports, mapsTypeMap, MapsTypeMapKey } from './beets/maps'
+import { UnitExports, unitTypeMap, UnitTypeMapKey } from './beets/unit'
 
 export * from './beets/aliases'
 export * from './beets/collections'
@@ -32,6 +33,7 @@ export * from './beets/maps'
 export * from './beets/numbers'
 export * from './beets/string'
 export * from './beets/tuples'
+export * from './beets/unit'
 export * from './beet.fixable'
 export * from './read-write'
 export * from './struct'
@@ -50,6 +52,7 @@ export type BeetTypeMapKey =
   | AliasesTypeMapKey
   | TuplesTypeMapKey
   | MapsTypeMapKey
+  | UnitTypeMapKey
 
 /**
  * @category TypeDefinition
@@ -63,6 +66,7 @@ export type BeetExports =
   | AliasesExports
   | TuplesExports
   | MapsExports
+  | UnitExports
 
 /**
  * Maps all {@link Beet} de/serializers to metadata which describes in which
@@ -85,4 +89,5 @@ export const supportedTypeMap: Record<
   ...aliasesTypeMap,
   ...tuplesTypeMap,
   ...mapsTypeMap,
+  ...unitTypeMap,
 }
