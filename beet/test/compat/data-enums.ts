@@ -13,10 +13,14 @@ import {
   u32,
   u8,
   uniformFixedSizeArray,
+  unit,
   utf8String,
 } from '../../src/beet'
 
 function convertToKindData(value: any) {
+  if (typeof value === 'string') {
+    return { __kind: value }
+  }
   // The compat rust tool JSON-stringifies the data, enum however we represent this as a
   // discriminated union with a __kind field.
   const [key, val] = Object.entries(value)[0]
@@ -67,6 +71,40 @@ test('compat data enums: CollectionInfo', (t) => {
 
   for (const { value, data } of fixture.collections) {
     const val = convertToKindData(value)
+    checkFixableFromDataSerialization(
+      t,
+      beet,
+      val,
+      data,
+      `${val.__kind} from data`
+    )
+    checkFixableFromValueSerialization(
+      t,
+      beet,
+      val,
+      data,
+      `${val.__kind} from value`
+    )
+  }
+  t.end()
+})
+
+test('compat data enums: data + scalar mix', (t) => {
+  type DataScalarMix = {
+    Data: { data_field: number }
+    Up: void
+    Down: void
+  }
+
+  const beet = dataEnum<DataScalarMix>([
+    ['Data', new BeetArgsStruct([['data_field', u32]])],
+    ['Up', unit],
+    ['Down', unit],
+  ])
+
+  for (const { value, data } of fixture.data_scalar_mix) {
+    const val = convertToKindData(value)
+    console.log({ value, val })
     checkFixableFromDataSerialization(
       t,
       beet,

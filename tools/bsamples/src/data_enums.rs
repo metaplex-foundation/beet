@@ -22,10 +22,18 @@ pub enum CollectionInfo {
     },
 }
 
+#[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+pub enum DataScalarMix {
+    Data { data_field: u32 },
+    Up,
+    Down,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct DataEnums {
     collections: Vec<Sample<CollectionInfo>>,
     simples: Vec<Sample<Simple>>,
+    data_scalar_mix: Vec<Sample<DataScalarMix>>,
 }
 
 pub fn produce_data_enums() -> Result<DataEnums> {
@@ -42,8 +50,15 @@ pub fn produce_data_enums() -> Result<DataEnums> {
         Simple::Second { second_field: 22 },
     ])?;
 
+    let data_scalar_mix = produce_samples(vec![
+        DataScalarMix::Data { data_field: 333 },
+        DataScalarMix::Up,
+        DataScalarMix::Down,
+    ])?;
+
     Ok(DataEnums {
         simples,
         collections,
+        data_scalar_mix,
     })
 }
