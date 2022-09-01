@@ -56,14 +56,14 @@ function verify<Args>(
     const [deserializedArgs] = (
       fixedFromData as BeetArgsStruct<Args>
     ).deserialize(data)
-    spok(t, deserializedArgs, {
+    spok(t, deserializedArgs, <Specifications<Args>>{
       ...argsForRoundTrip(args),
       $topic: 'round-tripped',
     })
   } else {
     // Beet
     const deserializedArgs = fixedFromData.read(data, 0)
-    spok(t, deserializedArgs, {
+    spok(t, deserializedArgs, <Specifications<Args>>{
       ...argsForRoundTrip(args),
       $topic: 'round-tripped',
     })

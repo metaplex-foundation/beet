@@ -147,7 +147,11 @@ export function array<T, V = Partial<T>>(
 
       const fixedElements: FixedSizeBeet<T, V>[] = new Array(len)
       for (let i = 0; i < len; i++) {
-        const fixedElement = fixBeetFromData(element, buf, cursor)
+        const fixedElement = fixBeetFromData(
+          element,
+          buf,
+          cursor
+        ) as FixedSizeBeet<T, V>
         fixedElements[i] = fixedElement
         cursor += fixedElement.byteSize
       }
@@ -161,7 +165,10 @@ export function array<T, V = Partial<T>>(
       const fixedElements: FixedSizeBeet<T, V>[] = new Array(vals.length)
 
       for (let i = 0; i < vals.length; i++) {
-        const fixedElement = fixBeetFromValue(element, vals[i])
+        const fixedElement: FixedSizeBeet<T, V> = fixBeetFromValue<T, V>(
+          element,
+          vals[i]
+        )
         fixedElements[i] = fixedElement
         elementsSize += fixedElement.byteSize
       }

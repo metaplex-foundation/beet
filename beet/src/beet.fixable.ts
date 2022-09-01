@@ -1,4 +1,5 @@
-import { Beet, isFixableBeet, isFixedSizeBeet } from './types'
+import { Beet, FixedSizeBeet, isFixableBeet, isFixedSizeBeet } from './types'
+import { UnreachableCaseError } from './utils'
 
 /**
  * Converts the provided beet into a {@link FixedBeet} unless it already is.
@@ -21,7 +22,7 @@ export function fixBeetFromData<T, V = Partial<T>>(
   if (isFixableBeet(beet)) {
     return beet.toFixedFromData(buf, offset)
   }
-  throw new Error(`${beet.description} is neither fixed size nor fixable`)
+  throw new UnreachableCaseError(beet)
 }
 
 /**
@@ -33,12 +34,15 @@ export function fixBeetFromData<T, V = Partial<T>>(
  *
  * @category beet
  */
-export function fixBeetFromValue<T, V = Partial<T>>(beet: Beet<T, V>, val: V) {
-  if (isFixedSizeBeet(beet)) {
+export function fixBeetFromValue<T, V = Partial<T>>(
+  beet: Beet<T, V>,
+  val: V
+): FixedSizeBeet<T, V> {
+  if (isFixedSizeBeet<T, V>(beet)) {
     return beet
   }
   if (isFixableBeet(beet)) {
     return beet.toFixedFromValue(val)
   }
-  throw new Error(`${beet.description} is neither fixed size nor fixable`)
+  throw new UnreachableCaseError(beet)
 }

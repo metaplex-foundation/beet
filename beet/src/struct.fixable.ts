@@ -93,7 +93,7 @@ export class FixableBeetStruct<Class, Args = Partial<Class>>
   }
 
   toFixedFromValue(args: Args): BeetStruct<Class, Args> {
-    const argsKeys = Object.keys(args)
+    const argsKeys = Object.keys(args as Args & {})
     const fixedFields = new Array(this.fields.length)
 
     for (let i = 0; i < this.fields.length; i++) {

@@ -36,3 +36,9 @@ export function beetBytes<T, V = Partial<T>>(
 export function bytes(n: number) {
   return brightBlack(`${n} B`)
 }
+
+export class UnreachableCaseError extends Error {
+  constructor(value: never) {
+    super(`Unreachable case: ${value}`)
+  }
+}
