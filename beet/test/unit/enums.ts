@@ -59,7 +59,7 @@ test('composites: Enum<Color> with assigned variants', (t) => {
   const beet: FixedSizeBeet<
     Enum<typeof Color>,
     Enum<typeof Color>
-  > = fixedScalarEnum(Color)
+  > = fixedScalarEnum<Color>(Color)
 
   checkCases(offsets, cases, beet, Color, t)
   t.end()
@@ -72,7 +72,7 @@ test('composites: Enum<Seat> with default variants', (t) => {
   const beet: FixedSizeBeet<
     Enum<typeof Seat>,
     Enum<typeof Seat>
-  > = fixedScalarEnum(Seat)
+  > = fixedScalarEnum<Seat>(Seat)
 
   checkCases(offsets, cases, beet, Seat, t)
   t.end()

@@ -19,7 +19,7 @@ enum Milligrams {
   Kilograms,
 }
 
-function variantFromString<T>(enumType: T, variant: string): T {
+function variantFromString<T>(enumType: T & {}, variant: string): T {
   const idx = Object.keys(enumType).indexOf(variant)
   return Object.values(enumType)[idx] as T
 }

@@ -46,7 +46,10 @@ function verify<T, V>(
     stringifyElements(deserializedArgs)
     t.deepEqual(deserializedArgs, args, 'round-tripped')
   } else {
-    spok(t, deserializedArgs, { ...args, $topic: 'round-tripped' })
+    spok(t, deserializedArgs, <Specifications<T>>{
+      ...args,
+      $topic: 'round-tripped',
+    })
   }
 }
 
