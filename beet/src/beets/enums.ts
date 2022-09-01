@@ -28,12 +28,12 @@ function resolveEnumVariant<T>(value: T, isNumVariant: boolean): keyof Enum<T> {
  *
  * @category beet/enum
  */
-export function fixedScalarEnum<T>(
-  enumType: Enum<T>
-): FixedSizeBeet<Enum<T>, Enum<T>> {
+export function fixedScalarEnum<T, V = Partial<T>>(
+  enumType: Enum<T> & {}
+): FixedSizeBeet<Enum<T>, Enum<V>> {
   const keys = Object.keys(enumType)
   return {
-    write(buf: Buffer, offset: number, value: T) {
+    write(buf: Buffer, offset: number, value: V) {
       const isNumVariant = typeof value === 'number'
       const variantKey = resolveEnumVariant(value, isNumVariant)
 
@@ -48,7 +48,9 @@ export function fixedScalarEnum<T>(
       if (isNumVariant) {
         u8.write(buf, offset, value)
       } else {
-        const enumValue = enumType[variantKey] as number
+        const enumValue = enumType[
+          variantKey as unknown as keyof Enum<T>
+        ] as number
         u8.write(buf, offset, enumValue)
       }
     },
@@ -128,13 +130,13 @@ type EnumDataVariant<Kind, Data> = {
   __kind: Kind
 } & Data
 
-function enumDataVariantBeet<Kind, T>(
-  inner: FixedSizeBeet<T>,
+function enumDataVariantBeet<Kind, T, V = Partial<T>>(
+  inner: FixedSizeBeet<T, V>,
   discriminant: number,
   kind: Kind
-): FixedSizeBeet<EnumDataVariant<Kind, T>> {
+): FixedSizeBeet<EnumDataVariant<Kind, T>, V> {
   return {
-    write(buf: Buffer, offset: number, value: T) {
+    write(buf: Buffer, offset: number, value: V) {
       u8.write(buf, offset, discriminant)
       inner.write(buf, offset + u8.byteSize, value)
     },

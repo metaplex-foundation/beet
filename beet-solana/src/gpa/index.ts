@@ -56,7 +56,7 @@ export class GpaBuilder<T> {
   private _addInnerFilter(
     key: keyof T & string,
     innerKey: string,
-    val: T[keyof T]
+    val: T[keyof T] & {}
   ) {
     logTrace(`gpa.addInnerFilter: ${key}.${innerKey}`)
     const outerBeetInfo = this.beets.get(key)
@@ -117,7 +117,7 @@ export class GpaBuilder<T> {
    * @param keys - the names of the fields by which to filter, i.e. `'outer.inner'`
    * @param val - the field value that the filter should match
    */
-  addInnerFilter(keys: string, val: T[keyof T]) {
+  addInnerFilter(keys: string, val: T[keyof T] & {}) {
     const parts = keys.split('.')
     assert.equal(
       parts.length,

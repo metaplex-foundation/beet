@@ -45,7 +45,7 @@ export function isNoneBuffer(buf: Buffer, offset: number) {
  * This matches the `COption::None` type borsh representation.
  *
  * @template T inner option type
- * @param inner the De/Serializer for the inner type
+ * @param description the description of the inner type
  *
  * @category beet/option
  */
@@ -135,7 +135,11 @@ export function coption<T, V = T>(inner: Beet<T, V>): FixableBeet<COption<T>> {
   return {
     toFixedFromData(buf: Buffer, offset: number) {
       if (isSomeBuffer(buf, offset)) {
-        const innerFixed = fixBeetFromData(inner, buf, offset + 1)
+        const innerFixed = fixBeetFromData<COption<T>, V>(
+          inner,
+          buf,
+          offset + 1
+        ) as FixedSizeBeet<COption<T>>
         return coptionSome(innerFixed)
       } else {
         assert(isNoneBuffer(buf, offset), `Expected ${buf} to hold a COption`)
@@ -146,7 +150,11 @@ export function coption<T, V = T>(inner: Beet<T, V>): FixableBeet<COption<T>> {
     toFixedFromValue(val: V | Partial<COption<T>>) {
       return val == null
         ? coptionNone(inner.description)
-        : coptionSome(fixBeetFromValue(inner, val as V))
+        : coptionSome(
+            fixBeetFromValue<COption<T>, V>(inner, val as V) as FixedSizeBeet<
+              COption<T>
+            >
+          )
     },
 
     description: `COption<${inner.description}>`,

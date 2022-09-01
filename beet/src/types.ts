@@ -221,7 +221,7 @@ export type SupportedTypeDefinition = {
  */
 export function isFixedSizeBeet<T, V = Partial<T>>(
   x: Beet<T, V>
-): x is FixedSizeBeet<T> {
+): x is FixedSizeBeet<T, V> {
   return Object.keys(x).includes('byteSize')
 }
 

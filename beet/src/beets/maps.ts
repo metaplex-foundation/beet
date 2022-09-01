@@ -196,7 +196,7 @@ export function map<K extends keyof any, V>(
 
       // Shortcut for the case that both key and value are fixed size beets
       if (keyIsFixed && valIsFixed) {
-        return fixedSizeMap(keyElement, valElement, new Map(), len)
+        return fixedSizeMap<K, V>(keyElement, valElement, new Map(), len)
       }
 
       // If either key or val are not fixed size beets we need to determine the
@@ -225,7 +225,7 @@ export function map<K extends keyof any, V>(
       const len = mapVal.size
       // As above shortcut for the optimal case and build a map for all others
       if (keyIsFixed && valIsFixed) {
-        return fixedSizeMap(keyElement, valElement, new Map(), len)
+        return fixedSizeMap<K, V>(keyElement, valElement, new Map(), len)
       }
       const fixedBeets: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]> = new Map()
       for (const [k, v] of mapVal) {
