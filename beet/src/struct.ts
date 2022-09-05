@@ -104,6 +104,25 @@ export class BeetStruct<Class, Args = Partial<Class>>
     return [writer.buffer, writer.offset]
   }
 
+  /**
+   * Get the offset of a structure field.
+   *
+   * @param fieldName the structure field name of interest.
+   * @returns the offset in bytes to the start of `fieldName`
+   * within the structure. Throw an error if `fieldName` is not a field
+   * within the structure.
+   */
+  offsetOf(fieldName: string): number  {
+    let offset = 0;
+    for (const fd of this.fields) {
+      if (fd[0] === fieldName) {
+        return offset;
+      }
+      offset += fd[1].byteSize;
+    }
+    throw new Error(`The field is missing: ${fieldName}`)
+  }
+  
   private getByteSize() {
     return this.fields.reduce((acc, [_, beet]) => acc + beet.byteSize, 0)
   }
