@@ -11,7 +11,6 @@ pub struct Sets {
     hash_set_u8s: Vec<Sample<HashSet<u8>>>,
     btree_set_u8s: Vec<Sample<BTreeSet<u8>>>,
     hash_set_strings: Vec<Sample<HashSet<String>>>,
-    hash_set_vec_i8s: Vec<Sample<HashSet<Vec<i8>>>>,
     vec_hash_set_strings: Vec<Sample<Vec<HashSet<String>>>>,
 }
 
@@ -45,21 +44,6 @@ pub fn produce_sets() -> Result<Sets> {
         produce_samples(vec![hm1, hm2])?
     };
 
-    let hash_set_vec_i8s = {
-        let hm1 = HashSet::from([
-            vec![-3, -2, -1],
-            vec![-1, 0, 1, 2, 3, 4],
-            vec![-3, -2, -1, 0, 1],
-        ]);
-        let hm2 = HashSet::from([
-            vec![3, 2, 1],
-            vec![1, 0, -1, -2, -3, -4],
-            vec![-3, -2, -1, 0, 1],
-            vec![],
-        ]);
-        produce_samples(vec![hm1, hm2])?
-    };
-
     let vec_hash_set_strings = {
         let hm1 = HashSet::from(["Uno".to_string(), "Dos".to_string(), "Tres".to_string()]);
         let hm2 = HashSet::from([
@@ -75,7 +59,6 @@ pub fn produce_sets() -> Result<Sets> {
         hash_set_u8s,
         btree_set_u8s,
         hash_set_strings,
-        hash_set_vec_i8s,
         vec_hash_set_strings,
     })
 }
