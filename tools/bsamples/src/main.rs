@@ -7,6 +7,7 @@ use data_enums::produce_data_enums;
 use enums::produce_enums;
 use maps::produce_maps;
 use options::produce_options;
+use sets::produce_sets;
 use simple::produce_simple;
 use tuples::produce_tuples;
 use vecs::produce_vecs;
@@ -17,6 +18,7 @@ mod enums;
 mod maps;
 mod options;
 mod samples;
+mod sets;
 mod simple;
 mod tuples;
 mod vecs;
@@ -78,6 +80,12 @@ fn main() -> Result<()> {
         let maps_json = serde_json::to_string_pretty(&produce_maps()?)?;
         let mut top_level_maps_file = File::create(format!("{}/maps.json", data_dir))?;
         top_level_maps_file.write_all(maps_json.as_bytes())?;
+    }
+
+    {
+        let sets_json = serde_json::to_string_pretty(&produce_sets()?)?;
+        let mut top_level_sets_file = File::create(format!("{}/sets.json", data_dir))?;
+        top_level_sets_file.write_all(sets_json.as_bytes())?;
     }
     Ok(())
 }
