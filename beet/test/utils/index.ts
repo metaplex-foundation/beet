@@ -150,6 +150,54 @@ export function checkFixableCases<T, V = Partial<T>>(
     }
   }
 }
+
+// -----------------
+// Sets
+// -----------------
+export function checkSetSerialize<K extends keyof any>(
+  t: test.Test,
+  m: Set<K>,
+  setBeet: FixedSizeBeet<Set<K>>,
+  keyBeet: Beet<K, K>
+) {
+  const serializedSet = Buffer.alloc(setBeet.byteSize)
+  setBeet.write(serializedSet, 0, m)
+
+  serializedSetIncludesKeys(t, serializedSet, m, keyBeet)
+}
+
+/**
+ * Verifies that each key of the provided set value {@link s} is contained in
+ * the {@link serializedSet}.
+ * Set keys aren't ordered and thus it is unknown how they are written to
+ * the buffer when serialized.
+ * Therefore we cannot compare the serialized buffers directly but have to look
+ * each key up one by one.
+ */
+function serializedSetIncludesKeys<K extends keyof any>(
+  t: test.Test,
+  serializedSet: Buffer,
+  s: Set<K>,
+  keyBeet: Beet<K, K>
+) {
+  for (const k of s) {
+    const fixedKey = fixFromValIfNeeded(keyBeet, k)
+
+    const keyBuf = Buffer.alloc(fixedKey.byteSize)
+
+    fixedKey.write(keyBuf, 0, k)
+
+    const key = deepInspect(k)
+    t.assert(
+      bufferIncludes(serializedSet, keyBuf),
+      `serialized set includes ${key}`
+    )
+  }
+}
+
+// -----------------
+// Maps
+// -----------------
 export function checkMapSerialize<K extends keyof any, V>(
   t: test.Test,
   m: Map<K, V>,
