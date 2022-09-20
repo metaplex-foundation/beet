@@ -4,8 +4,8 @@
     "baseUrl": "./",
     "outDir": "./dist/cjs",
     "module": "commonjs",
-    "declarationDir": null,
-    "declaration": false
+    "declarationDir": "./dist/types",
+    "declaration": true
   },
   "include": ["src", "test"]
 }
