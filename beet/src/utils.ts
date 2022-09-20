@@ -37,6 +37,10 @@ export function bytes(n: number) {
   return brightBlack(`${n} B`)
 }
 
+export function stringify(x: any) {
+  return x.toString === 'function' ? x.toString() : x
+}
+
 export class UnreachableCaseError extends Error {
   constructor(value: never) {
     super(`Unreachable case: ${value}`)

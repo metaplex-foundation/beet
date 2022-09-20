@@ -8,6 +8,7 @@ import {
   SupportedTypeDefinition,
 } from '../types'
 import { u32 } from './numbers'
+import { stringify } from '../utils'
 import { strict as assert } from 'assert'
 
 /**
@@ -27,7 +28,7 @@ import { strict as assert } from 'assert'
  * @category beet/composite
  * @private
  */
-function fixedSizeMap<K extends keyof any, V>(
+function fixedSizeMap<K, V>(
   keyElement: Beet<K, K>,
   valElement: Beet<V, V>,
   fixedElements: Map<K, [FixedSizeBeet<K>, FixedSizeBeet<V>]>,
@@ -102,7 +103,7 @@ function fixedSizeMap<K extends keyof any, V>(
           const els = fixedElements.get(k)
           assert(
             els != null,
-            `Should be able to find beet els for ${k.toString()}, but could not`
+            `Should be able to find beet els for ${stringify(k)}, but could not`
           )
           fixedKey ??= els[0]
           fixedVal ??= els[1]
@@ -180,7 +181,7 @@ function fixedSizeMap<K extends keyof any, V>(
  *
  * @category beet/composite
  */
-export function map<K extends keyof any, V>(
+export function map<K, V>(
   keyElement: Beet<K, K>,
   valElement: Beet<V, V>
 ): FixableBeet<Map<K, V>, Map<K, V>> {
