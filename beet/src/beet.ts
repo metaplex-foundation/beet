@@ -24,6 +24,7 @@ import {
 import { TuplesExports, tuplesTypeMap, TuplesTypeMapKey } from './beets/tuples'
 import { MapsExports, mapsTypeMap, MapsTypeMapKey } from './beets/maps'
 import { UnitExports, unitTypeMap, UnitTypeMapKey } from './beets/unit'
+import { SetsExports, setsTypeMap, SetsTypeMapKey } from './beets/sets'
 
 export * from './beets/aliases'
 export * from './beets/collections'
@@ -31,6 +32,7 @@ export * from './beets/composites'
 export * from './beets/enums'
 export * from './beets/maps'
 export * from './beets/numbers'
+export * from './beets/sets'
 export * from './beets/string'
 export * from './beets/tuples'
 export * from './beets/unit'
@@ -52,6 +54,7 @@ export type BeetTypeMapKey =
   | AliasesTypeMapKey
   | TuplesTypeMapKey
   | MapsTypeMapKey
+  | SetsTypeMapKey
   | UnitTypeMapKey
 
 /**
@@ -66,6 +69,7 @@ export type BeetExports =
   | AliasesExports
   | TuplesExports
   | MapsExports
+  | SetsExports
   | UnitExports
 
 /**
@@ -89,5 +93,6 @@ export const supportedTypeMap: Record<
   ...aliasesTypeMap,
   ...tuplesTypeMap,
   ...mapsTypeMap,
+  ...setsTypeMap,
   ...unitTypeMap,
 }
