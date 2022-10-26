@@ -103,3 +103,8 @@ test('struct: roundtrip two numbers only structs', (t) => {
   })
   t.end()
 })
+
+test('struct: offsetOf', (t) => {
+  t.equal(GameScore.struct.offsetOf('losses'), 19, 'offset')
+  t.end()
+})
