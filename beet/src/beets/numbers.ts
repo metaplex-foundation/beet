@@ -34,7 +34,7 @@ export const f64: FixedSizeBeet<number> = {
   read: function (buf: Buffer, offset: number): number {
     return buf.readFloatLE(offset)
   },
-  byteSize: 4,
+  byteSize: 8,
   description: 'f64',
 }
 
