@@ -14,6 +14,7 @@ import {
   u8,
   bool,
   i64,
+  f64,
   i128,
   i256,
   FixedSizeBeet,
@@ -101,6 +102,15 @@ test('numbers: round trip u64', (t) => {
   const cases = [0, 0xff, 0xffff, 0xffffffff, new BN('18446744073709551615')]
   const offsets = [0, u64.byteSize, 2 * u64.byteSize]
   const beet = u64
+
+  checkCases(offsets, cases, beet, t)
+  t.end()
+})
+
+test('numbers: round trip f64', (t) => {
+  const cases = [0, 0xff, 0xffff, 0xffffffff, 3.141592653589793]
+  const offsets = [0, f64.byteSize, 2 * f64.byteSize]
+  const beet = f64
 
   checkCases(offsets, cases, beet, t)
   t.end()

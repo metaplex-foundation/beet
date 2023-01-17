@@ -23,6 +23,22 @@ export const u8: FixedSizeBeet<number> = {
 }
 
 /**
+ * De/Serializer for 64-bit float aka `f64`.
+ *
+ * @category beet/primitive
+ */
+export const f64: FixedSizeBeet<number> = {
+  write: function (buf: Buffer, offset: number, value: number) {
+    buf.writeFloatLE(value, offset)
+  },
+  read: function (buf: Buffer, offset: number): number {
+    return buf.readFloatLE(offset)
+  },
+  byteSize: 4,
+  description: 'f64',
+}
+
+/**
  * De/Serializer 16-bit unsigned integers aka `u16`.
  *
  * @category beet/primitive
