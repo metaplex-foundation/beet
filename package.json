@@ -2,6 +2,7 @@
   "scripts": {
     "build": "(cd ./beet && yarn build) && (cd ./beet-solana && yarn build)",
     "postinstall": "patch-package",
+    "test": "yarn test:beet && yarn test:beet-solana",
     "test:beet": "cd ./beet && yarn test && yarn test:browser",
     "test:beet-solana": "cd ./beet-solana && yarn test",
     "doc": "(cd ./beet && yarn doc); (cd ./beet-solana && yarn doc)",
